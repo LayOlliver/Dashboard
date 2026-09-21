@@ -22,6 +22,32 @@ Este documento registra todas as alterações significativas, decisões de arqui
 
 ## 🗓️ 2. Histórico de Versões e Alterações Significativas
 
+### 🟢 [v2.1.0] - 21/09/2026: Motor de Filtragem Dinâmica por Tipo de Produto e Recortes
+**Objetivo**: Permitir a análise aprofundada e ágil por tipo de produto/pacote contratado, integrando os dados brutos reais dos 100 registros para recomputação estatística instantânea de KPIs, gráficos e vulnerabilidades.
+
+#### Modificações Implementadas:
+- **Barra de Filtros Dinâmicos no Dashboard**:
+  - **Filtro Principal por Produto/Plano**: Botões tipo *pills* para `Todos os Produtos (100)`, `Plano Básico (45)`, `Plano Intermediário (30)`, `Plano Avançado (12)` e `Plano Personalizado (13)`.
+  - **Filtros Complementares**: Dropdowns para refino cruzado por `Segmento` e `Canal de Atendimento`.
+  - **Contador de Universo Amostral**: Indicador visual mostrando exatamente quantas contas estão no recorte ativo (ex: `12 de 100 clientes (12% da base)`).
+  - **Botão Limpar Filtros**: Restauração com 1 clique para a visão consolidada global.
+- **Banner Contextual de Diagnóstico por Produto**:
+  - **Plano Avançado (12 contas)**: Dispara alerta crítico evidenciando o **pior CSAT da empresa (2,67)** e a **maior taxa de Churn (58,3%)**, com 58,3% de detratores.
+  - **Plano Personalizado (13 contas)**: Dispara alerta de MRR evidenciando o **pior NPS da empresa (-38)** e **100% de Churn no canal WhatsApp**.
+  - **Plano Básico (45 contas)**: Perfil de volume com NPS de -13 e CSAT de 3,27.
+  - **Plano Intermediário (30 contas)**: Perfil moderado com 40% de churn e tempo mediano de 26,2h.
+- **Motor Reativo em JavaScript (`RAW_DATA`)**:
+  - Incorporação dos 100 registros auditados diretamente no script do cliente (zero latência, 100% autônomo e sem necessidade de servidor).
+  - Recomputação matemática em tempo real:
+    - **NPS**: % Promotores, % Neutros, % Detratores e nota final com distribuição gráfica.
+    - **CSAT**: Média ponderada e defasagem contra a meta de 4,20.
+    - **Tempo de Resolução**: Mediana robusta, média, amplitude (min/max) e posicionamento do indicador.
+    - **Risco de Churn**: Contagem e percentual exatos de clientes em alto risco.
+    - **Gráfico de Canais**: Barras e rótulos atualizados dinamicamente para o produto selecionado.
+    - **Painel Financeiro**: Contagem de contas ativas e ticket médio recalculados por segmento para o produto.
+
+---
+
 ### 🟢 [v2.0.0] - 21/09/2026: Modernização Visual, Gráfica e Interativa
 **Objetivo**: Transformar o dashboard estático em um painel executivo moderno de alto impacto visual (*Dark Glassmorphism*), agregando gráficos embutidos e interatividade.
 
