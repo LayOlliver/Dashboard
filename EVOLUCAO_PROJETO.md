@@ -126,6 +126,7 @@ Dashboard/
 ├── Banco/
 │   └── base_dados_brutos_satisfacao_100_registros.xlsx  # Dados brutos auditados
 ├── index.html                                          # Aplicação do dashboard executivo
+├── PLANEJAMENTO_BANCO_DE_DADOS.md                      # Planejamento completo: Banco Gratuito + Análise Anual/Mensal
 ├── EVOLUCAO_PROJETO.md                                 # Registro contínuo de evolução
 └── .vscode/                                            # Configurações do ambiente
 ```
@@ -134,10 +135,11 @@ Dashboard/
 
 ## 🚀 4. Sugestões de Próximas Evoluções (Backlog)
 
+- [ ] **Integração com Banco Gratuito (Supabase) e Análise Multitemporal (Anual/Mensal)**: [Ver planejamento detalhado em PLANEJAMENTO_BANCO_DE_DADOS.md](./PLANEJAMENTO_BANCO_DE_DADOS.md).
 - [ ] **Simulador Interativo de Perda de MRR**: Slider onde o usuário seleciona quantas contas B2B/B2C foram perdidas e o painel calcula o impacto financeiro total.
 - [ ] **Tabela Dinâmica / Modal de Detalhes da Auditoria**: Modal com busca e paginação para consulta rápida aos 100 registros da planilha.
 - [ ] **Matriz de Dispersão (Scatter Plot / Quadrante)**: Gráfico de dispersão cruzando Ticket Médio x Tempo de Espera por segmento.
-- [ ] **Alternador de Tema (Light / Dark)** para apresentações em projetores acadêmicos.
+- [ ] **Alternador de Tema (Light / Dark)** para apresentações em projetores acadêmicos. (Concluído na v2.2.0)
 
 ---
 
