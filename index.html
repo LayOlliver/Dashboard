@@ -1,14 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Executivo CX - Auditoria e Análise de Risco</title>
+    <title>Dashboard - Auditoria e Análise de Risco</title>
     
+    <!-- Inicialização Instantânea de Tema (Padrão: Modo Claro, independente do SO) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('audit_dashboard_theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.add('light');
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -36,32 +51,201 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        /* Fundos Globais Conforme Tema */
+        html.light body {
+            background: radial-gradient(circle at 15% 15%, rgba(219, 234, 254, 0.7) 0%, #F8FAFC 50%, #EDF2F7 100%);
+            color: #0F172A;
+        }
+        html.dark body {
             background: radial-gradient(circle at 15% 15%, rgba(30, 58, 138, 0.18) 0%, rgba(11, 23, 42, 1) 50%, #070D18 100%);
             color: #F8FAFC;
-            min-height: 100vh;
         }
 
         /* Glassmorphism Card System */
         .glass-card {
-            background: rgba(22, 33, 54, 0.65);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.04) inset;
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
         }
         
-        .glass-card:hover {
+        html.dark .glass-card {
+            background: rgba(22, 33, 54, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.04) inset;
+        }
+        html.dark .glass-card:hover {
             transform: translateY(-2px);
             border-color: rgba(148, 163, 184, 0.25);
             box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
         }
 
-        .accent-glow-red { box-shadow: inset 0 2px 0 0 #EF4444, 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-        .accent-glow-orange { box-shadow: inset 0 2px 0 0 #F97316, 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-        .accent-glow-amber { box-shadow: inset 0 2px 0 0 #F59E0B, 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-        .accent-glow-blue { box-shadow: inset 0 2px 0 0 #38BDF8, 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
+        html.light .glass-card {
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(203, 213, 225, 0.75);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+            color: #0F172A;
+        }
+        html.light .glass-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(148, 163, 184, 0.6);
+            box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.12), 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+        }
+
+        /* Accents e Glows nos KPIs */
+        html.dark .accent-glow-red { box-shadow: inset 0 2px 0 0 #EF4444, 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
+        html.dark .accent-glow-orange { box-shadow: inset 0 2px 0 0 #F97316, 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
+        html.dark .accent-glow-amber { box-shadow: inset 0 2px 0 0 #F59E0B, 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
+        html.dark .accent-glow-blue { box-shadow: inset 0 2px 0 0 #38BDF8, 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
+
+        html.light .accent-glow-red { box-shadow: inset 0 3px 0 0 #EF4444, 0 10px 25px -5px rgba(15, 23, 42, 0.06); }
+        html.light .accent-glow-orange { box-shadow: inset 0 3px 0 0 #F97316, 0 10px 25px -5px rgba(15, 23, 42, 0.06); }
+        html.light .accent-glow-amber { box-shadow: inset 0 3px 0 0 #F59E0B, 0 10px 25px -5px rgba(15, 23, 42, 0.06); }
+        html.light .accent-glow-blue { box-shadow: inset 0 3px 0 0 #2563EB, 0 10px 25px -5px rgba(15, 23, 42, 0.06); }
+
+        /* Ajustes Tipográficos e Contraste em Modo Claro */
+        html.light h1.text-white,
+        html.light h2.text-white,
+        html.light h3.text-white,
+        html.light h4.text-white {
+            color: #0F172A !important;
+        }
+        html.light .text-slate-200 { color: #1E293B !important; }
+        html.light .text-slate-300 { color: #334155 !important; }
+        html.light .text-slate-400 { color: #64748B !important; }
+        html.light .text-slate-500 { color: #64748B !important; }
+
+        /* Cores Semânticas de Alerta Calibradas para Modo Claro */
+        html.light .text-red-400 { color: #DC2626 !important; }
+        html.light .text-red-300 { color: #991B1B !important; }
+        html.light .text-orange-400 { color: #EA580C !important; }
+        html.light .text-orange-300 { color: #9A3412 !important; }
+        html.light .text-amber-400, html.light .text-amber-300 { color: #D97706 !important; }
+        html.light .text-blue-400, html.light .text-blue-300 { color: #2563EB !important; }
+        html.light .text-blue-200 { color: #1E40AF !important; }
+        html.light .text-red-200 { color: #991B1B !important; }
+        html.light .text-emerald-400, html.light .text-emerald-300 { color: #059669 !important; }
+
+        /* Fundos e Bordas Modo Claro */
+        html.light .border-slate-700,
+        html.light .border-slate-700\/60,
+        html.light .border-slate-700\/50,
+        html.light .border-slate-800 {
+            border-color: rgba(203, 213, 225, 0.8) !important;
+        }
+        html.light .bg-slate-800\/80,
+        html.light .bg-slate-800\/70,
+        html.light .bg-slate-800\/50,
+        html.light .bg-slate-800\/90,
+        html.light .bg-slate-800 {
+            background-color: rgba(241, 245, 249, 0.88) !important;
+        }
+        html.light .bg-slate-900,
+        html.light .bg-slate-900\/80,
+        html.light .bg-slate-900\/90 {
+            background-color: rgba(226, 232, 240, 0.95) !important;
+        }
+
+        /* Controles de Formulário e Botões no Modo Claro */
+        html.light select.bg-slate-800 {
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
+            border-color: #CBD5E1 !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        html.light button.bg-slate-800:not(.bg-blue-600):not(.bg-red-600):not(.bg-amber-600) {
+            background-color: #FFFFFF !important;
+            color: #334155 !important;
+            border-color: #CBD5E1 !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        html.light button.bg-slate-800:not(.bg-blue-600):not(.bg-red-600):not(.bg-amber-600):hover {
+            background-color: #F1F5F9 !important;
+            color: #0F172A !important;
+        }
+        html.light .plan-filter-btn:not(.bg-blue-600) {
+            background-color: #FFFFFF !important;
+            color: #334155 !important;
+            border-color: #CBD5E1 !important;
+        }
+        html.light .plan-filter-btn:not(.bg-blue-600):hover {
+            background-color: #F1F5F9 !important;
+            color: #0F172A !important;
+        }
+
+        /* Manter texto branco para botões de destaque sólido */
+        html.light .bg-blue-600,
+        html.light .bg-blue-600 *,
+        html.light .bg-red-600,
+        html.light .bg-red-600 *,
+        html.light .bg-amber-600,
+        html.light .bg-amber-600 * {
+            color: #FFFFFF !important;
+        }
+
+        /* Badges e Banners de Destaque em Modo Claro */
+        html.light .bg-red-500\/10, html.light .bg-red-500\/15, html.light .bg-red-500\/20 {
+            background-color: rgba(239, 68, 68, 0.12) !important;
+            border-color: rgba(239, 68, 68, 0.25) !important;
+        }
+        html.light .bg-orange-500\/10, html.light .bg-orange-500\/20 {
+            background-color: rgba(249, 115, 22, 0.12) !important;
+            border-color: rgba(249, 115, 22, 0.25) !important;
+        }
+        html.light .bg-amber-500\/10, html.light .bg-amber-500\/20 {
+            background-color: rgba(245, 158, 11, 0.12) !important;
+            border-color: rgba(245, 158, 11, 0.25) !important;
+        }
+        html.light .bg-blue-500\/10, html.light .bg-blue-500\/20 {
+            background-color: rgba(59, 130, 246, 0.12) !important;
+            border-color: rgba(59, 130, 246, 0.25) !important;
+        }
+        html.light .bg-emerald-500\/20 {
+            background-color: rgba(16, 185, 129, 0.12) !important;
+            border-color: rgba(16, 185, 129, 0.25) !important;
+        }
+        html.light .bg-red-950 {
+            background-color: #FEE2E2 !important;
+            color: #991B1B !important;
+            border-color: #FCA5A5 !important;
+        }
+        html.light .bg-orange-950 {
+            background-color: #FFEDD5 !important;
+            color: #9A3412 !important;
+            border-color: #FDBA74 !important;
+        }
+
+        /* Detalhes específicos de cards e gráficos em Modo Claro */
+        html.light #tempoMedianDot, html.light #tempoMaxDot {
+            border-color: #FFFFFF !important;
+        }
+        html.light span[id^="ticketB2"] {
+            color: #0F172A !important;
+            background-color: #FFFFFF !important;
+            border-color: #CBD5E1 !important;
+        }
+        html.light #infographicMultiplier {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            color: #DC2626 !important;
+        }
+        html.light #btnAll:not(.bg-blue-600),
+        html.light #btnChurn:not(.bg-red-600),
+        html.light #btnTime:not(.bg-amber-600) {
+            color: #64748B !important;
+        }
+        html.light #btnAll:not(.bg-blue-600):hover,
+        html.light #btnChurn:not(.bg-red-600):hover,
+        html.light #btnTime:not(.bg-amber-600):hover {
+            color: #0F172A !important;
+            background-color: #E2E8F0 !important;
+        }
+        html.light #csatProgressBar + div {
+            background-color: #0F172A !important;
+        }
 
         @keyframes pulse-ring {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
@@ -101,13 +285,13 @@
                 </div>
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex flex-wrap items-center gap-2">
-                        Dashboard Executivo de CX 
+                        Dashboard de Auditoria e Risco
                         <span class="text-xs md:text-sm font-semibold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2.5 py-0.5 rounded-full">
-                            Auditoria Rigorosa
+                            Auditoria
                         </span>
                     </h1>
                     <p class="text-xs md:text-sm text-slate-400 font-normal">
-                        Diagnóstico Metodológico de Risco, Atrito Operacional e Vulnerabilidade de Receita (MRR)
+                        Diagnóstico de Risco, Atrito Operacional e Vulnerabilidade de Receita (MRR - Monthly Recurring Revenue)
                     </p>
                 </div>
             </div>
@@ -125,6 +309,18 @@
                 <span class="w-2.5 h-2.5 rounded-full bg-red-500 pulse-badge"></span>
                 <span>STATUS: OPERAÇÃO EM RISCO SEVERO</span>
             </div>
+
+            <!-- BOTÃO ALTERNAR TEMA (DARK / LIGHT MODE COM ÍCONES INTERATIVOS) -->
+            <button id="themeToggleBtn" onclick="toggleTheme()" aria-label="Alternar entre modo claro e escuro" title="Mudar para Modo Escuro" class="no-print inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 hover:text-slate-900 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                <!-- Ícone Sol (visível no modo escuro) -->
+                <svg id="themeIconSun" class="w-4 h-4 text-amber-400 hover:text-amber-300 hidden transition-transform duration-300 hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <!-- Ícone Lua (visível no modo claro) -->
+                <svg id="themeIconMoon" class="w-4 h-4 text-slate-700 hover:text-slate-900 transition-transform duration-300 hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+            </button>
 
             <button onclick="window.print()" class="no-print inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-semibold transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,7 +435,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                     </div>
-                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">NPS Metodológico</h2>
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">NPS</h2>
                 </div>
                 <span id="npsBadge" class="text-[11px] font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">
                     Zona Crítica
@@ -268,7 +464,7 @@
             </div>
 
             <p id="npsDesc" class="text-xs text-slate-400 leading-snug pt-2 border-t border-slate-700/50">
-                <strong class="text-red-400">Atenção Metodológica:</strong> A média simples mascara a proporção alarmante de detratores na carteira.
+                <strong class="text-red-400">Atenção:</strong> A média simples mascara a proporção alarmante de detratores na carteira. 
             </p>
         </div>
 
@@ -671,7 +867,9 @@
 
         // Função de Inicialização
         document.addEventListener('DOMContentLoaded', function() {
+            const isDark = document.documentElement.classList.contains('dark');
             initChart();
+            applyThemeUI(isDark);
             renderDashboard();
         });
 
@@ -685,6 +883,15 @@
             const amberGradient = ctx.createLinearGradient(0, 0, 400, 0);
             amberGradient.addColorStop(0, '#F59E0B');
             amberGradient.addColorStop(1, '#B45309');
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#F8FAFC' : '#0F172A';
+            const subTextColor = isDark ? '#94A3B8' : '#64748B';
+            const gridColor = isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(203, 213, 225, 0.6)';
+            const tooltipBg = isDark ? 'rgba(11, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.96)';
+            const tooltipTitle = isDark ? '#F8FAFC' : '#0F172A';
+            const tooltipBody = isDark ? '#CBD5E1' : '#334155';
+            const tooltipBorder = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(203, 213, 225, 0.8)';
 
             channelsChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -727,7 +934,7 @@
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#F8FAFC',
+                                color: textColor,
                                 font: { family: "'Inter', sans-serif", size: 13, weight: '600' },
                                 padding: 18,
                                 usePointStyle: true,
@@ -735,13 +942,13 @@
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(11, 23, 42, 0.95)',
-                            titleColor: '#F8FAFC',
-                            bodyColor: '#CBD5E1',
+                            backgroundColor: tooltipBg,
+                            titleColor: tooltipTitle,
+                            bodyColor: tooltipBody,
                             titleFont: { size: 13, family: "'Inter', sans-serif", weight: '700' },
                             bodyFont: { size: 12, family: "'Inter', sans-serif" },
                             padding: 12,
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderColor: tooltipBorder,
                             borderWidth: 1,
                             cornerRadius: 8,
                             callbacks: {
@@ -777,16 +984,76 @@
                     },
                     scales: {
                         x: {
-                            grid: { color: 'rgba(51, 65, 85, 0.4)', drawBorder: false },
-                            ticks: { color: '#94A3B8', font: { family: "'Inter', sans-serif", size: 11 } }
+                            grid: { color: gridColor, drawBorder: false },
+                            ticks: { color: subTextColor, font: { family: "'Inter', sans-serif", size: 11 } }
                         },
                         y: {
                             grid: { display: false, drawBorder: false },
-                            ticks: { color: '#F8FAFC', font: { family: "'Inter', sans-serif", size: 13, weight: '600' } }
+                            ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 13, weight: '600' } }
                         }
                     }
                 }
             });
+        }
+
+        // Gerenciamento e Alternância de Tema (Light Mode padrão / Dark Mode)
+        function applyThemeUI(isDark) {
+            const sunIcon = document.getElementById('themeIconSun');
+            const moonIcon = document.getElementById('themeIconMoon');
+            const toggleBtn = document.getElementById('themeToggleBtn');
+
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+                if (sunIcon) sunIcon.classList.remove('hidden');
+                if (moonIcon) moonIcon.classList.add('hidden');
+                if (toggleBtn) {
+                    toggleBtn.className = "no-print inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-amber-400 hover:text-amber-300 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40";
+                    toggleBtn.setAttribute('title', 'Mudar para Modo Claro');
+                }
+            } else {
+                document.documentElement.classList.add('light');
+                document.documentElement.classList.remove('dark');
+                if (sunIcon) sunIcon.classList.add('hidden');
+                if (moonIcon) moonIcon.classList.remove('hidden');
+                if (toggleBtn) {
+                    toggleBtn.className = "no-print inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 hover:text-slate-900 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40";
+                    toggleBtn.setAttribute('title', 'Mudar para Modo Escuro');
+                }
+            }
+
+            updateChartTheme(isDark);
+        }
+
+        function toggleTheme() {
+            const isCurrentDark = document.documentElement.classList.contains('dark');
+            const newTheme = isCurrentDark ? 'light' : 'dark';
+            localStorage.setItem('audit_dashboard_theme', newTheme);
+            applyThemeUI(newTheme === 'dark');
+        }
+
+        function updateChartTheme(isDark) {
+            if (!channelsChartInstance) return;
+
+            const textColor = isDark ? '#F8FAFC' : '#0F172A';
+            const subTextColor = isDark ? '#94A3B8' : '#64748B';
+            const gridColor = isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(203, 213, 225, 0.6)';
+            const tooltipBg = isDark ? 'rgba(11, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.96)';
+            const tooltipTitle = isDark ? '#F8FAFC' : '#0F172A';
+            const tooltipBody = isDark ? '#CBD5E1' : '#334155';
+            const tooltipBorder = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(203, 213, 225, 0.8)';
+
+            channelsChartInstance.options.plugins.legend.labels.color = textColor;
+            channelsChartInstance.options.plugins.tooltip.backgroundColor = tooltipBg;
+            channelsChartInstance.options.plugins.tooltip.titleColor = tooltipTitle;
+            channelsChartInstance.options.plugins.tooltip.bodyColor = tooltipBody;
+            channelsChartInstance.options.plugins.tooltip.borderColor = tooltipBorder;
+            
+            channelsChartInstance.options.scales.x.grid.color = gridColor;
+            channelsChartInstance.options.scales.x.ticks.color = subTextColor;
+            channelsChartInstance.options.scales.y.ticks.color = textColor;
+
+            channelsChartInstance.update('none');
         }
 
         // Funções de Controle de Filtros
