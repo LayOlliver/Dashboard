@@ -22,6 +22,26 @@ Este documento registra todas as alterações significativas, decisões de arqui
 
 ## 🗓️ 2. Histórico de Versões e Alterações Significativas
 
+### 🟢 [v2.2.0] - 21/09/2026: Sistema Dual de Temas (Modo Claro Padrão & Modo Escuro Interativo)
+**Objetivo**: Implementação de arquitetura de temas com suporte a **Modo Claro** (*Executive Clean Slate Glass*) e **Modo Escuro** (*Dark Navy Glassmorphism*), definindo o Modo Claro como padrão inicial obrigatório e garantindo persistência no navegador com alternância via ícones interativos.
+
+#### Modificações Implementadas:
+- **Padrão Inicial Obrigatório**:
+  - Inicialização garantida no **Modo Claro**, independente das preferências do sistema operacional (`prefers-color-scheme`).
+  - Script inline anti-FOUC no `<head>` para leitura e aplicação instantânea da preferência salva em `localStorage`.
+- **Botão com Ícones Interativos no Cabeçalho Executivo**:
+  - Posicionamento orgânico antes do botão de exportação.
+  - Ícone de **Lua (🌙)** no modo claro (com animação rotacional suave ao hover) convidando para alternar ao modo escuro.
+  - Ícone de **Sol (☀️)** no modo escuro convidando para o modo claro.
+- **Design System Adaptativo**:
+  - **Fundo**: Transição suave entre Slate Suave (`#F8FAFC` a `#EDF2F7`) e Navy Profundo (`#070D18` a `#0B172A`).
+  - **Cards Translúcidos**: Adaptação de opacidade, elevação e bordas (`rgba(255, 255, 255, 0.86)` no claro).
+  - **Contraste WCAG AA**: Calibração automática das cores de texto e alertas semânticos (vermelho, âmbar, azul e esmeralda) para leitura confortável e sem fadiga visual.
+- **Gráfico Dinâmico Reativo (Chart.js)**:
+  - Função `updateChartTheme()` que recalcula rótulos dos eixos, linhas de grade, tooltips e legendas em tempo real a cada clique de alternância, sem perda de dados ou estado dos filtros ativos.
+
+---
+
 ### 🟢 [v2.1.1] - 21/09/2026: Instalação e Integração do Plugin Vercel
 **Objetivo**: Instalação do plugin oficial `vercel/vercel-plugin` para integração com o ambiente de desenvolvimento (VS Code) e facilitação do ciclo de deploy contínuo.
 
