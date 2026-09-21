@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Executivo CX - Auditoria e Análise de Risco</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            950: '#070D18',
+                            900: '#0B172A',
+                            800: '#13233E',
+                            700: '#1E3255'
+                        },
+                        danger: {
+                            50: '#FEF2F2',
+                            500: '#EF4444',
+                            600: '#DC2626'
+                        },
+                        warning: {
+                            500: '#F59E0B',
+                            600: '#D97706'
+                        },
+                        success: {
+                            500: '#10B981',
+                            600: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 15% 15%, rgba(30, 58, 138, 0.18) 0%, rgba(11, 23, 42, 1) 50%, #070D18 100%);
+            color: #F8FAFC;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Card System */
+        .glass-card {
+            background: rgba(22, 33, 54, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.04) inset;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(148, 163, 184, 0.25);
+            box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
+        }
+
+        /* Accent top borders for modern sleek touch */
+        .accent-glow-red {
+            box-shadow: inset 0 2px 0 0 #EF4444, 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .accent-glow-orange {
+            box-shadow: inset 0 2px 0 0 #F97316, 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .accent-glow-amber {
+            box-shadow: inset 0 2px 0 0 #F59E0B, 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .accent-glow-blue {
+            box-shadow: inset 0 2px 0 0 #38BDF8, 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Subtle pulse glow for status */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .pulse-badge {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Segment Bars Gradient */
+        .bar-gradient-b2b-corp { background: linear-gradient(90deg, #EF4444 0%, #B91C1C 100%); }
+        .bar-gradient-b2b-pme { background: linear-gradient(90deg, #F97316 0%, #C2410C 100%); }
+        .bar-gradient-b2c-prem { background: linear-gradient(90deg, #38BDF8 0%, #0284C7 100%); }
+        .bar-gradient-b2c-std { background: linear-gradient(90deg, #64748B 0%, #475569 100%); }
+
+        /* Print styles for executive reporting */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                color: #0F172A !important;
+            }
+            .glass-card {
+                background: #F8FAFC !important;
+                border: 1px solid #CBD5E1 !important;
+                box-shadow: none !important;
+                color: #0F172A !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .text-white {
+                color: #0F172A !important;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col gap-6 max-w-[1600px] mx-auto">
+
+    <!-- HEADER EXECUTIVO -->
+    <header class="glass-card p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div class="space-y-1.5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                    <!-- Gauge / Dashboard Icon -->
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex flex-wrap items-center gap-2">
+                        Dashboard Executivo de CX 
+                        <span class="text-xs md:text-sm font-semibold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2.5 py-0.5 rounded-full">
+                            Auditoria Rigorosa
+                        </span>
+                    </h1>
+                    <p class="text-xs md:text-sm text-slate-400 font-normal">
+                        Diagnóstico Metodológico de Risco, Atrito Operacional e Vulnerabilidade de Receita (MRR)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metadados & Ações de Topo -->
+        <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
+            <!-- Fonte de dados -->
+            <div class="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-lg">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span>Base: <strong class="text-slate-200">100 Registros Auditados</strong></span>
+            </div>
+
+            <!-- Status Badge Crítico -->
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 text-xs font-bold">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 pulse-badge"></span>
+                <span>STATUS: OPERAÇÃO EM RISCO SEVERO</span>
+            </div>
+
+            <!-- Botão de Impressão / Exportação -->
+            <button onclick="window.print()" class="no-print inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-semibold transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                </svg>
+                Exportar Relatório
+            </button>
+        </div>
+    </header>
+
+    <!-- 1. GRID DE 4 KPIS CRÍTICOS (REDESENHADOS COM ELEMENTOS GRÁFICOS) -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- KPI 1: NPS Metodológico -->
+        <div class="glass-card p-6 accent-glow-red flex flex-col justify-between relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 rounded-lg bg-red-500/10 text-red-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">NPS Metodológico</h2>
+                </div>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">
+                    Zona Crítica
+                </span>
+            </div>
+
+            <!-- Valor Principal -->
+            <div class="my-2">
+                <div class="text-5xl font-black text-red-500 tracking-tight">-21</div>
+                <div class="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                    <span class="text-red-400 font-semibold">% Promotores (23%) - % Detratores (44%)</span>
+                </div>
+            </div>
+
+            <!-- Barra Gráfica de Distribuição NPS (Visualização Tripartida) -->
+            <div class="space-y-1.5 pt-2 pb-1">
+                <div class="flex justify-between text-[11px] font-semibold">
+                    <span class="text-red-400">Detratores: 44%</span>
+                    <span class="text-slate-400">Neutros: 33%</span>
+                    <span class="text-emerald-400">Promotores: 23%</span>
+                </div>
+                <div class="h-2.5 w-full bg-slate-800 rounded-full flex overflow-hidden p-0.5 gap-0.5 border border-slate-700/50">
+                    <div class="h-full bg-red-500 rounded-l-full" style="width: 44%" title="Detratores: 44%"></div>
+                    <div class="h-full bg-slate-500" style="width: 33%" title="Neutros: 33%"></div>
+                    <div class="h-full bg-emerald-500 rounded-r-full" style="width: 23%" title="Promotores: 23%"></div>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-snug pt-2 border-t border-slate-700/50">
+                <strong class="text-red-400">Atenção:</strong> A média simples de 6,27 é matematicamente enganosa e mascara o risco de evasão massiva.
+            </p>
+        </div>
+
+        <!-- KPI 2: CSAT Geral -->
+        <div class="glass-card p-6 accent-glow-orange flex flex-col justify-between relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 rounded-lg bg-orange-500/10 text-orange-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">CSAT Geral</h2>
+                </div>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                    Defasagem: -1,01
+                </span>
+            </div>
+
+            <!-- Valor Principal -->
+            <div class="my-2">
+                <div class="text-5xl font-black text-orange-400 tracking-tight">
+                    3,19 <span class="text-xl text-slate-500 font-semibold">/ 5,0</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-1">
+                    Meta de Excelência: <strong class="text-slate-200">4,20</strong>
+                </div>
+            </div>
+
+            <!-- Barra Gráfica de Progresso CSAT vs Meta -->
+            <div class="space-y-1.5 pt-2 pb-1">
+                <div class="flex justify-between text-[11px] font-semibold text-slate-300">
+                    <span>Atual: 3,19 (63,8%)</span>
+                    <span class="text-orange-400">Meta: 4,20 (84%)</span>
+                </div>
+                <div class="relative h-2.5 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
+                    <div class="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full" style="width: 63.8%"></div>
+                    <!-- Linha da Meta -->
+                    <div class="absolute top-0 bottom-0 w-1 bg-white shadow-sm" style="left: 84%" title="Meta Corporativa: 4.20"></div>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-snug pt-2 border-t border-slate-700/50">
+                A experiência global está <strong class="text-orange-400">24% abaixo da meta</strong> estipulada para retenção e fidelidade de clientes.
+            </p>
+        </div>
+
+        <!-- KPI 3: Tempo de Resolução Mediano -->
+        <div class="glass-card p-6 accent-glow-amber flex flex-col justify-between relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Tempo Mediano</h2>
+                </div>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    Alta Variância
+                </span>
+            </div>
+
+            <!-- Valor Principal -->
+            <div class="my-2">
+                <div class="text-5xl font-black text-amber-400 tracking-tight">26,8h</div>
+                <div class="text-xs text-slate-400 mt-1 flex items-center justify-between">
+                    <span>Média Simples: <s class="text-slate-500">29,2h</s></span>
+                    <span class="text-red-400 font-semibold">Max: 71,0h</span>
+                </div>
+            </div>
+
+            <!-- Indicador Visual de Dispersão / Outliers -->
+            <div class="space-y-1.5 pt-2 pb-1">
+                <div class="flex justify-between text-[11px] font-semibold text-slate-300">
+                    <span class="text-emerald-400">Min: 4,0h</span>
+                    <span class="text-amber-400">Mediana: 26,8h</span>
+                    <span class="text-red-400">Pior Outlier: 71,0h</span>
+                </div>
+                <div class="relative h-2.5 w-full bg-slate-800 rounded-full border border-slate-700/50 flex items-center px-1">
+                    <div class="h-1.5 w-full bg-slate-700 rounded-full relative">
+                        <!-- Ponto Mediana -->
+                        <div class="absolute -top-1 w-3.5 h-3.5 bg-amber-400 rounded-full border-2 border-slate-900 shadow" style="left: 37%" title="Mediana: 26.8h"></div>
+                        <!-- Ponto Média -->
+                        <div class="absolute -top-1 w-2.5 h-2.5 bg-slate-400 rounded-full opacity-60" style="left: 41%" title="Média: 29.2h"></div>
+                        <!-- Ponto Max Outlier -->
+                        <div class="absolute -top-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-slate-900 shadow" style="right: 0%" title="Pico Extremo: 71h"></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-snug pt-2 border-t border-slate-700/50">
+                A mediana foi adotada por rigor estatístico; outliers extremos de até <strong class="text-white">71h</strong> geram frustração severa.
+            </p>
+        </div>
+
+        <!-- KPI 4: Clientes em Risco Alto -->
+        <div class="glass-card p-6 accent-glow-red flex flex-col justify-between relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 rounded-lg bg-red-500/10 text-red-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Risco de Churn</h2>
+                </div>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">
+                    44 de 100 Contas
+                </span>
+            </div>
+
+            <!-- Valor Principal -->
+            <div class="my-2">
+                <div class="text-5xl font-black text-red-500 tracking-tight">44%</div>
+                <div class="text-xs text-slate-400 mt-1">
+                    Classificação: <strong class="text-red-400 font-semibold">Risco Alto Imediato</strong>
+                </div>
+            </div>
+
+            <!-- Barra Gráfica de Proporção de Risco -->
+            <div class="space-y-1.5 pt-2 pb-1">
+                <div class="flex justify-between text-[11px] font-semibold">
+                    <span class="text-red-400">Em Risco Alto: 44%</span>
+                    <span class="text-slate-400">Médio/Baixo: 56%</span>
+                </div>
+                <div class="h-2.5 w-full bg-slate-800 rounded-full flex overflow-hidden border border-slate-700/50">
+                    <div class="h-full bg-gradient-to-r from-red-600 to-red-500 rounded-l-full" style="width: 44%"></div>
+                    <div class="h-full bg-slate-600 rounded-r-full" style="width: 56%"></div>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-snug pt-2 border-t border-slate-700/50">
+                <span class="text-red-400 font-bold">Ameaça Direta ao MRR:</span> Quase metade da carteira apresenta propensão iminente de cancelamento.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- 2. SEÇÃO CENTRAL: GARGALOS POR CANAL + IMPACTO POR SEGMENTO -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
+        
+        <!-- PAINEL ESQUERDO: GRÁFICO DE GARGALOS POR CANAL (Lg: 7 colunas) -->
+        <div class="glass-card p-6 flex flex-col lg:col-span-7">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-slate-700/60">
+                <div>
+                    <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        Gargalos por Canal de Atendimento
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Cruzamento: Risco de Churn (%) vs. Tempo de Resolução (h) ordenado pelo maior atrito
+                    </p>
+                </div>
+
+                <!-- Controles Visuais / Filtro Rápido de Visualização -->
+                <div class="flex items-center gap-1 bg-slate-800/90 p-1 rounded-lg border border-slate-700 text-xs no-print">
+                    <button id="btnAll" onclick="filterChart('all')" class="px-2.5 py-1 rounded font-medium bg-blue-600 text-white transition">
+                        Todos
+                    </button>
+                    <button id="btnChurn" onclick="filterChart('churn')" class="px-2.5 py-1 rounded font-medium text-slate-400 hover:text-white transition">
+                        Risco (%)
+                    </button>
+                    <button id="btnTime" onclick="filterChart('time')" class="px-2.5 py-1 rounded font-medium text-slate-400 hover:text-white transition">
+                        Tempo (h)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Destaque Informativo do Canal Crítico WhatsApp -->
+            <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2 text-red-400 font-semibold">
+                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.971.53 1.771.815 2.795.816h.001c3.18 0 5.767-2.586 5.768-5.766 0-3.18-2.587-5.767-5.769-5.767zm3.394 8.205c-.144.405-.837.774-1.17.824-.312.045-.698.077-2.227-.557-1.782-.741-2.909-2.55-2.997-2.668-.088-.119-.724-.963-.724-1.836 0-.874.457-1.303.621-1.48.163-.178.354-.223.473-.223.118 0 .237.001.341.006.109.006.257-.041.401.307.149.356.507 1.237.551 1.326.044.089.074.193.015.312-.059.119-.089.193-.177.297-.089.104-.188.232-.268.312-.089.089-.182.186-.078.364.104.178.461.761.989 1.231.679.605 1.252.793 1.43.882.178.089.281.074.385-.044.104-.119.444-.519.563-.697.118-.178.237-.148.399-.089.163.059 1.037.489 1.215.578.178.089.296.134.341.208.044.074.044.43-.1 1.035z"/>
+                    </svg>
+                    <span>WhatsApp lidera o Risco de Churn (75%) e registrou o pior CES (2,38 - esforço exaustivo).</span>
+                </div>
+                <span class="text-[11px] text-slate-400 hidden sm:inline">Tempo não mensurado</span>
+            </div>
+            
+            <!-- Canvas do Gráfico -->
+            <div class="flex-grow relative min-h-[340px] w-full">
+                <canvas id="channelsChart"></canvas>
+            </div>
+            
+            <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-800">
+                <span>Ordenação decrescente pelo percentual de risco de cancelamento</span>
+                <span>Auditoria: 100 Registros</span>
+            </div>
+        </div>
+
+        <!-- PAINEL DIREITO: IMPACTO FINANCEIRO POR SEGMENTO (Lg: 5 colunas) -->
+        <div class="glass-card p-6 flex flex-col lg:col-span-5">
+            <div class="mb-4 pb-3 border-b border-slate-700/60">
+                <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Vulnerabilidade Financeira por Segmento
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Ticket Mediano Mensal e Exposição de Receita ao Atrito
+                </p>
+            </div>
+
+            <!-- Cards dos 4 Segmentos com Barras Proporcionais de Faturamento -->
+            <div class="space-y-3.5 flex-grow flex flex-col justify-between">
+                
+                <!-- B2B Corporativo -->
+                <div class="bg-slate-800/70 p-3.5 rounded-xl border border-red-500/30 hover:border-red-500/50 transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">B2B Corporativo</span>
+                        </div>
+                        <span class="text-xs font-black text-white bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700">
+                            R$ 3.404,87
+                        </span>
+                    </div>
+                    <!-- Barra de Proporção Relativa (100%) -->
+                    <div class="w-full bg-slate-900/80 h-1.5 rounded-full overflow-hidden mb-2">
+                        <div class="h-full bar-gradient-b2b-corp rounded-full" style="width: 100%"></div>
+                    </div>
+                    <div class="bg-red-500/10 text-red-300 p-2 rounded-lg text-[11px] font-medium border border-red-500/20 leading-snug flex items-start gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span><strong class="text-red-200 font-bold">ALERTA CRÍTICO:</strong> A perda de <strong>1 única conta</strong> equivale ao faturamento de <strong>33 clientes B2C</strong>.</span>
+                    </div>
+                </div>
+
+                <!-- B2B PME -->
+                <div class="bg-slate-800/70 p-3.5 rounded-xl border border-orange-500/30 hover:border-orange-500/50 transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                            <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">B2B PME</span>
+                        </div>
+                        <span class="text-xs font-black text-white bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700">
+                            R$ 916,66
+                        </span>
+                    </div>
+                    <!-- Barra de Proporção Relativa (26.9%) -->
+                    <div class="w-full bg-slate-900/80 h-1.5 rounded-full overflow-hidden mb-2">
+                        <div class="h-full bar-gradient-b2b-pme rounded-full" style="width: 26.9%"></div>
+                    </div>
+                    <div class="bg-orange-500/10 text-orange-300 p-2 rounded-lg text-[11px] font-medium border border-orange-500/20 leading-snug flex items-start gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-orange-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span><strong class="text-orange-200 font-bold">GARGALO OPERACIONAL:</strong> Apresenta o maior tempo médio de resposta da base: <strong>34,7h</strong>.</span>
+                    </div>
+                </div>
+
+                <!-- B2C Premium -->
+                <div class="bg-slate-800/70 p-3.5 rounded-xl border border-blue-500/30 hover:border-blue-500/50 transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                            <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">B2C Premium</span>
+                        </div>
+                        <span class="text-xs font-black text-white bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700">
+                            R$ 279,23
+                        </span>
+                    </div>
+                    <!-- Barra de Proporção Relativa (8.2%) -->
+                    <div class="w-full bg-slate-900/80 h-1.5 rounded-full overflow-hidden mb-2">
+                        <div class="h-full bar-gradient-b2c-prem rounded-full" style="width: 8.2%"></div>
+                    </div>
+                    <p class="text-slate-400 text-[11px] leading-snug">
+                        Segmento de estabilidade relativa; exige proteção ativa contra o contágio da queda geral do CSAT.
+                    </p>
+                </div>
+
+                <!-- B2C Standard -->
+                <div class="bg-slate-800/70 p-3.5 rounded-xl border border-slate-700 hover:border-slate-600 transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                            <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">B2C Standard</span>
+                        </div>
+                        <span class="text-xs font-black text-white bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700">
+                            R$ 102,34
+                        </span>
+                    </div>
+                    <!-- Barra de Proporção Relativa (3.0%) -->
+                    <div class="w-full bg-slate-900/80 h-1.5 rounded-full overflow-hidden mb-2">
+                        <div class="h-full bar-gradient-b2c-std rounded-full" style="width: 3.0%"></div>
+                    </div>
+                    <p class="text-slate-400 text-[11px] leading-snug">
+                        Maior volume transacional e menor ticket. Demanda automação eficiente e curadoria urgente no Chatbot.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Infográfico Comparativo de Impacto B2B vs B2C -->
+            <div class="mt-4 p-3 rounded-xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                    <div class="p-1.5 rounded-lg bg-red-500/20 text-red-400 font-black">
+                        1:33
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-200">Equivalência de Risco de Churn</div>
+                        <div class="text-[11px] text-slate-400">1 B2B Corp (R$ 3.405) = 33 B2C Standard (R$ 3.377)</div>
+                    </div>
+                </div>
+                <span class="text-[10px] uppercase font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded border border-red-500/20">
+                    Assimetria Alta
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- 3. PLANO DE AÇÃO EXECUTIVO IMEDIATO -->
+    <section class="glass-card p-6">
+        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-700/60">
+            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+            <h3 class="text-base font-bold text-white uppercase tracking-wider">Diretrizes Estratégicas para Decisão C-Level</h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-red-500/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-xs font-bold">1</span>
+                        <h4 class="text-sm font-bold text-slate-200">Contenção de WhatsApp & Chatbot</h4>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Canais com 75% e 55,6% de risco de evasão. É urgente redesenhar os fluxos de autoatendimento e criar transbordo humano imediato quando detectado atrito.
+                    </p>
+                </div>
+                <span class="mt-3 text-[11px] font-semibold text-red-400">Prioridade Operacional: Máxima</span>
+            </div>
+
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-orange-500/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-6 h-6 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs font-bold">2</span>
+                        <h4 class="text-sm font-bold text-slate-200">SLA Blindado para B2B Corporativo</h4>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Instituir fila expressa com atendimento VIP. Cada conta perdida drena 33 vezes mais receita que o cliente padrão da base.
+                    </p>
+                </div>
+                <span class="mt-3 text-[11px] font-semibold text-orange-400">Impacto Financeiro: Extremo</span>
+            </div>
+
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-blue-500/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">3</span>
+                        <h4 class="text-sm font-bold text-slate-200">Eliminação dos Outliers (>70h)</h4>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Implementar escalonamento automático quando chamados ultrapassarem 24 horas, puxando o tempo médio para mais perto da meta e reduzindo os 44% de detratores.
+                    </p>
+                </div>
+                <span class="mt-3 text-[11px] font-semibold text-blue-400">Alvo de Qualidade: CSAT 4,20</span>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SCRIPTS E CONFIGURAÇÃO GRÁFICA AVANÇADA DO CHART.JS -->
+    <script>
+        // Registrar Plugin de DataLabels
+        Chart.register(ChartDataLabels);
+
+        let channelsChartInstance = null;
+
+        // Dados estritos auditados
+        const channelLabels = ['WhatsApp', 'Chatbot', 'E-mail', 'Chat Humano', 'Telefone'];
+        const churnData = [75, 55.6, 40, 38, 35];
+        const timeData = [0, 35.0, 25.9, 29.2, 27.1];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('channelsChart').getContext('2d');
+            
+            // Gradientes visuais modernos para as barras
+            const redGradient = ctx.createLinearGradient(0, 0, 400, 0);
+            redGradient.addColorStop(0, '#EF4444');
+            redGradient.addColorStop(1, '#991B1B');
+
+            const amberGradient = ctx.createLinearGradient(0, 0, 400, 0);
+            amberGradient.addColorStop(0, '#F59E0B');
+            amberGradient.addColorStop(1, '#B45309');
+
+            channelsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: channelLabels,
+                    datasets: [
+                        {
+                            label: 'Risco de Churn (%)',
+                            data: churnData,
+                            backgroundColor: redGradient,
+                            borderColor: '#DC2626',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.85,
+                            categoryPercentage: 0.8
+                        },
+                        {
+                            label: 'Tempo de Resolução (h)',
+                            data: timeData,
+                            backgroundColor: amberGradient,
+                            borderColor: '#D97706',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.85,
+                            categoryPercentage: 0.8
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            right: 90, // Espaço confortável para os datalabels
+                            top: 10
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#F8FAFC',
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 13,
+                                    weight: '600'
+                                },
+                                padding: 18,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(11, 23, 42, 0.95)',
+                            titleColor: '#F8FAFC',
+                            bodyColor: '#CBD5E1',
+                            titleFont: { size: 13, family: "'Inter', sans-serif", weight: '700' },
+                            bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                            padding: 12,
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    let val = context.raw;
+                                    if (context.datasetIndex === 0) {
+                                        return ` Risco de Churn: ${val}%`;
+                                    } else {
+                                        if (context.label === 'WhatsApp' && val === 0) {
+                                            return ' Tempo: Não avaliado (Pior esforço CES: 2,38)';
+                                        }
+                                        return ` Tempo de Resolução: ${val}h`;
+                                    }
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#FFFFFF',
+                            font: {
+                                family: "'Inter', sans-serif",
+                                weight: 'bold',
+                                size: 11
+                            },
+                            anchor: 'end',
+                            align: 'end',
+                            formatter: function(value, context) {
+                                if (context.datasetIndex === 0) {
+                                    return value + '%';
+                                } else {
+                                    if (context.dataIndex === 0) { // WhatsApp
+                                        return 'Pior CES (2.38)';
+                                    }
+                                    if (context.dataIndex === 3) { // Chat Humano
+                                        return value + 'h (CSAT Alto)';
+                                    }
+                                    return value.toFixed(1) + 'h';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(51, 65, 85, 0.4)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#94A3B8',
+                                font: { family: "'Inter', sans-serif", size: 11 }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#F8FAFC',
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 13,
+                                    weight: '600'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Função para filtrar / alternar visão do gráfico de canais
+        function filterChart(mode) {
+            const btnAll = document.getElementById('btnAll');
+            const btnChurn = document.getElementById('btnChurn');
+            const btnTime = document.getElementById('btnTime');
+
+            // Reset de classes dos botões
+            [btnAll, btnChurn, btnTime].forEach(btn => {
+                btn.className = "px-2.5 py-1 rounded font-medium text-slate-400 hover:text-white transition";
+            });
+
+            if (mode === 'all') {
+                btnAll.className = "px-2.5 py-1 rounded font-medium bg-blue-600 text-white transition";
+                channelsChartInstance.setDatasetVisibility(0, true);
+                channelsChartInstance.setDatasetVisibility(1, true);
+            } else if (mode === 'churn') {
+                btnChurn.className = "px-2.5 py-1 rounded font-medium bg-red-600 text-white transition";
+                channelsChartInstance.setDatasetVisibility(0, true);
+                channelsChartInstance.setDatasetVisibility(1, false);
+            } else if (mode === 'time') {
+                btnTime.className = "px-2.5 py-1 rounded font-medium bg-amber-600 text-white transition";
+                channelsChartInstance.setDatasetVisibility(0, false);
+                channelsChartInstance.setDatasetVisibility(1, true);
+            }
+            channelsChartInstance.update();
+        }
+    </script>
+</body>
+</html>
