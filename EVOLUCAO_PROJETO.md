@@ -22,6 +22,15 @@ Este documento registra todas as alterações significativas, decisões de arqui
 
 ## 🗓️ 2. Histórico de Versões e Alterações Significativas
 
+### 🟢 [v2.1.1] - 21/09/2026: Instalação e Integração do Plugin Vercel
+**Objetivo**: Instalação do plugin oficial `vercel/vercel-plugin` para integração com o ambiente de desenvolvimento (VS Code) e facilitação do ciclo de deploy contínuo.
+
+#### Modificações Implementadas:
+- Instalação via CLI de plugins (`npx plugins add vercel/vercel-plugin --target vscode`).
+- Registro do pacote de habilidades (36 skills, 5 comandos, hooks e MCP) para orquestração e deploy na Vercel diretamente pelo assistente/editor.
+
+---
+
 ### 🟢 [v2.1.0] - 21/09/2026: Motor de Filtragem Dinâmica por Tipo de Produto e Recortes
 **Objetivo**: Permitir a análise aprofundada e ágil por tipo de produto/pacote contratado, integrando os dados brutos reais dos 100 registros para recomputação estatística instantânea de KPIs, gráficos e vulnerabilidades.
 
