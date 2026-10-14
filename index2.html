@@ -468,9 +468,6 @@
       <span class="badge">Ticket Médio: R$ 180</span>
       <span class="badge">Meta 2026: +10 Clínicas</span>
     </div>
-    <a href="index.html" class="btn-action" style="text-decoration:none;" title="Voltar para Auditoria CX">
-      📊 Auditoria CX
-    </a>
     <button class="btn-theme" onclick="toggleTheme()" title="Alternar entre Modo Claro e Escuro" id="theme-btn">
       <span id="theme-icon">🌙</span> <span id="theme-text">Modo Escuro</span>
     </button>
@@ -1952,13 +1949,19 @@ function renderExplorerKPIs() {
 
 function renderExplorerChart() {
   const data = getExplorerFilteredData();
-  const xKey = document.getElementById('exp-axis-x').value;
-  const yKey = document.getElementById('exp-axis-y').value;
-  const chartType = document.getElementById('exp-chart-type').value;
   const ctx = document.getElementById('chartExplorer');
   if (!ctx) return;
 
-  if (chartExplorerInstance) chartExplorerInstance.destroy();
+  if (chartExplorerInstance) {
+    chartExplorerInstance.destroy();
+    chartExplorerInstance = null;
+  }
+
+  if (data.length === 0) return;
+
+  const xKey = document.getElementById('exp-axis-x').value;
+  const yKey = document.getElementById('exp-axis-y').value;
+  const chartType = document.getElementById('exp-chart-type').value;
 
   const metaX = varsMeta.find(v => v.key === xKey) || {name: xKey, label: xKey};
   const metaY = varsMeta.find(v => v.key === yKey) || {name: yKey, label: yKey};
@@ -2057,29 +2060,45 @@ function renderExplorerChart() {
 }
 
 function renderExplorerTable() {
-  const data = getExplorerFilteredData();
+  let data = getExplorerFilteredData();
   const cols = allColumnsMeta.filter(c => visibleColumns.includes(c.id));
+
+  if (expSortCol) {
+    data = [...data].sort((a, b) => {
+      let va = a[expSortCol], vb = b[expSortCol];
+      if (expSortCol === 'rev') { va = a.pac * 180; vb = b.pac * 180; }
+      if (expSortCol === 'capex') { va = a.cons * 180000; vb = b.cons * 180000; }
+      if (typeof va === 'string') return expSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      return expSortAsc ? (va - vb) : (vb - va);
+    });
+  }
 
   let html = `<thead><tr>`;
   cols.forEach(c => {
-    html += `<th onclick="sortExplorerTable('${c.id}')">${c.label} ⬍</th>`;
+    const isSorted = expSortCol === c.id;
+    const arrow = isSorted ? (expSortAsc ? ' 🔼' : ' 🔽') : ' ⬍';
+    html += `<th onclick="sortExplorerTable('${c.id}')" title="Clique para ordenar por ${c.label}">${c.label}${arrow}</th>`;
   });
   html += `</tr></thead><tbody>`;
 
-  data.forEach(d => {
-    html += `<tr>`;
-    cols.forEach(c => {
-      let val = d[c.id];
-      if (c.id === 'rev') val = "R$ " + fmt(d.pac * 180, 0);
-      else if (c.id === 'capex') val = "R$ " + fmt(d.cons * 180000, 0);
-      else if (typeof val === 'number') val = fmt(val, c.id==='mkt'||c.id==='sat'?1:0);
-      
-      const align = (c.id==='clinica'||c.id==='regiao') ? 'text-align:left;' : '';
-      const strong = (c.id==='pac'||c.id==='clinica') ? 'font-weight:700;' : '';
-      html += `<td style="${align}${strong}">${val}</td>`;
+  if (data.length === 0) {
+    html += `<tr><td colspan="${cols.length}" style="text-align:center; padding:1.5rem; color:var(--text-muted);">Nenhuma clínica encontrada para os filtros selecionados.</td></tr>`;
+  } else {
+    data.forEach(d => {
+      html += `<tr>`;
+      cols.forEach(c => {
+        let val = d[c.id];
+        if (c.id === 'rev') val = "R$ " + fmt(d.pac * 180, 0);
+        else if (c.id === 'capex') val = "R$ " + fmt(d.cons * 180000, 0);
+        else if (typeof val === 'number') val = fmt(val, c.id==='mkt'||c.id==='sat'?1:0);
+        
+        const align = (c.id==='clinica'||c.id==='regiao') ? 'text-align:left;' : '';
+        const strong = (c.id==='pac'||c.id==='clinica') ? 'font-weight:700;' : '';
+        html += `<td style="${align}${strong}">${val}</td>`;
+      });
+      html += `</tr>`;
     });
-    html += `</tr>`;
-  });
+  }
   html += `</tbody>`;
   document.getElementById('exp-table').innerHTML = html;
 }
@@ -2089,14 +2108,6 @@ let expSortAsc = true;
 function sortExplorerTable(colId) {
   if (expSortCol === colId) expSortAsc = !expSortAsc;
   else { expSortCol = colId; expSortAsc = true; }
-
-  rawData.sort((a, b) => {
-    let va = a[colId], vb = b[colId];
-    if (colId === 'rev') { va = a.pac * 180; vb = b.pac * 180; }
-    if (colId === 'capex') { va = a.cons * 180000; vb = b.cons * 180000; }
-    if (typeof va === 'string') return expSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-    return expSortAsc ? va - vb : vb - va;
-  });
   renderExplorerTable();
 }
 
@@ -2104,15 +2115,19 @@ function exportFilteredCSV() {
   const data = getExplorerFilteredData();
   const cols = allColumnsMeta.filter(c => visibleColumns.includes(c.id));
   
-  let csv = cols.map(c => `"${c.label}"`).join(",") + "\n";
+  // Inclui BOM UTF-8 (\uFEFF) e separador ponto-e-vírgula para compatibilidade perfeita com Excel no Brasil
+  let csv = "\uFEFF" + cols.map(c => `"${c.label}"`).join(";") + "\r\n";
   data.forEach(d => {
     const row = cols.map(c => {
       let val = d[c.id];
       if (c.id === 'rev') val = d.pac * 180;
       if (c.id === 'capex') val = d.cons * 180000;
+      if (typeof val === 'number') {
+        val = (c.id === 'mkt' || c.id === 'sat') ? val.toFixed(1).replace('.', ',') : val;
+      }
       return typeof val === 'string' ? `"${val}"` : val;
     });
-    csv += row.join(",") + "\n";
+    csv += row.join(";") + "\r\n";
   });
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -2203,13 +2218,15 @@ function initHistograms() {
 
 let scatterChartInstance = null;
 function updateScatterChart() {
-  const xKey = document.getElementById('scatter-select').value;
-  const meta = varsMeta.find(v => v.key === xKey);
-  const xArr = getArr(xKey), yArr = getArr('pac');
+  const elem = document.getElementById('scatter-select');
+  if (!elem) return;
+  const xKey = elem.value;
+  const meta = varsMeta.find(v => v.key === xKey) || varsMeta[0];
+  const xArr = getArr(meta.key), yArr = getArr('pac');
   const mx = mean(xArr), my = mean(yArr);
   let num = 0, den = 0;
   for(let i=0; i<xArr.length; i++){ num += (xArr[i]-mx)*(yArr[i]-my); den += Math.pow(xArr[i]-mx,2); }
-  const b1 = num/den, b0 = my - b1*mx;
+  const b1 = den > 0 ? num/den : 0, b0 = my - b1*mx;
   const minX = Math.min(...xArr), maxX = Math.max(...xArr);
 
   if(scatterChartInstance) scatterChartInstance.destroy();
@@ -2219,7 +2236,7 @@ function updateScatterChart() {
       datasets: [
         {
           label: 'Clínicas da Rede (n=40)',
-          data: rawData.map(d => ({x: d[xKey], y: d.pac, clinica: d.clinica})),
+          data: rawData.map(d => ({x: d[meta.key], y: d.pac, clinica: d.clinica})),
           backgroundColor: '#0284c7',
           pointRadius: 6
         },
@@ -2248,9 +2265,11 @@ function updateScatterChart() {
 }
 
 function runRLS() {
-  const xKey = document.getElementById('rls-select').value;
-  const meta = varsMeta.find(v => v.key === xKey);
-  const x = getArr(xKey), y = getArr('pac');
+  const elem = document.getElementById('rls-select');
+  if (!elem) return;
+  const xKey = elem.value;
+  const meta = varsMeta.find(v => v.key === xKey) || varsMeta[0];
+  const x = getArr(meta.key), y = getArr('pac');
   const n = y.length, mx = mean(x), my = mean(y);
   let sxy = 0, sxx = 0, syy = 0;
   for(let i=0; i<n; i++){
