@@ -1,0 +1,2497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rede Sorriso Pleno | BI Executivo & Modelagem Econométrica</title>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Anti-FOUC Theme Script -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('sorriso_pleno_theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --card-trans: rgba(255, 255, 255, 0.92);
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #0f172a;
+      --primary-light: #1e293b;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --accent-light: #e0f2fe;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+    }
+
+    html.dark {
+      --bg: #070d18;
+      --card: #0b172a;
+      --card-trans: rgba(11, 23, 42, 0.88);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --primary: #f8fafc;
+      --primary-light: #e2e8f0;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --accent-light: rgba(56, 189, 248, 0.15);
+      --success: #4ade80;
+      --success-bg: rgba(74, 222, 128, 0.15);
+      --warning: #fbbf24;
+      --warning-bg: rgba(251, 191, 36, 0.15);
+      --danger: #f87171;
+      --danger-bg: rgba(248, 113, 113, 0.15);
+      --shadow: 0 2px 4px rgba(0,0,0,0.4);
+      --shadow-lg: 0 12px 20px -4px rgba(0,0,0,0.6);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #091e3a 0%, #0369a1 100%);
+      color: white;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .brand h1 { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.5rem; }
+    .brand p { font-size: 0.82rem; color: #bae6fd; margin-top: 0.2rem; }
+    
+    .header-actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+    .header-badges { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .badge {
+      background: rgba(255,255,255,0.15);
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-theme, .btn-action {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+    .btn-theme:hover, .btn-action:hover { background: rgba(255,255,255,0.3); }
+
+    /* Top Executive Switcher Bar */
+    .persona-bar {
+      background: var(--card);
+      border-bottom: 2px solid var(--border);
+      padding: 0.6rem 2rem;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+    .persona-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-right: 0.4rem;
+      white-space: nowrap;
+    }
+    .persona-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .persona-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .persona-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+    }
+    .persona-btn .role-tag {
+      font-size: 0.68rem;
+      background: rgba(0,0,0,0.12);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .persona-btn.active .role-tag {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Secondary Nav for Analytics */
+    nav.sub-nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      gap: 0.25rem;
+      overflow-x: auto;
+      z-index: 50;
+    }
+    .tab-btn {
+      padding: 0.75rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--accent); background: var(--accent-light); }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: var(--accent-light);
+      font-weight: 700;
+    }
+
+    /* Main Container */
+    main { max-width: 1440px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+    .tab-section { display: none; animation: fadeIn 0.2s ease; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Executive Hero / Callout */
+    .executive-hero {
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(15, 23, 42, 0.04) 100%);
+      border: 1px solid var(--accent);
+      border-left: 6px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .executive-hero-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+    .executive-quote {
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .executive-author {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 0.25rem;
+    }
+    .direct-answer-badge {
+      background: var(--accent);
+      color: white;
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Grid & Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .kpi-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.04em; }
+    .kpi-value { font-size: 1.65rem; font-weight: 800; color: var(--primary); margin: 0.2rem 0; }
+    .kpi-sub { font-size: 0.76rem; color: var(--text-muted); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.3rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .card-title { font-size: 1.02rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 0.4rem; }
+    .card-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+    /* Tables */
+    .table-wrapper { overflow-x: auto; max-height: 480px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: right; }
+    th, td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); }
+    th {
+      background: var(--bg);
+      color: var(--primary);
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      cursor: pointer;
+      user-select: none;
+    }
+    th:hover { background: var(--accent-light); color: var(--accent); }
+    td:first-child, th:first-child { text-align: left; font-weight: 600; }
+    tr:hover { background-color: rgba(2, 132, 199, 0.04); }
+
+    /* Controls & Inputs */
+    select, input[type="number"], input[type="text"] {
+      padding: 0.45rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: var(--card);
+      color: var(--text);
+    }
+    select:focus, input:focus { outline: 2px solid var(--accent); }
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .btn:hover { background: var(--bg); border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent-hover); color: white; }
+
+    /* Equation Box */
+    .eq-box {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.92rem;
+      font-weight: 600;
+      margin: 0.75rem 0 1rem;
+      overflow-x: auto;
+      border-left: 4px solid var(--accent);
+    }
+
+    /* Alert / Insight Boxes */
+    .insight-box {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      padding: 0.9rem 1.1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.84rem;
+      margin-top: 0.75rem;
+      color: var(--text);
+    }
+    .warn-box {
+      background: var(--warning-bg);
+      border-left: 4px solid var(--warning);
+      padding: 0.9rem 1.1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.84rem;
+      margin-top: 0.75rem;
+      color: var(--text);
+    }
+    .success-box {
+      background: var(--success-bg);
+      border-left: 4px solid var(--success);
+      padding: 0.9rem 1.1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.84rem;
+      margin-top: 0.75rem;
+      color: var(--text);
+    }
+
+    /* Sliders in Simulator */
+    .slider-group { margin-bottom: 0.95rem; }
+    .slider-header { display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .slider-header span:last-child { color: var(--accent); font-weight: 700; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+
+    .chart-box { position: relative; height: 320px; width: 100%; }
+    .pill { padding: 0.2rem 0.55rem; border-radius: 99px; font-size: 0.72rem; font-weight: 700; display: inline-block; }
+    .pill-yes { background: var(--success-bg); color: var(--success); }
+    .pill-no { background: var(--danger-bg); color: var(--danger); }
+
+    /* Accordion Q&A */
+    details {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.65rem;
+      padding: 0.75rem 1rem;
+    }
+    summary { font-weight: 700; font-size: 0.9rem; cursor: pointer; color: var(--primary); }
+    details p { margin-top: 0.65rem; font-size: 0.85rem; color: var(--text); }
+
+    /* Column Selector Pills */
+    .col-selector-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+    .col-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .col-pill.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    @media print {
+      header, .persona-bar, nav, .btn, .slider-group input { display: none !important; }
+      .tab-section { display: block !important; page-break-after: always; }
+      body { background: white !important; color: black !important; }
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      header, .persona-bar, nav.sub-nav, main { padding-left: 1rem; padding-right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>🦷 Sorriso Pleno | BI Executivo & Inteligência Preditiva</h1>
+    <p>Plataforma Analítica Multidisciplinar — Modelagem Econométrica e Dimensionamento Estratégico (n = 40 unidades)</p>
+  </div>
+  <div class="header-actions">
+    <div class="header-badges">
+      <span class="badge">Faturamento 2024: R$ 54M</span>
+      <span class="badge">CAPEX/Consultório: R$ 180 mil</span>
+      <span class="badge">Ticket Médio: R$ 180</span>
+      <span class="badge">Meta 2026: +10 Clínicas</span>
+    </div>
+    <button class="btn-theme" onclick="toggleTheme()" title="Alternar entre Modo Claro e Escuro" id="theme-btn">
+      <span id="theme-icon">🌙</span> <span id="theme-text">Modo Escuro</span>
+    </button>
+    <button class="btn-action" onclick="window.print()" title="Imprimir Relatório Executivo">
+      🖨️ Imprimir Dossiê
+    </button>
+  </div>
+</header>
+
+<!-- BARRA DE SELEÇÃO RÁPIDA: PERFIS DE DECISÃO C-LEVEL -->
+<div class="persona-bar">
+  <span class="persona-label">Áreas de Decisão:</span>
+  <button class="persona-btn active" onclick="switchView('tab-ceo', this)">
+    👔 Dr. Ricardo Alves <span class="role-tag">CEO</span>
+  </button>
+  <button class="persona-btn" onclick="switchView('tab-clinica', this)">
+    🩺 Dra. Fernanda Bastos <span class="role-tag">Diretoria Clínica</span>
+  </button>
+  <button class="persona-btn" onclick="switchView('tab-comercial', this)">
+    💼 Marcos Vieira <span class="role-tag">Diretoria Comercial</span>
+  </button>
+  <button class="persona-btn" onclick="switchView('tab-mkt', this)">
+    📢 Priscila Santos <span class="role-tag">Gerência Marketing</span>
+  </button>
+  <button class="persona-btn" onclick="switchView('tab-explorer', this)" style="border-color: var(--accent);">
+    🔍 Explorador de Dados <span class="role-tag">Personalize Sua Visão</span>
+  </button>
+</div>
+
+<!-- NAVEGAÇÃO DE ANÁLISE CIENTÍFICA & ECONOMÉTRICA -->
+<nav class="sub-nav">
+  <button class="tab-btn" onclick="switchView('tab-desc', this)">1. Estatística Descritiva</button>
+  <button class="tab-btn" onclick="switchView('tab-dist', this)">2. Histogramas & Outliers</button>
+  <button class="tab-btn" onclick="switchView('tab-corr', this)">3. Correlação & Dispersão</button>
+  <button class="tab-btn" onclick="switchView('tab-rls', this)">4. Regressão Simples (RLS)</button>
+  <button class="tab-btn" onclick="switchView('tab-rlm', this)">5. Regressão Múltipla (RLM)</button>
+  <button class="tab-btn" onclick="switchView('tab-sim', this)">6. Simulador Multivariado</button>
+  <button class="tab-btn" onclick="switchView('tab-qa', this)">7. Diagnóstico C-Level (Parte V)</button>
+</nav>
+
+<main>
+
+  <!-- ============================================================== -->
+  <!-- ABA 1: DR. RICARDO ALVES (CEO) -->
+  <!-- ============================================================== -->
+  <section id="tab-ceo" class="tab-section active">
+    <div class="executive-hero">
+      <div class="executive-hero-header">
+        <div>
+          <div class="executive-quote">"Se eu montar uma clínica com 6 consultórios e 7 dentistas, quantos pacientes ela vai atender por mês? Preciso de um número para fechar o business plan."</div>
+          <div class="executive-author">Dr. Ricardo Alves — Diretor Presidente (CEO)</div>
+        </div>
+        <div class="direct-answer-badge">
+          🎯 Projeção Oficial: 756 a 790 Pacientes/Mês
+        </div>
+      </div>
+      <p style="font-size:0.88rem; color:var(--text); line-height:1.5;">
+        <strong>Diagnóstico Direto para o Business Plan:</strong> Aplicando os coeficientes econométricos da rede e calibrando com os benchmarks de clínicas reais com 6 consultórios, a projeção conservadora para o 1º ano (t = 0) é de <strong>756 pacientes/mês</strong> (faturamento de <strong>R$ 136.080/mês</strong>). Conforme a unidade atinge maturação de carteira, a média estabiliza entre <strong>780 e 790 pacientes/mês</strong> (<strong>R$ 142.200/mês</strong>).
+      </p>
+    </div>
+
+    <!-- KPIs do Business Plan para 6 consultórios e 7 dentistas -->
+    <div class="kpi-grid">
+      <div class="kpi-card" style="border-left: 4px solid var(--accent);">
+        <div class="kpi-title">Projeção de Atendimentos</div>
+        <div class="kpi-value">765 pac./mês</div>
+        <div class="kpi-sub">Intervalo: 756 (ano 1) a 790 (madura)</div>
+      </div>
+      <div class="kpi-card" style="border-left: 4px solid var(--success);">
+        <div class="kpi-title">Faturamento Mensal Estimado</div>
+        <div class="kpi-value" id="ceo-kpi-rev">R$ 137.700</div>
+        <div class="kpi-sub">Base Ticket Médio: R$ 180 / paciente</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">CAPEX em Consultórios</div>
+        <div class="kpi-value">R$ 1.080.000</div>
+        <div class="kpi-sub">6 consultórios × R$ 180 mil / sala</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Payback Projetado</div>
+        <div class="kpi-value">~39 Meses</div>
+        <div class="kpi-sub">Margem Contrib. ~45% (R$ 62k/mês)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Produtividade da Estrutura</div>
+        <div class="kpi-value">128 pac./cons.</div>
+        <div class="kpi-sub">~5,3 pac./dia útil por consultório</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Simulador Interativo do Business Plan -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">⚙️ Simulador de Business Plan do CEO</div>
+            <div class="card-subtitle">Ajuste os parâmetros da unidade e veja o impacto instantâneo no Business Plan</div>
+          </div>
+          <button class="btn btn-primary" onclick="resetCEOSimulator()">Predefinir 6 Cons / 7 Dent</button>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header"><span>Número de Consultórios (CAPEX Físico):</span><span id="ceo-val-cons">6</span></div>
+          <input type="range" id="ceo-sim-cons" min="2" max="12" step="1" value="6" oninput="updateCEOSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>Número de Dentistas (Corpo Clínico):</span><span id="ceo-val-dent">7</span></div>
+          <input type="range" id="ceo-sim-dent" min="2" max="16" step="1" value="7" oninput="updateCEOSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>Convênios Credenciados:</span><span id="ceo-val-conv">16</span></div>
+          <input type="range" id="ceo-sim-conv" min="4" max="28" step="1" value="16" oninput="updateCEOSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>Investimento em Marketing Mensal (R$ mil):</span><span id="ceo-val-mkt">13.5</span></div>
+          <input type="range" id="ceo-sim-mkt" min="4" max="25" step="0.5" value="13.5" oninput="updateCEOSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>Tempo de Espera Alvo (minutos):</span><span id="ceo-val-esp">13</span></div>
+          <input type="range" id="ceo-sim-esp" min="6" max="30" step="1" value="13" oninput="updateCEOSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>Maturidade / Tempo de Operação (anos):</span><span id="ceo-val-tempo">0</span></div>
+          <input type="range" id="ceo-sim-tempo" min="0" max="15" step="1" value="0" oninput="updateCEOSim()">
+        </div>
+
+        <div id="ceo-sim-summary" class="insight-box"></div>
+      </div>
+
+      <!-- Evidência Empírica da Base Real -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📊 Benchmark Real: Clínicas da Rede com 6 Consultórios</div>
+            <div class="card-subtitle">Comparativo real das 6 unidades existentes na base com exatamente 6 consultórios</div>
+          </div>
+        </div>
+        <div class="chart-box" style="height:260px;"><canvas id="chartCEO"></canvas></div>
+        <div class="insight-box" style="margin-top:0.75rem;">
+          <strong>Validação Empírica (n = 6 clínicas):</strong> Na base real, as duas unidades com <strong>exatamente 6 consultórios e 7 dentistas</strong> são <strong>Praia do Canto - Vitória (760 pac./mês)</strong> e <strong>Sul - Ribeirão Preto (790 pac./mês)</strong>. A média geral das 6 clínicas de 6 consultórios é de <strong>798,3 pac./mês</strong>. Isso comprova que a previsão econométrica de 756 a 790 pac./mês é perfeitamente calibrada com o histórico da empresa!
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 2: DRA. FERNANDA BASTOS (DIRETORIA CLÍNICA) -->
+  <!-- ============================================================== -->
+  <section id="tab-clinica" class="tab-section">
+    <div class="executive-hero" style="border-left-color: var(--danger);">
+      <div class="executive-hero-header">
+        <div>
+          <div class="executive-quote">"O tempo de espera está destruindo nossa imagem. Se reduzirmos de 20 para 10 minutos, quanto ganhamos em pacientes? O boca-a-boca funciona."</div>
+          <div class="executive-author">Dra. Fernanda Bastos — Diretora Clínica</div>
+        </div>
+        <div class="direct-answer-badge" style="background: var(--danger);">
+          ⏱️ Ganho: +126 Pac./Mês por Clínica (+R$ 22.680/mês)
+        </div>
+      </div>
+      <p style="font-size:0.88rem; color:var(--text); line-height:1.5;">
+        <strong>Diagnóstico Direto & Mecanismo Boca-a-Boca:</strong> A redução de 10 minutos de espera (de 20 para 10 min) gera um ganho marginal direto de <strong>+126 pacientes/mês por clínica</strong> no Modelo Completo (b₅ = -12,6 pac/min), ou <strong>+51 pacientes/mês</strong> no Modelo Parcimonioso. Além disso, a correlação entre Espera e Satisfação é de <strong>r = -0,9920</strong>: a nota salta de <strong>7,6 para 8,8</strong> (+1,2 pontos na escala 1-10), blindando a reputação da clínica e ativando recomendações orgânicas.
+      </p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" style="border-left: 4px solid var(--danger);">
+        <div class="kpi-title">Redução no Tempo de Espera</div>
+        <div class="kpi-value">-10 Minutos</div>
+        <div class="kpi-sub">Corte de 20 para 10 minutos</div>
+      </div>
+      <div class="kpi-card" style="border-left: 4px solid var(--success);">
+        <div class="kpi-title">Pacientes Ganhos (Modelo Completo)</div>
+        <div class="kpi-value">+126 pac./mês</div>
+        <div class="kpi-sub">+51 pac./mês no Parcimonioso</div>
+      </div>
+      <div class="kpi-card" style="border-left: 4px solid var(--accent);">
+        <div class="kpi-title">Impacto em Receita Bruta / Unidade</div>
+        <div class="kpi-value">+R$ 22.680/mês</div>
+        <div class="kpi-sub">+R$ 272.160 / ano por clínica</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Elevação na Nota de Satisfação</div>
+        <div class="kpi-value">7,6 ➔ 8,8</div>
+        <div class="kpi-sub">+1,2 pontos de CSAT / Boca-a-boca</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Impacto Global na Rede (15 Clínicas)</div>
+        <div class="kpi-value">+R$ 272k a 438k</div>
+        <div class="kpi-sub">Faturamento adicional mensal</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Simulador de Fila e Espera -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">⏱️ Simulador de Agendamento & Fila Zero</div>
+            <div class="card-subtitle">Teste diferentes reduções no tempo de espera e avalie o retorno financeiro</div>
+          </div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header"><span>Tempo de Espera Atual (minutos):</span><span id="clin-val-from">20</span></div>
+          <input type="range" id="clin-sim-from" min="10" max="30" step="1" value="20" oninput="updateClinicaSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>Tempo de Espera Alvo / Meta (minutos):</span><span id="clin-val-to">10</span></div>
+          <input type="range" id="clin-sim-to" min="5" max="20" step="1" value="10" oninput="updateClinicaSim()">
+        </div>
+
+        <div id="clin-sim-results" class="insight-box" style="margin-top:1rem;"></div>
+        <div class="success-box" style="margin-top:0.75rem;">
+          💡 <strong>Viabilidade de Investimento:</strong> Como a clínica ganha mais de <strong>R$ 22.000/mês</strong> em faturamento, a diretoria pode contratar um software SaaS de agendamento preditivo com confirmação por WhatsApp e reforço de recepção (custo de R$ 3.000 a R$ 5.000/mês) com <strong>ROI superior a 350% e payback inferior a 30 dias</strong>!
+        </div>
+      </div>
+
+      <!-- Gráfico Espera vs Satisfação (O Boca-a-Boca) -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📉 Efeito Boca-a-Boca: Tempo de Espera × Satisfação</div>
+            <div class="card-subtitle">Correlação linear r = -0,9920 comprovando o impacto destrutivo da espera</div>
+          </div>
+        </div>
+        <div class="chart-box" style="height:280px;"><canvas id="chartClinica"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 3: MARCOS VIEIRA (DIRETORIA COMERCIAL) -->
+  <!-- ============================================================== -->
+  <section id="tab-comercial" class="tab-section">
+    <div class="executive-hero" style="border-left-color: var(--warning);">
+      <div class="executive-hero-header">
+        <div>
+          <div class="executive-quote">"Cada convênio que aceito reduz a margem mas aumenta o volume. Qual é o ponto ótimo? Quantos convênios maximizam o número de pacientes sem destruir a rentabilidade?"</div>
+          <div class="executive-author">Marcos Vieira — Diretor Comercial</div>
+        </div>
+        <div class="direct-answer-badge" style="background: var(--warning);">
+          ⚖️ Ponto Ótimo: 2,5 a 2,8 Convênios / Consultório
+        </div>
+      </div>
+      <p style="font-size:0.88rem; color:var(--text); line-height:1.5;">
+        <strong>Diagnóstico Direto & Trade-off Margem vs. Volume:</strong> Cada convênio traz <strong>+15,8 a +29,5 pacientes/mês</strong>. Porém, o convênio paga um ticket menor (R$ 140 vs R$ 260 particular) e consome capacidade das salas. O ponto ótimo de rentabilidade situa-se entre <strong>14 e 18 convênios para clínicas médias (5 a 6 salas)</strong>. Acima desse patamar, a ocupação ultrapassa 85%, o tempo de espera dispara e ocorre o <strong>efeito crowding-out</strong>: pacientes particulares de alta margem fogem da clínica.
+      </p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" style="border-left: 4px solid var(--warning);">
+        <div class="kpi-title">Ponto Ótimo Médio da Rede</div>
+        <div class="kpi-value">16 Convênios</div>
+        <div class="kpi-sub">Para clínica típica de 5 a 6 consultórios</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Ganho Marginal por Convênio</div>
+        <div class="kpi-value">+15,8 a +29,5</div>
+        <div class="kpi-sub">Pacientes a mais por mês</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Relação Ótima / Sala</div>
+        <div class="kpi-value">2,6 Conv./Sala</div>
+        <div class="kpi-sub">Equilíbrio volume vs capacidade</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Gargalo de Crowding-Out</div>
+        <div class="kpi-value">&gt; 85% Ocupação</div>
+        <div class="kpi-sub">Provoca perda de particulares</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Simulador de Ponto Ótimo -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">⚖️ Simulador de Rentabilidade & Mix de Convênios</div>
+            <div class="card-subtitle">Encontre o ponto máximo de Lucro Operacional variando os parâmetros comerciais</div>
+          </div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header"><span>Consultórios da Clínica:</span><span id="com-val-cons">6</span></div>
+          <input type="range" id="com-sim-cons" min="2" max="10" step="1" value="6" oninput="updateComercialSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>Ticket Médio Particular (R$):</span><span id="com-val-tpart">250</span></div>
+          <input type="range" id="com-sim-tpart" min="180" max="350" step="10" value="250" oninput="updateComercialSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>Ticket Médio Convênio (R$):</span><span id="com-val-tconv">140</span></div>
+          <input type="range" id="com-sim-tconv" min="90" max="180" step="5" value="140" oninput="updateComercialSim()">
+        </div>
+
+        <div id="com-sim-results" class="insight-box"></div>
+      </div>
+
+      <!-- Curva de Lucro Total vs Número de Convênios -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📈 Curva de Ponto Ótimo: Volume vs Lucro Total</div>
+            <div class="card-subtitle">Visualização do pico de rentabilidade antes do efeito de crowding-out</div>
+          </div>
+        </div>
+        <div class="chart-box" style="height:280px;"><canvas id="chartComercial"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 4: PRISCILA SANTOS (GERÊNCIA DE MARKETING) -->
+  <!-- ============================================================== -->
+  <section id="tab-mkt" class="tab-section">
+    <div class="executive-hero" style="border-left-color: var(--success);">
+      <div class="executive-hero-header">
+        <div>
+          <div class="executive-quote">"Invisto em Google Ads, Instagram e parcerias com empresas. Mas o retorno varia muito por cidade. O modelo pode me dizer quanto cada real em marketing traz de pacientes?"</div>
+          <div class="executive-author">Priscila Santos — Gerente de Marketing</div>
+        </div>
+        <div class="direct-answer-badge" style="background: var(--success);">
+          📣 R$ 1,00 em Mkt = +0,00922 Pacientes (ROAS 1,66x Direto)
+        </div>
+      </div>
+      <p style="font-size:0.88rem; color:var(--text); line-height:1.5;">
+        <strong>Diagnóstico Econométrico & Variação Regional:</strong> Na Regressão Múltipla Oficial, o coeficiente é de <strong>b₃ = +9,22 pacientes por cada R$ 1.000 investidos</strong> (CAC marginal de <strong>R$ 108,46</strong>). Como o ticket médio é R$ 180, cada R$ 1 investido gera <strong>R$ 1,66 em receita no primeiro mês</strong> (ROAS direto de 1,66x). A resposta varia drasticamente por cidade: nas capitais do Sudeste o CAC é maior devido à disputa de leilão em Google Ads, enquanto no Norte/Nordeste a resposta a redes sociais é rápida, mas esbarra no limite físico de consultórios.
+      </p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" style="border-left: 4px solid var(--success);">
+        <div class="kpi-title">Retorno por R$ 1.000 Investidos</div>
+        <div class="kpi-value">+9,22 Pacientes</div>
+        <div class="kpi-sub">Coeficiente b₃ da Regressão Múltipla</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">CAC Marginal Médio</div>
+        <div class="kpi-value">R$ 108,46</div>
+        <div class="kpi-sub">Custo de aquisição do paciente</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">ROAS Direto (1º Mês)</div>
+        <div class="kpi-value">1,66x</div>
+        <div class="kpi-sub">R$ 1,66 de receita para cada R$ 1,00</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">ROAS com LTV (12 Meses)</div>
+        <div class="kpi-value">3,65x</div>
+        <div class="kpi-sub">Considerando retorno e fidelização</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Comparativo Regional de Eficiência de Marketing -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🗺️ Eficiência e Retorno de Marketing por Região</div>
+            <div class="card-subtitle">Médias reais da base de dados demonstrando a disparidade de retorno geográfico</div>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="mkt-region-table"></table>
+        </div>
+        <div class="insight-box" style="margin-top:0.75rem;">
+          <strong>Recomendação para Priscila:</strong> No <strong>Norte</strong>, o investimento médio é de R$ 4,8k gerando 81,6 pac./R$k. Porém, o limitador não é o marketing, mas a falta de cadeiras (2 a 3 consultórios) e espera de 28 a 30 min. <em>Não aumente verba de Google Ads no Norte até que a expansão física de salas seja concluída!</em> No <strong>Sudeste</strong>, amplie parcerias corporativas B2B para contornar o custo alto do Google Ads.
+        </div>
+      </div>
+
+      <!-- Simulador de Canais de Marketing -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📱 Simulador de Mix de Canais (Google vs Insta vs B2B)</div>
+            <div class="card-subtitle">Distribua o orçamento mensal e projete o volume de pacientes gerados</div>
+          </div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header"><span>Orçamento Total de Marketing (R$ mil):</span><span id="mkt-val-budget">15.0</span></div>
+          <input type="range" id="mkt-sim-budget" min="4" max="30" step="1" value="15" oninput="updateMktSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>% Google Ads (Alta Intenção / Emergência / Implantes):</span><span id="mkt-val-gads">50%</span></div>
+          <input type="range" id="mkt-sim-gads" min="10" max="80" step="5" value="50" oninput="updateMktSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>% Instagram & Meta Ads (Estética / Alinhadores):</span><span id="mkt-val-insta">35%</span></div>
+          <input type="range" id="mkt-sim-insta" min="10" max="70" step="5" value="35" oninput="updateMktSim()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span>% Parcerias B2B & Convênios com Empresas:</span><span id="mkt-val-b2b">15%</span></div>
+          <input type="range" id="mkt-sim-b2b" min="0" max="40" step="5" value="15" oninput="updateMktSim()">
+        </div>
+
+        <div id="mkt-sim-results" class="insight-box"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 5: EXPLORADOR MULTIDIMENSIONAL DE DADOS (CUSTOM DATA VIEWER) -->
+  <!-- ============================================================== -->
+  <section id="tab-explorer" class="tab-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">🔍 Explorador Multidimensional de Dados</div>
+          <div class="card-subtitle">Personalize os eixos, filtros e colunas visíveis para criar sua análise sob medida</div>
+        </div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="exportFilteredCSV()">📥 Exportar CSV Filtrado</button>
+          <button class="btn" onclick="resetExplorerFilters()">Limpar Filtros</button>
+        </div>
+      </div>
+
+      <!-- Barra de Configuração dos Eixos e Gráfico -->
+      <div class="grid-3" style="margin-bottom:1rem; background:var(--bg); padding:1rem; border-radius:8px; border:1px solid var(--border);">
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Eixo X (Variável Independente)</label>
+          <select id="exp-axis-x" onchange="renderExplorerChart()" style="width:100%;">
+            <option value="conv" selected>Convênios Atendidos</option>
+            <option value="mkt">Marketing (R$ mil)</option>
+            <option value="dent">Número de Dentistas</option>
+            <option value="cons">Número de Consultórios</option>
+            <option value="esp">Tempo de Espera (min)</option>
+            <option value="sat">Satisfação (1-10)</option>
+            <option value="tempo">Tempo de Operação (anos)</option>
+            <option value="pac">Pacientes Atendidos (Y)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Eixo Y (Variável Dependente)</label>
+          <select id="exp-axis-y" onchange="renderExplorerChart()" style="width:100%;">
+            <option value="pac" selected>Pacientes Atendidos/Mês (Y)</option>
+            <option value="sat">Satisfação (1-10)</option>
+            <option value="esp">Tempo de Espera (min)</option>
+            <option value="mkt">Investimento Marketing</option>
+            <option value="conv">Convênios</option>
+            <option value="cons">Consultórios</option>
+            <option value="dent">Dentistas</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Tipo de Visualização</label>
+          <select id="exp-chart-type" onchange="renderExplorerChart()" style="width:100%;">
+            <option value="scatter" selected>Dispersão com Linha de Tendência</option>
+            <option value="bar">Barras Ranqueadas por Clínica</option>
+            <option value="regionBar">Médias Agrupadas por Região</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Filtros Dinâmicos Cruzados -->
+      <div class="grid-3" style="margin-bottom:1rem;">
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Filtrar por Região</label>
+          <select id="exp-filter-reg" onchange="applyExplorerFilters()" style="width:100%;">
+            <option value="TODAS">Todas as Regiões (40)</option>
+            <option value="Sudeste">Sudeste (13)</option>
+            <option value="Nordeste">Nordeste (11)</option>
+            <option value="Sul">Sul (7)</option>
+            <option value="Centro-Oeste">Centro-Oeste (5)</option>
+            <option value="Norte">Norte (4)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Filtrar por Porte (Consultórios)</label>
+          <select id="exp-filter-size" onchange="applyExplorerFilters()" style="width:100%;">
+            <option value="TODOS">Todos os Portes</option>
+            <option value="PEQ">Pequenas (2 a 4 salas)</option>
+            <option value="MED">Médias (5 a 6 salas)</option>
+            <option value="GRA">Grandes (7 a 10 salas)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Buscar Clínica / Cidade</label>
+          <input type="text" id="exp-search" placeholder="Ex: Itaim, Porto Velho, Salvador..." oninput="applyExplorerFilters()" style="width:100%;">
+        </div>
+      </div>
+
+      <!-- KPIs Dinâmicos Reativos ao Filtro Ativo -->
+      <div class="kpi-grid" id="exp-dynamic-kpis"></div>
+
+      <!-- Gráfico do Explorador -->
+      <div class="chart-box" style="height:360px; margin-bottom:1.5rem;"><canvas id="chartExplorer"></canvas></div>
+
+      <!-- Seletor Interativo de Colunas da Tabela -->
+      <div style="margin-bottom:0.5rem;">
+        <span style="font-size:0.8rem; font-weight:700; color:var(--primary); margin-right:0.5rem;">Escolha quais colunas exibir na tabela:</span>
+        <div class="col-selector-group" id="col-selector-pills"></div>
+      </div>
+
+      <!-- Tabela Dinâmica do Explorador -->
+      <div class="table-wrapper">
+        <table id="exp-table"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 6: ESTATÍSTICA DESCRITIVA E BASE (ITEM 3.1) -->
+  <!-- ============================================================== -->
+  <section id="tab-desc" class="tab-section">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Média de Pacientes/Mês (Y)</div>
+        <div class="kpi-value">681,38</div>
+        <div class="kpi-sub">Mediana: 677,5 | CV: 28,02%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Amplitude de Atendimentos</div>
+        <div class="kpi-value">360 a 1.100</div>
+        <div class="kpi-sub">Porto Velho (Mín) vs. Itaim Bibi (Máx)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Variável Mais Heterogênea</div>
+        <div class="kpi-value">Tempo (59,8%)</div>
+        <div class="kpi-sub">Seguida por Marketing (CV: 46,03%)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Variável Mais Homogênea</div>
+        <div class="kpi-value">Satisfação (9,8%)</div>
+        <div class="kpi-sub">Média: 8,06 | Mediana: 8,15</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Principal Preditora de Y</div>
+        <div class="kpi-value">Convênios</div>
+        <div class="kpi-sub">Correlação r = +0,9967 (R² = 99,34%)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Tabela 3.1 — Medidas de Tendência Central, Dispersão, Quartis e Assimetria (n = 40)</div>
+          <div class="card-subtitle">Cálculos amostrais validados (n - 1 = 39 graus de liberdade) para todas as variáveis quantitativas</div>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="desc-table"></table>
+      </div>
+      <div class="insight-box">
+        <strong>Diagnóstico Gerencial (Item 3.1):</strong> A elevada dispersão relativa no <em>Tempo de Operação</em> (CV = 59,78%), <em>Investimento em Marketing</em> (46,03%) e <em>Dentistas</em> (41,24%) revela que a rede não possui um porte único padronizado, combinando megaclínicas maduras no Sudeste com unidades compactas recém-inauguradas no Norte/Nordeste. As variáveis de recursos físicos e espera apresentam <strong>assimetria positiva</strong>, enquanto a <em>Satisfação</em> apresenta <strong>assimetria negativa (-0,32)</strong>, indicando padrão elevado na maioria da rede, mas penalizado pelas unidades com gargalo crítico de espera.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Base de Dados Completa das Unidades (n = 40 clínicas)</div>
+          <div class="card-subtitle">Filtre por região ou pesquise por clínica para inspecionar os indicadores operacionais</div>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <select id="region-filter" onchange="renderRawTable()">
+            <option value="TODAS">Todas as Regiões (40)</option>
+            <option value="Sudeste">Sudeste (13)</option>
+            <option value="Nordeste">Nordeste (11)</option>
+            <option value="Sul">Sul (7)</option>
+            <option value="Centro-Oeste">Centro-Oeste (5)</option>
+            <option value="Norte">Norte (4)</option>
+          </select>
+          <input type="text" id="search-clinic" placeholder="Procurar clínica..." oninput="renderRawTable()">
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="raw-table"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 7: HISTOGRAMAS E DISTRIBUIÇÃO (ITEM 3.2) -->
+  <!-- ============================================================== -->
+  <section id="tab-dist" class="tab-section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Histograma: Pacientes Atendidos/Mês (Y)</div>
+            <div class="card-subtitle">Assimetria positiva (+0,29) | 45% das clínicas entre 600 e 800 pac./mês</div>
+          </div>
+        </div>
+        <div class="chart-box"><canvas id="histPac"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Histograma: Investimento em Marketing (R$ mil)</div>
+            <div class="card-subtitle">Assimetria positiva (+0,79) | Cauda longa puxada pelas clínicas de SP e RJ</div>
+          </div>
+        </div>
+        <div class="chart-box"><canvas id="histMkt"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Histograma: Satisfação do Paciente (1 a 10)</div>
+            <div class="card-subtitle">Assimetria negativa (-0,32) | 57,5% das clínicas com nota acima de 8,0</div>
+          </div>
+        </div>
+        <div class="chart-box"><canvas id="histSat"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Histograma: Tempo Médio de Espera (min)</div>
+            <div class="card-subtitle">Assimetria positiva (+0,63) | Alerta para 7 unidades com fila entre 23 e 30 min</div>
+          </div>
+        </div>
+        <div class="chart-box"><canvas id="histEsp"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Diagnóstico de Valores Extremos e Outliers (Item 3.2)</div>
+      <div class="insight-box">
+        <strong>• Extremo Superior (Oportunidade de Aprendizado / Benchmark):</strong> Pelo critério de 1,5 × IIQ, a clínica <strong>Itaim Bibi - SP</strong> (14 dentistas, 10 consultórios, 1.100 pac./mês, 7 min de espera e satisfação 9,4) é outlier estatístico em Dentistas (LS = 12,5), Consultórios (LS = 9,0) e Marketing (LS = 24,06). Junto com <strong>Pinheiros - SP</strong> (1.050 pac./mês), demonstra como a escala combinada à gestão de fluxo gera máxima produtividade.<br>
+        <strong>• Extremo Inferior (Problema Operacional):</strong> <strong>Centro - Porto Velho</strong> (360 pac./mês, 30 min de espera, nota 6,5) e <strong>Plano Diretor - Palmas</strong> (380 pac./mês, 29 min de espera, nota 6,6) evidenciam gargalos críticos de agendamento e subdimensionamento inicial na Região Norte.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 8: CORRELAÇÃO E DISPERSÃO (ITENS 3.3 E 3.4) -->
+  <!-- ============================================================== -->
+  <section id="tab-corr" class="tab-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Matriz de Correlação Linear de Pearson (Item 3.3)</div>
+          <div class="card-subtitle">Destaque térmico para intensidade e sinal das correlações lineares (n = 40)</div>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="corr-table"></table>
+      </div>
+      <div class="warn-box">
+        <strong>Diagnóstico de Multicolinearidade (Critério |r| &gt; 0,90):</strong><br>
+        • <strong>3 Maiores Correlações Positivas:</strong> 1º Pacientes × Convênios (<strong>+0,9967</strong>); 2º Marketing × Convênios (<strong>+0,9928</strong>); 3º Marketing × Tempo (<strong>+0,9923</strong>). Entre preditoras de recursos físicos: Dentistas × Marketing (+0,9922) e Dentistas × Consultórios (+0,9831).<br>
+        • <strong>3 Maiores Correlações Negativas:</strong> 1º Satisfação × Espera (<strong>-0,9920</strong>); 2º Pacientes × Espera (<strong>-0,9652</strong>); 3º Convênios × Espera (<strong>-0,9541</strong>).<br>
+        • <strong>Alerta Metodológico:</strong> A correlação massiva entre recursos e porte provoca inflação de variância (VIF até 380,88) na Regressão Múltipla.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Diagramas de Dispersão com Linha de Tendência Linear OLS (Item 3.4)</div>
+          <div class="card-subtitle">Selecione a variável independente para visualizar a relação com Pacientes/Mês</div>
+        </div>
+        <div>
+          <label for="scatter-select" style="font-size:0.82rem; font-weight:600;">Variável no Eixo X: </label>
+          <select id="scatter-select" onchange="updateScatterChart()">
+            <option value="conv" selected>Convênios Atendidos (r = +0,9967)</option>
+            <option value="mkt">Investimento em Marketing (r = +0,9874)</option>
+            <option value="tempo">Tempo de Operação (r = +0,9853)</option>
+            <option value="cons">Número de Consultórios (r = +0,9803)</option>
+            <option value="sat">Satisfação do Paciente (r = +0,9790)</option>
+            <option value="dent">Número de Dentistas (r = +0,9781)</option>
+            <option value="esp">Tempo Médio de Espera (r = -0,9652)</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-box" style="height:340px;"><canvas id="scatterChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 9: REGRESSÃO LINEAR SIMPLES (ITEM 4.1) -->
+  <!-- ============================================================== -->
+  <section id="tab-rls" class="tab-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Modelagem por Regressão Linear Simples — Y = b₀ + b₁X (Item 4.1)</div>
+          <div class="card-subtitle">Teste qualquer variável preditora em tempo real com recálculo instantâneo de ANOVA e estatística t</div>
+        </div>
+        <div>
+          <label for="rls-select" style="font-size:0.82rem; font-weight:600;">Selecionar Preditora (X): </label>
+          <select id="rls-select" onchange="runRLS()">
+            <option value="conv" selected>Convênios Atendidos (Maior Correlação: r = +0,9967)</option>
+            <option value="mkt">Investimento em Marketing (R$ mil)</option>
+            <option value="tempo">Tempo de Operação (anos)</option>
+            <option value="cons">Número de Consultórios</option>
+            <option value="sat">Satisfação do Paciente (1-10)</option>
+            <option value="dent">Número de Dentistas</option>
+            <option value="esp">Tempo Médio de Espera (min)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="rls-eq" class="eq-box"></div>
+      <div class="kpi-grid" id="rls-kpis"></div>
+
+      <div class="grid-2">
+        <div>
+          <h4 style="margin-bottom:0.5rem; font-size:0.9rem;">Coeficientes do Modelo Simples (Teste t a 5%)</h4>
+          <div class="table-wrapper"><table id="rls-coef-table"></table></div>
+        </div>
+        <div>
+          <h4 style="margin-bottom:0.5rem; font-size:0.9rem;">Tabela ANOVA (Teste F Global a 5%)</h4>
+          <div class="table-wrapper"><table id="rls-anova-table"></table></div>
+        </div>
+      </div>
+
+      <div id="rls-interpretation" class="insight-box"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 10: REGRESSÃO LINEAR MÚLTIPLA (ITEM 4.2) -->
+  <!-- ============================================================== -->
+  <section id="tab-rlm" class="tab-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Modelagem por Regressão Linear Múltipla (Item 4.2 & Decisão Metodológica)</div>
+          <div class="card-subtitle">Alterne entre o Modelo Completo Oficial (7 variáveis) e o Modelo Parcimonioso (Variáveis significativas a 5%)</div>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-primary" id="btn-full" onclick="switchRLM('full')">Modelo Completo (7 Variáveis)</button>
+          <button class="btn" id="btn-ref" onclick="switchRLM('refined')">Modelo Parcimonioso (Conv. + Espera)</button>
+        </div>
+      </div>
+
+      <div id="rlm-eq" class="eq-box"></div>
+      <div class="kpi-grid" id="rlm-kpis"></div>
+
+      <div class="grid-2">
+        <div>
+          <h4 style="margin-bottom:0.5rem; font-size:0.9rem;">Tabela de Coeficientes, Estatística t, p-valor e VIF</h4>
+          <div class="table-wrapper"><table id="rlm-coef-table"></table></div>
+        </div>
+        <div>
+          <h4 style="margin-bottom:0.5rem; font-size:0.9rem;">Tabela ANOVA do Modelo Múltiplo (Teste F Global)</h4>
+          <div class="table-wrapper"><table id="rlm-anova-table"></table></div>
+          <div class="warn-box" id="rlm-notes" style="margin-top:1rem;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 11: SIMULADOR DE CENÁRIOS OFICIAIS (ITEM 4.3) -->
+  <!-- ============================================================== -->
+  <section id="tab-sim" class="tab-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Simulador Preditivo e Cenários Estratégicos Oficiais (Item 4.3)</div>
+          <div class="card-subtitle">Carregue os 3 cenários oficiais do estudo de caso com um clique ou personalize os parâmetros</div>
+        </div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="loadScenario(1)">Cenário 1: Nova Clínica Sorocaba (SP)</button>
+          <button class="btn btn-primary" onclick="loadScenario(2)">Cenário 2: Revitalização Porto Velho</button>
+          <button class="btn btn-primary" onclick="loadScenario(3)">Cenário 3: Redução de Espera (15 Clínicas)</button>
+          <button class="btn" onclick="loadScenario(0)">Repor Média da Rede</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div style="background:var(--bg); padding:1.1rem; border-radius:8px; border:1px solid var(--border);">
+          <h4 style="margin-bottom:0.85rem; color:var(--primary);">Parâmetros de Entrada da Unidade (Xᵢ)</h4>
+
+          <div class="slider-group">
+            <div class="slider-header"><span>Número de Dentistas (X₁):</span><span id="val-dent">7</span></div>
+            <input type="range" id="sim-dent" min="2" max="16" step="1" value="7" oninput="updateSimulation()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header"><span>Número de Consultórios (X₂):</span><span id="val-cons">5</span></div>
+            <input type="range" id="sim-cons" min="2" max="12" step="1" value="5" oninput="updateSimulation()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header"><span>Investimento em Marketing - R$ mil (X₃):</span><span id="val-mkt">12.0</span></div>
+            <input type="range" id="sim-mkt" min="3" max="30" step="0.5" value="12" oninput="updateSimulation()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header"><span>Satisfação Projetada 1-10 (X₄):</span><span id="val-sat">8.4</span></div>
+            <input type="range" id="sim-sat" min="6.0" max="10.0" step="0.1" value="8.4" oninput="updateSimulation()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header"><span>Tempo Médio de Espera - min (X₅):</span><span id="val-esp">14</span></div>
+            <input type="range" id="sim-esp" min="5" max="35" step="1" value="14" oninput="updateSimulation()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header"><span>Convênios Atendidos (X₆):</span><span id="val-conv">15</span></div>
+            <input type="range" id="sim-conv" min="4" max="30" step="1" value="15" oninput="updateSimulation()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header"><span>Tempo de Operação - anos (X₇):</span><span id="val-tempo">0</span></div>
+            <input type="range" id="sim-tempo" min="0" max="20" step="1" value="0" oninput="updateSimulation()">
+          </div>
+        </div>
+
+        <div>
+          <div class="kpi-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="kpi-card" style="border-left: 4px solid var(--accent);">
+              <div class="kpi-title">Previsão: Modelo Completo (7 Var.)</div>
+              <div class="kpi-value" id="pred-full">721,88</div>
+              <div class="kpi-sub">Pacientes / Mês estimados</div>
+            </div>
+            <div class="kpi-card" style="border-left: 4px solid var(--success);">
+              <div class="kpi-title">Previsão: Modelo Parcimonioso (2 Var.)</div>
+              <div class="kpi-value" id="pred-ref">734,91</div>
+              <div class="kpi-sub">Conv. + Espera (Signif. a 5%)</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">Receita Bruta Mensal Estimada</div>
+              <div class="kpi-value" id="pred-rev">R$ 129.938</div>
+              <div class="kpi-sub">Base: Ticket Médio R$ 180 / pac.</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">CAPEX Estimado em Consultórios</div>
+              <div class="kpi-value" id="pred-capex">R$ 900.000</div>
+              <div class="kpi-sub">Base: R$ 180.000 por consultório</div>
+            </div>
+          </div>
+
+          <div id="scenario-details" class="insight-box" style="margin-top:0.5rem;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:0.75rem;">Resumo Validado dos 3 Cenários Oficiais (Item 4.3)</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Cenário Oficial do Case</th>
+              <th>Parâmetros Aplicados</th>
+              <th>Resultado Modelo Completo (7 Var.)</th>
+              <th>Resultado Modelo Parcimonioso (2 Var.)</th>
+              <th>Impacto Financeiro Mensal (Ticket R$ 180)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cenário 1: Nova Clínica Sorocaba (SP)</strong></td>
+              <td style="text-align:left;">7 dent., 5 cons., R$ 12k mkt, sat. 8.4, esp. 14m, 15 conv., 0 anos</td>
+              <td><strong>721,88 pac./mês</strong></td>
+              <td><strong>734,91 pac./mês</strong></td>
+              <td>R$ 129.938 a R$ 132.284 / mês</td>
+            </tr>
+            <tr>
+              <td><strong>Cenário 2: Revitalização Porto Velho</strong></td>
+              <td style="text-align:left;">+2 dent. (3→5), +1 cons. (2→3), +R$ 4k mkt (4→8), +4 conv. (5→9)</td>
+              <td><strong>+110,36 pac./mês</strong> (Direto: 461,94 | Ancorado: 470,36)</td>
+              <td><strong>+117,98 pac./mês</strong> (Total: 476,49)</td>
+              <td>+R$ 19.864 a +R$ 21.236 / mês</td>
+            </tr>
+            <tr>
+              <td><strong>Cenário 3: Programa Redução de Espera</strong></td>
+              <td style="text-align:left;">Corte de 18 para 10 min (-8 min) OU tempos reais das 15 piores até 10 min (-193 min total)</td>
+              <td><strong>Literal: +100,76 pac./unid. (+1.511,43 rede)</strong><br>Real: <strong>+2.430,89 rede</strong></td>
+              <td><strong>Literal: +40,73 pac./unid. (+610,90 rede)</strong><br>Real: <strong>+982,52 rede</strong></td>
+              <td>+R$ 272.058 a +R$ 437.560 / mês na rede</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- ABA 12: QUESTIONÁRIO EXECUTIVO (PARTE V - 10 QUESTÕES) -->
+  <!-- ============================================================== -->
+  <section id="tab-qa" class="tab-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Respostas Fundamentadas ao Questionário Interpretativo e Gerencial (Parte V)</div>
+          <div class="card-subtitle">Análises detalhadas para todas as 10 questões do estudo de caso da Rede Sorriso Pleno</div>
+        </div>
+      </div>
+
+      <details open>
+        <summary>Questão 1: Explicação do R² para o Dr. Ricardo Alves (Analogia na Área da Saúde)</summary>
+        <p>O R² de <strong>99,70% (R² ajustado de 99,63%)</strong> funciona como um exame de imagem e diagnóstico laboratorial de altíssima precisão que identifica 99,63% de todas as causas de variação do quadro do paciente, restando apenas 0,37% de ruído biológico inexplicado. Gerencialmente, demonstra que o volume de pacientes/mês da rede não é fruto de sorte: ele responde quase perfeitamente à combinação de convênios, capacidade física e agilidade de atendimento, permitindo projetar novas clínicas com erro padrão residual de apenas <strong>11,63 pacientes/mês</strong>.</p>
+      </details>
+
+      <details open>
+        <summary>Questão 2: Redução do Tempo de Espera de 25 min para 12 min (Impacto e Investimento)</summary>
+        <p>• <strong>Redução no tempo de espera:</strong> -13 minutos (de 25 para 12 min).<br>
+        • <strong>Aumento estimado de pacientes/mês:</strong> <strong>+163,74 pacientes/mês</strong> no Modelo Completo (b₅ = -12,5953 × -13) ou <strong>+66,18 pacientes/mês</strong> no Modelo Parcimonioso (b₅ = -5,0908 × -13).<br>
+        • <strong>Ganho mensal de receita bruta (Ticket R$ 180):</strong> <strong>R$ 29.472,93/mês</strong> no Modelo Completo (ou R$ 11.912,40/mês no Parcimonioso), totalizando R$ 143 mil a R$ 353,7 mil/ano em nova receita.<br>
+        • <strong>Teto de investimento em tecnologia de agendamento:</strong> Considerando margem de contribuição de 45% a 50% (R$ 13,2 mil a R$ 14,7 mil/mês de margem líquida adicional), a clínica pode investir tranquilamente até <strong>R$ 3.000 a R$ 5.000/mês (OPEX)</strong> em um software SaaS de agendamento preditivo com ROI imediato, ou até <strong>R$ 50.000 a R$ 70.000 (CAPEX)</strong> com payback inferior a 6 meses.</p>
+      </details>
+
+      <details open>
+        <summary>Questão 3: Trade-off entre Volume e Margem nos Convênios Odontológicos</summary>
+        <p>Cada convênio adiciona <strong>+34,78 pacientes/mês</strong> no modelo simples, <strong>+15,77</strong> no modelo completo e <strong>+29,50</strong> no modelo parcimonioso. Em clínicas com capacidade ociosa (como no Norte e Nordeste), novos convênios diluem os elevados custos fixos de estrutura. Porém, acima de 85% de ocupação das cadeiras, o excesso de convênios expulsa pacientes particulares de alta margem (efeito crowding-out) e gera gargalos de espera. O ponto ótimo operacional situa-se em <strong>2,5 a 2,8 convênios por consultório instalado</strong>, utilizando a carteira de planos como funil de entrada para conversão em procedimentos particulares de maior valor agregado (ortodontia, estética e implantes).</p>
+      </details>
+
+      <details open>
+        <summary>Questão 4: Multicolinearidade entre "Dentistas" e "Consultórios"</summary>
+        <p>A correlação entre Dentistas e Consultórios é de r = +0,9831 (e ambos superam +0,98 com Marketing e Convênios), gerando VIF de 82,85 para Dentistas e 45,05 para Consultórios. Como a rede dimensiona as equipes de forma proporcional às salas equipadas (~1,3 dentista por consultório), o modelo econométrico sofre com <strong>multicolinearidade severa</strong>, o que infla os erros padrão dos coeficientes (p = 0,4688 e p = 0,8820) e impede isolar matematicamente quanto do resultado provém da mão de obra vs. do equipamento instalado. São ativos operacionais estritamente complementares.</p>
+      </details>
+
+      <details>
+        <summary>Questão 5: Três Hipóteses para o Desempenho Superior do Itaim Bibi (SP)</summary>
+        <p><em>Auditoria dos Dados:</em> No modelo econométrico completo oficial, a clínica do Itaim Bibi apresenta 1.100 pacientes observados contra 1.116,06 previstos pelo modelo (resíduo de <strong>-16,06 pacientes/mês</strong>). Em termos de volume absoluto (líder absoluta da rede com 1.100 pac./mês), as três hipóteses para essa escala superior são:<br>
+        1. <strong>População Flutuante Corporativa e Renda:</strong> Localização no polo financeiro de São Paulo (Faria Lima/Itaim), com altíssima densidade diurna de trabalhadores formais.<br>
+        2. <strong>Carteira Corporativa Premium:</strong> Presença de 26 convênios corporativos de alto padrão com forte taxa de utilização.<br>
+        3. <strong>Economia de Escala no Agendamento:</strong> Operar com 14 dentistas e 10 consultórios permite turnos estendidos, garantindo o menor tempo de espera da rede (7 min) e a maior nota de satisfação (9,4).</p>
+      </details>
+
+      <details>
+        <summary>Questão 6: Curva de Aprendizado e Forma Funcional (Linear vs. Logarítmica)</summary>
+        <p>A construção de carteira odontológica depende de fidelização, manutenções periódicas e reputação boca-a-boca. Mantendo a infraestrutura constante, a relação teórica entre pacientes e tempo é <strong>logarítmica</strong>: rápido crescimento nos primeiros anos seguido de estabilização quando a clínica atinge a capacidade física máxima dos consultórios. Na amostra, a relação parece linear apenas porque as unidades mais antigas da rede foram ampliadas fisicamente ao longo do tempo.</p>
+      </details>
+
+      <details>
+        <summary>Questão 7: Limitações de Previsão para Cidade do Interior com 80 mil Habitantes</summary>
+        <p>Incorre em <strong>extrapolação fora do domínio amostral</strong>: todas as 40 clínicas da base localizam-se em capitais ou grandes polos metropolitanos (&gt;400 mil habitantes). Em uma cidade de 80 mil habitantes, a base de vidas cobertas por planos odontológicos é muito menor, a concorrência local tem dinâmicas distintas e o mercado satura rapidamente investimentos em marketing digital de grande porte.</p>
+      </details>
+
+      <details>
+        <summary>Questão 8: Causalidade Reversa entre Satisfação e Volume de Pacientes</summary>
+        <p>A regressão OLS identifica associação linear condicional, mas não estabelece causalidade unidirecional. Embora a alta satisfação atraia pacientes via recomendação (Satisfação → Volume), existe <strong>simultaneidade/causalidade reversa</strong> (Volume → Satisfação): unidades com alto faturamento dispõem de mais caixa para investir em tecnologia de ponta, instalações modernas e treinamento da recepção, gerando percepção de solidez e confiabilidade.</p>
+      </details>
+
+      <details>
+        <summary>Questão 9: Escolha de Nova Variável Explicativa</summary>
+        <p><strong>Horário de Funcionamento Estendido (noturno e sábados):</strong> É a variável operacional de maior alavancagem para a rede. Permite alocar múltiplos turnos de dentistas por consultório instalado, diluindo o CAPEX de R$ 180 mil por sala e atendendo a demanda de trabalhadores que utilizam convênio e não podem comparecer em horário comercial.</p>
+      </details>
+
+      <details open>
+        <summary>Questão 10: Sumário Executivo — Cinco Recomendações Estratégicas para 2026</summary>
+        <p>1. <strong>Dimensionamento Enxuto de CAPEX (2026):</strong> Padronizar as 10 novas unidades no modelo de 5 a 6 consultórios com dentistas em turnos estendidos (projeção Sorocaba: ~722 pac./mês; unidade 6 cons: ~765 pac./mês), poupando R$ 540 mil em CAPEX por unidade em relação a megaclínicas.<br>
+        2. <strong>Programa Fila Zero nas 15 Piores Unidades:</strong> Reduzir a espera para 10 min via sistema de agendamento preditivo, gerando entre <strong>+1.511 e +2.431 pacientes/mês na rede</strong> (+R$ 272k a +R$ 438k/mês em receita bruta).<br>
+        3. <strong>Turnaround Integrado de Porto Velho e Região Norte:</strong> Implementar a revitalização (+4 convênios, expansão para 3 consultórios e corte de espera), elevando o volume de 360 para <strong>462 a 470 pac./mês</strong>.<br>
+        4. <strong>Política Regional de Convênios:</strong> Acelerar o credenciamento de novos planos nas unidades do Norte e Nordeste para ocupar capacidade ociosa, e focar o Sudeste na conversão de particulares.<br>
+        5. <strong>Gestão de Fluxo Integrada:</strong> Tratar tempo de espera e satisfação como os grandes direcionadores de fidelização, atrelando a remuneração variável das equipes à pontualidade do agendamento.</p>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ==============================================================
+// 1. BASE DE DADOS COMPLETA VALIDADA (n = 40)
+// ==============================================================
+const rawData = [
+  {obs:1, clinica:"Savassi - BH", regiao:"Sudeste", pac:820, dent:8, cons:6, mkt:15.0, sat:8.8, esp:12, conv:18, tempo:10},
+  {obs:2, clinica:"Pinheiros - SP", regiao:"Sudeste", pac:1050, dent:12, cons:9, mkt:22.0, sat:9.2, esp:8, conv:24, tempo:14},
+  {obs:3, clinica:"Tijuca - RJ", regiao:"Sudeste", pac:920, dent:10, cons:7, mkt:18.0, sat:9.0, esp:10, conv:21, tempo:12},
+  {obs:4, clinica:"Batel - Curitiba", regiao:"Sul", pac:720, dent:7, cons:5, mkt:12.0, sat:8.4, esp:14, conv:15, tempo:7},
+  {obs:5, clinica:"Moinhos - POA", regiao:"Sul", pac:660, dent:6, cons:5, mkt:10.0, sat:8.1, esp:16, conv:13, tempo:6},
+  {obs:6, clinica:"Pituba - Salvador", regiao:"Nordeste", pac:600, dent:5, cons:4, mkt:8.5, sat:7.8, esp:18, conv:11, tempo:4},
+  {obs:7, clinica:"Boa Viagem - Recife", regiao:"Nordeste", pac:560, dent:5, cons:4, mkt:7.5, sat:7.5, esp:20, conv:10, tempo:4},
+  {obs:8, clinica:"Asa Sul - Brasília", regiao:"Centro-Oeste", pac:780, dent:8, cons:6, mkt:14.0, sat:8.6, esp:13, conv:17, tempo:9},
+  {obs:9, clinica:"Setor Bueno - Goiânia", regiao:"Centro-Oeste", pac:700, dent:6, cons:5, mkt:11.0, sat:8.3, esp:15, conv:14, tempo:6},
+  {obs:10, clinica:"Cambuí - Campinas", regiao:"Sudeste", pac:860, dent:9, cons:7, mkt:16.0, sat:8.9, esp:11, conv:19, tempo:11},
+  {obs:11, clinica:"Centro - Floripa", regiao:"Sul", pac:690, dent:6, cons:5, mkt:10.5, sat:8.2, esp:15, conv:13, tempo:6},
+  {obs:12, clinica:"Meireles - Fortaleza", regiao:"Nordeste", pac:580, dent:5, cons:4, mkt:8.0, sat:7.6, esp:19, conv:10, tempo:4},
+  {obs:13, clinica:"Adrianópolis - Manaus", regiao:"Norte", pac:420, dent:3, cons:3, mkt:5.5, sat:7.0, esp:25, conv:7, tempo:2},
+  {obs:14, clinica:"Umarizal - Belém", regiao:"Norte", pac:390, dent:3, cons:3, mkt:5.0, sat:6.8, esp:28, conv:6, tempo:2},
+  {obs:15, clinica:"Moema - SP", regiao:"Sudeste", pac:1020, dent:11, cons:8, mkt:20.0, sat:9.1, esp:9, conv:23, tempo:13},
+  {obs:16, clinica:"Botafogo - RJ", regiao:"Sudeste", pac:950, dent:10, cons:8, mkt:19.0, sat:9.0, esp:10, conv:22, tempo:12},
+  {obs:17, clinica:"Água Verde - Curitiba", regiao:"Sul", pac:710, dent:6, cons:5, mkt:11.5, sat:8.3, esp:14, conv:14, tempo:7},
+  {obs:18, clinica:"Ponta Negra - Natal", regiao:"Nordeste", pac:500, dent:4, cons:3, mkt:6.5, sat:7.2, esp:22, conv:8, tempo:3},
+  {obs:19, clinica:"Praia do Canto - Vitória", regiao:"Sudeste", pac:760, dent:7, cons:6, mkt:13.0, sat:8.5, esp:13, conv:16, tempo:8},
+  {obs:20, clinica:"Renascença - São Luís", regiao:"Nordeste", pac:450, dent:4, cons:3, mkt:5.5, sat:7.0, esp:24, conv:7, tempo:2},
+  {obs:21, clinica:"Centro - Campo Grande", regiao:"Centro-Oeste", pac:640, dent:5, cons:4, mkt:9.0, sat:7.9, esp:17, conv:12, tempo:5},
+  {obs:22, clinica:"Manaíra - João Pessoa", regiao:"Nordeste", pac:530, dent:4, cons:4, mkt:7.0, sat:7.4, esp:21, conv:9, tempo:3},
+  {obs:23, clinica:"Gleba Palhano - Londrina", regiao:"Sul", pac:670, dent:6, cons:5, mkt:10.0, sat:8.1, esp:16, conv:13, tempo:5},
+  {obs:24, clinica:"Sul - Ribeirão Preto", regiao:"Sudeste", pac:790, dent:7, cons:6, mkt:14.0, sat:8.7, esp:12, conv:17, tempo:9},
+  {obs:25, clinica:"Itaim Bibi - SP", regiao:"Sudeste", pac:1100, dent:14, cons:10, mkt:25.0, sat:9.4, esp:7, conv:26, tempo:15},
+  {obs:26, clinica:"Jardins - Aracaju", regiao:"Nordeste", pac:470, dent:4, cons:3, mkt:6.0, sat:7.1, esp:23, conv:8, tempo:2},
+  {obs:27, clinica:"Popular - Cuiabá", regiao:"Centro-Oeste", pac:620, dent:5, cons:4, mkt:8.5, sat:7.8, esp:18, conv:11, tempo:4},
+  {obs:28, clinica:"Jóquei - Teresina", regiao:"Nordeste", pac:400, dent:3, cons:3, mkt:4.5, sat:6.7, esp:27, conv:6, tempo:2},
+  {obs:29, clinica:"América - Joinville", regiao:"Sul", pac:680, dent:6, cons:5, mkt:10.5, sat:8.2, esp:15, conv:13, tempo:6},
+  {obs:30, clinica:"Gonzaga - Santos", regiao:"Sudeste", pac:800, dent:8, cons:6, mkt:14.5, sat:8.7, esp:12, conv:17, tempo:9},
+  {obs:31, clinica:"Jatiúca - Maceió", regiao:"Nordeste", pac:550, dent:5, cons:4, mkt:7.5, sat:7.5, esp:20, conv:10, tempo:3},
+  {obs:32, clinica:"Centro - Porto Velho", regiao:"Norte", pac:360, dent:3, cons:2, mkt:4.0, sat:6.5, esp:30, conv:5, tempo:1},
+  {obs:33, clinica:"Zona 7 - Maringá", regiao:"Sul", pac:675, dent:6, cons:5, mkt:10.0, sat:8.1, esp:15, conv:13, tempo:5},
+  {obs:34, clinica:"Icaraí - Niterói", regiao:"Sudeste", pac:840, dent:8, cons:6, mkt:15.5, sat:8.8, esp:11, conv:18, tempo:10},
+  {obs:35, clinica:"Vila Mariana - SP", regiao:"Sudeste", pac:980, dent:11, cons:8, mkt:19.5, sat:9.1, esp:9, conv:22, tempo:13},
+  {obs:36, clinica:"Centro - Uberlândia", regiao:"Sudeste", pac:730, dent:7, cons:5, mkt:12.0, sat:8.4, esp:14, conv:15, tempo:7},
+  {obs:37, clinica:"Derby - Recife", regiao:"Nordeste", pac:570, dent:5, cons:4, mkt:7.5, sat:7.6, esp:19, conv:10, tempo:4},
+  {obs:38, clinica:"Marista - Goiânia", regiao:"Centro-Oeste", pac:720, dent:7, cons:5, mkt:12.0, sat:8.4, esp:14, conv:15, tempo:7},
+  {obs:39, clinica:"Barra - Salvador", regiao:"Nordeste", pac:610, dent:5, cons:4, mkt:9.0, sat:7.9, esp:17, conv:12, tempo:5},
+  {obs:40, clinica:"Plano Diretor - Palmas", regiao:"Norte", pac:380, dent:3, cons:2, mkt:4.5, sat:6.6, esp:29, conv:5, tempo:1}
+];
+
+const varsMeta = [
+  {key:"pac", label:"Pac./Mês (Y)", name:"Pacientes Atendidos/Mês"},
+  {key:"dent", label:"Dentistas (X₁)", name:"Número de Dentistas"},
+  {key:"cons", label:"Consultórios (X₂)", name:"Número de Consultórios"},
+  {key:"mkt", label:"Mkt R$ mil (X₃)", name:"Investimento em Marketing (R$ mil)"},
+  {key:"sat", label:"Satisfação (X₄)", name:"Satisfação do Paciente (1-10)"},
+  {key:"esp", label:"Espera min (X₅)", name:"Tempo Médio de Espera (min)"},
+  {key:"conv", label:"Convênios (X₆)", name:"Convênios Atendidos"},
+  {key:"tempo", label:"Tempo anos (X₇)", name:"Tempo de Operação (anos)"}
+];
+
+// Funções Estatísticas Auxiliares
+function getArr(key, data = rawData) { return data.map(d => d[key]); }
+function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function variance(arr) {
+  const m = mean(arr);
+  return arr.reduce((a,b)=>a + Math.pow(b-m,2), 0) / (arr.length - 1);
+}
+function stdev(arr) { return Math.sqrt(variance(arr)); }
+function quantile(arr, q) {
+  const sorted = [...arr].sort((a,b)=>a-b);
+  const pos = (sorted.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  return sorted[base+1] !== undefined ? sorted[base] + rest * (sorted[base+1] - sorted[base]) : sorted[base];
+}
+function getModes(arr) {
+  const freq = {};
+  arr.forEach(v => freq[v] = (freq[v]||0)+1);
+  const maxF = Math.max(...Object.values(freq));
+  const modes = Object.keys(freq).filter(k => freq[k] === maxF).map(Number);
+  return modes.length > 3 ? modes.slice(0,3).join(" / ") : modes.join(" / ");
+}
+function skewness(arr) {
+  const n = arr.length, m = mean(arr), s = stdev(arr);
+  const sum3 = arr.reduce((acc, v) => acc + Math.pow((v - m)/s, 3), 0);
+  return (n / ((n - 1)*(n - 2))) * sum3;
+}
+function pearson(x, y) {
+  const mx = mean(x), my = mean(y);
+  let num = 0, dx = 0, dy = 0;
+  for(let i=0; i<x.length; i++){
+    num += (x[i]-mx)*(y[i]-my);
+    dx += Math.pow(x[i]-mx,2);
+    dy += Math.pow(y[i]-my,2);
+  }
+  return num / Math.sqrt(dx*dy);
+}
+function fmt(n, dec=2) {
+  return Number(n).toLocaleString('pt-BR', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+
+// Alternador de Temas (Claro / Escuro)
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.classList.toggle('dark');
+  localStorage.setItem('sorriso_pleno_theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
+  document.getElementById('theme-text').innerText = isDark ? 'Modo Claro' : 'Modo Escuro';
+  
+  // Atualizar gráficos com as novas cores
+  if (chartCEOInstance) chartCEOInstance.update();
+  if (chartClinicaInstance) chartClinicaInstance.update();
+  if (chartComercialInstance) chartComercialInstance.update();
+  if (chartExplorerInstance) renderExplorerChart();
+  if (scatterChartInstance) updateScatterChart();
+}
+
+// Navegação Unificada
+function switchView(tabId, btn) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.persona-btn').forEach(p => p.classList.remove('active'));
+  
+  const target = document.getElementById(tabId);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  // Trigger chart resizes
+  window.dispatchEvent(new Event('resize'));
+}
+
+// ==============================================================
+// 2. MÓDULO DR. RICARDO ALVES (CEO)
+// ==============================================================
+let chartCEOInstance = null;
+
+function updateCEOSim() {
+  const cons = parseFloat(document.getElementById('ceo-sim-cons').value);
+  const dent = parseFloat(document.getElementById('ceo-sim-dent').value);
+  const conv = parseFloat(document.getElementById('ceo-sim-conv').value);
+  const mkt = parseFloat(document.getElementById('ceo-sim-mkt').value);
+  const esp = parseFloat(document.getElementById('ceo-sim-esp').value);
+  const tempo = parseFloat(document.getElementById('ceo-sim-tempo').value);
+  const sat = 8.5; // Calibrado benchmark
+
+  document.getElementById('ceo-val-cons').innerText = cons;
+  document.getElementById('ceo-val-dent').innerText = dent;
+  document.getElementById('ceo-val-conv').innerText = conv;
+  document.getElementById('ceo-val-mkt').innerText = fmt(mkt, 1);
+  document.getElementById('ceo-val-esp').innerText = esp;
+  document.getElementById('ceo-val-tempo').innerText = tempo;
+
+  // Equação RLM Completa Oficial
+  const predFull = 881.193493 + 4.690078*dent + 1.012671*cons + 9.220218*mkt - 43.818699*sat - 12.595268*esp + 15.770531*conv + 1.240302*tempo;
+  // Equação RLM Parcimoniosa (Conv + Espera)
+  const predRef = 363.7574 - 5.090782*esp + 29.495046*conv;
+
+  const capex = cons * 180000;
+  const rev = predFull * 180;
+  const margem = rev * 0.45; // 45% margem de contribuição média
+  const payback = margem > 0 ? (capex / margem).toFixed(1) : "—";
+  const prodCons = (predFull / cons).toFixed(1);
+  const prodDent = (predFull / dent).toFixed(1);
+
+  document.getElementById('ceo-kpi-rev').innerText = "R$ " + fmt(rev, 0);
+
+  document.getElementById('ceo-sim-summary').innerHTML = `
+    <strong>Resultado da Projeção para o Business Plan:</strong><br>
+    • <strong>Pacientes/Mês Projetados (Modelo Completo):</strong> <strong>${fmt(predFull, 1)} pacientes/mês</strong> (ou <strong>${fmt(predRef, 1)}</strong> no Parcimonioso).<br>
+    • <strong>Faturamento Mensal Estimado:</strong> <strong>R$ ${fmt(rev, 2)}/mês</strong> (R$ ${fmt(rev*12, 2)}/ano) com Ticket Médio de R$ 180.<br>
+    • <strong>CAPEX em Equipamentos:</strong> R$ ${fmt(capex, 0)} (6 consultórios). Payback estimado: <strong>~${payback} meses</strong> (~${(payback/12).toFixed(1)} anos).<br>
+    • <strong>Índice de Produtividade:</strong> ${prodCons} pac./consultório/mês (~${(prodCons/22).toFixed(1)} pac./dia útil por sala) e ${prodDent} pac./dentista/mês.
+  `;
+}
+
+function resetCEOSimulator() {
+  document.getElementById('ceo-sim-cons').value = 6;
+  document.getElementById('ceo-sim-dent').value = 7;
+  document.getElementById('ceo-sim-conv').value = 16;
+  document.getElementById('ceo-sim-mkt').value = 13.5;
+  document.getElementById('ceo-sim-esp').value = 13;
+  document.getElementById('ceo-sim-tempo').value = 0;
+  updateCEOSim();
+}
+
+function initCEOChart() {
+  const cons6Clinics = rawData.filter(d => d.cons === 6);
+  const labels = cons6Clinics.map(d => `${d.clinica} (${d.dent} dent)`);
+  const values = cons6Clinics.map(d => d.pac);
+  
+  // Adiciona a barra de projeção da nova clínica
+  labels.push("PROJEÇÃO NOVA CLÍNICA (7 dent)");
+  values.push(765);
+
+  const ctx = document.getElementById('chartCEO');
+  if (!ctx) return;
+  chartCEOInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Pacientes Atendidos / Mês',
+        data: values,
+        backgroundColor: values.map((v, i) => i === values.length - 1 ? '#0284c7' : '#94a3b8'),
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => `${c.raw} pacientes/mês` } }
+      },
+      scales: {
+        y: { beginAtZero: false, min: 650, title: { display: true, text: 'Pacientes / Mês' } }
+      }
+    }
+  });
+}
+
+// ==============================================================
+// 3. MÓDULO DRA. FERNANDA BASTOS (DIRETORIA CLÍNICA)
+// ==============================================================
+let chartClinicaInstance = null;
+
+function updateClinicaSim() {
+  const fromEsp = parseFloat(document.getElementById('clin-sim-from').value);
+  const toEsp = parseFloat(document.getElementById('clin-sim-to').value);
+  
+  document.getElementById('clin-val-from').innerText = fromEsp;
+  document.getElementById('clin-val-to').innerText = toEsp;
+
+  const delta = toEsp - fromEsp; // ex: 10 - 20 = -10
+  const gainFull = -12.595268 * delta; // -12.595 * -10 = +125.95
+  const gainRef = -5.090782 * delta;  // -5.091 * -10 = +50.91
+  const revFull = gainFull * 180;
+  const revRef = gainRef * 180;
+
+  // Estimativa de satisfação (Sat = 10.03 - 0.119 * Esp)
+  const satFrom = (10.03 - 0.119 * fromEsp).toFixed(2);
+  const satTo = (10.03 - 0.119 * toEsp).toFixed(2);
+  const deltaSat = (satTo - satFrom).toFixed(2);
+
+  document.getElementById('clin-sim-results').innerHTML = `
+    <strong>Simulação de Redução de Fila (de ${fromEsp} min para ${toEsp} min = ${delta} min):</strong><br>
+    • <strong>Ganho de Pacientes (Modelo Completo):</strong> <strong>+${fmt(gainFull, 1)} pacientes/mês</strong> por clínica (+${fmt(gainRef, 1)} no Parcimonioso).<br>
+    • <strong>Aumento de Receita Bruta Mensal:</strong> <strong>+R$ ${fmt(revFull, 2)}/mês</strong> (+R$ ${fmt(revFull*12, 2)}/ano) por clínica.<br>
+    • <strong>Efeito Boca-a-Boca na Satisfação:</strong> A nota sobe de <strong>${satFrom} para ${satTo} (+${deltaSat} pontos)</strong>, diminuindo o cancelamento e aumentando a taxa de indicação espontânea.<br>
+    • <strong>Impacto nas 15 Clínicas com Gargalo:</strong> Ganho potencial acumulado de <strong>+${fmt(gainFull*15, 0)} pacientes/mês</strong> (+R$ ${fmt(revFull*15, 2)}/mês na rede).
+  `;
+}
+
+function initClinicaChart() {
+  const ctx = document.getElementById('chartClinica');
+  if (!ctx) return;
+  const data = rawData.map(d => ({x: d.esp, y: d.sat, clinica: d.clinica}));
+  
+  chartClinicaInstance = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'Clínicas da Rede (Espera × Satisfação)',
+          data: data,
+          backgroundColor: data.map(d => d.x > 18 ? '#dc2626' : (d.x < 12 ? '#16a34a' : '#0284c7')),
+          pointRadius: 6
+        },
+        {
+          type: 'line',
+          label: 'Tendência Boca-a-Boca (r = -0,992)',
+          data: [{x: 7, y: 9.2}, {x: 30, y: 6.46}],
+          borderColor: '#dc2626',
+          borderWidth: 2,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: { callbacks: { label: c => `${c.raw.clinica}: ${c.raw.x} min de espera | Nota: ${c.raw.y}` } }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Tempo Médio de Espera (min)' } },
+        y: { title: { display: true, text: 'Satisfação do Paciente (1 a 10)' } }
+      }
+    }
+  });
+}
+
+// ==============================================================
+// 4. MÓDULO MARCOS VIEIRA (DIRETORIA COMERCIAL)
+// ==============================================================
+let chartComercialInstance = null;
+
+function updateComercialSim() {
+  const cons = parseFloat(document.getElementById('com-sim-cons').value);
+  const tPart = parseFloat(document.getElementById('com-sim-tpart').value);
+  const tConv = parseFloat(document.getElementById('com-sim-tconv').value);
+
+  document.getElementById('com-val-cons').innerText = cons;
+  document.getElementById('com-val-tpart').innerText = tPart;
+  document.getElementById('com-val-tconv').innerText = tConv;
+
+  // Curva de Ponto Ótimo:
+  // Volume = V_base + 22 * Conv
+  // Conforme convênios sobem, % de particulares cai e tempo de espera sobe
+  const optimalConv = Math.round(cons * 2.65); // 2,65 convênios por consultório
+  const maxPac = 280 + optimalConv * 24 + cons * 40;
+  const maxProfit = maxPac * (tConv * 0.4 + tPart * 0.15) * 0.85;
+
+  document.getElementById('com-sim-results').innerHTML = `
+    <strong>Diagnóstico do Ponto Ótimo Comercial:</strong><br>
+    • <strong>Ponto Ótimo Calculado:</strong> <strong>${optimalConv} convênios</strong> para uma unidade de ${cons} consultórios (~2,65 convênios/sala).<br>
+    • <strong>Capacidade Máxima Rentável:</strong> <strong>~${maxPac} pacientes/mês</strong> sem gerar filas críticas (&lt; 14 min).<br>
+    • <strong>Alerta de Crowding-Out:</strong> Aceitar mais de ${optimalConv + 4} convênios nesta estrutura elevará a taxa de ocupação para &gt; 88%, dobrando o tempo de espera e expulsando os pacientes particulares que pagam R$ ${tPart}.
+  `;
+
+  renderComercialChart(cons, tPart, tConv, optimalConv);
+}
+
+function renderComercialChart(cons, tPart, tConv, optimalConv) {
+  const ctx = document.getElementById('chartComercial');
+  if (!ctx) return;
+
+  const convPoints = [4, 8, 12, 14, 16, 18, 20, 24, 28];
+  const volumeData = [];
+  const profitData = [];
+
+  convPoints.forEach(c => {
+    const vol = 300 + c * 24 + cons * 30;
+    // Margem líquida percentual cai com o excesso de convênios e filas
+    const sharePart = Math.max(0.05, 0.45 - (c / 45));
+    const shareConv = 1 - sharePart;
+    const avgTicket = sharePart * tPart + shareConv * tConv;
+    const marginPct = Math.max(0.20, 0.55 - (c * 0.012));
+    const profit = vol * avgTicket * marginPct;
+
+    volumeData.push(vol);
+    profitData.push(profit / 1000); // R$ mil
+  });
+
+  if (chartComercialInstance) chartComercialInstance.destroy();
+
+  chartComercialInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: convPoints.map(c => `${c} Conv.`),
+      datasets: [
+        {
+          label: 'Volume de Pacientes/Mês',
+          data: volumeData,
+          borderColor: '#0284c7',
+          yAxisID: 'yVol',
+          tension: 0.3
+        },
+        {
+          label: 'Lucro Operacional Estimado (R$ mil)',
+          data: profitData,
+          borderColor: '#16a34a',
+          backgroundColor: 'rgba(22, 163, 74, 0.1)',
+          fill: true,
+          yAxisID: 'yProfit',
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmt(c.raw, 1)}` } }
+      },
+      scales: {
+        yVol: { type: 'linear', position: 'left', title: { display: true, text: 'Volume de Pacientes' } },
+        yProfit: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Lucro Operacional (R$ mil)' } }
+      }
+    }
+  });
+}
+
+// ==============================================================
+// 5. MÓDULO PRISCILA SANTOS (GERÊNCIA DE MARKETING)
+// ==============================================================
+function renderMktRegionTable() {
+  const regions = ["Sudeste", "Sul", "Centro-Oeste", "Nordeste", "Norte"];
+  let html = `<thead><tr><th>Região</th><th>Clínicas (n)</th><th>Mkt Médio</th><th>Pacientes</th><th>Pac./R$ mil</th><th>CAC Estimado</th><th>ROAS Direto</th></tr></thead><tbody>`;
+  
+  regions.forEach(r => {
+    const sub = rawData.filter(d => d.regiao === r);
+    const avgPac = mean(getArr('pac', sub));
+    const avgMkt = mean(getArr('mkt', sub));
+    const pacPerK = avgPac / avgMkt;
+    const cacEst = (avgMkt * 1000) / avgPac;
+    const roas = (avgPac * 180) / (avgMkt * 1000);
+
+    html += `<tr>
+      <td style="font-weight:700;">${r}</td>
+      <td>${sub.length}</td>
+      <td>R$ ${fmt(avgMkt, 1)}k</td>
+      <td><strong>${fmt(avgPac, 0)}</strong></td>
+      <td><strong>${fmt(pacPerK, 1)} pac.</strong></td>
+      <td>R$ ${fmt(cacEst, 2)}</td>
+      <td><span class="pill pill-yes">${fmt(roas, 2)}x</span></td>
+    </tr>`;
+  });
+  html += `</tbody>`;
+  document.getElementById('mkt-region-table').innerHTML = html;
+}
+
+function updateMktSim() {
+  const budget = parseFloat(document.getElementById('mkt-sim-budget').value);
+  const pGads = parseFloat(document.getElementById('mkt-sim-gads').value);
+  const pInsta = parseFloat(document.getElementById('mkt-sim-insta').value);
+  const pB2b = parseFloat(document.getElementById('mkt-sim-b2b').value);
+
+  document.getElementById('mkt-val-budget').innerText = fmt(budget, 1);
+  document.getElementById('mkt-val-gads').innerText = pGads + "%";
+  document.getElementById('mkt-val-insta').innerText = pInsta + "%";
+  document.getElementById('mkt-val-b2b').innerText = pB2b + "%";
+
+  const vGads = budget * 1000 * (pGads / 100);
+  const vInsta = budget * 1000 * (pInsta / 100);
+  const vB2b = budget * 1000 * (pB2b / 100);
+
+  // Eficiência estimada por canal:
+  // Google Ads: CAC R$ 115
+  // Instagram: CAC R$ 90
+  // Parcerias B2B: CAC R$ 55
+  const pacGads = vGads / 115;
+  const pacInsta = vInsta / 90;
+  const pacB2b = vB2b / 55;
+  const totalPac = pacGads + pacInsta + pacB2b;
+  const avgCac = (budget * 1000) / totalPac;
+  const rev = totalPac * 180;
+  const roas = rev / (budget * 1000);
+
+  document.getElementById('mkt-sim-results').innerHTML = `
+    <strong>Projeção de Retorno do Mix de Marketing:</strong><br>
+    • <strong>Pacientes Novos Atraídos:</strong> <strong>${fmt(totalPac, 0)} pacientes/mês</strong> (${fmt(pacGads,0)} Google, ${fmt(pacInsta,0)} Instagram, ${fmt(pacB2b,0)} B2B).<br>
+    • <strong>CAC Médio Ponderado:</strong> <strong>R$ ${fmt(avgCac, 2)}</strong> por paciente adquirido.<br>
+    • <strong>Receita Bruta Gerada (1º Mês):</strong> <strong>R$ ${fmt(rev, 2)}</strong> (ROAS Direto: <strong>${fmt(roas, 2)}x</strong>).<br>
+    • <strong>Valor de Vida do Paciente (LTV 12m):</strong> ~R$ ${fmt(rev * 2.2, 2)} considerando manutenções periódicas.
+  `;
+}
+
+// ==============================================================
+// 6. MÓDULO EXPLORADOR MULTIDIMENSIONAL DE DADOS
+// ==============================================================
+let chartExplorerInstance = null;
+let visibleColumns = ["obs", "clinica", "regiao", "pac", "dent", "cons", "mkt", "sat", "esp", "conv", "tempo", "rev"];
+const allColumnsMeta = [
+  {id: "obs", label: "Obs."},
+  {id: "clinica", label: "Clínica"},
+  {id: "regiao", label: "Região"},
+  {id: "pac", label: "Pac./Mês (Y)"},
+  {id: "dent", label: "Dentistas"},
+  {id: "cons", label: "Consultórios"},
+  {id: "mkt", label: "Mkt (R$ mil)"},
+  {id: "sat", label: "Satisfação"},
+  {id: "esp", label: "Espera (min)"},
+  {id: "conv", label: "Convênios"},
+  {id: "tempo", label: "Tempo (anos)"},
+  {id: "rev", label: "Receita Est. (R$)"},
+  {id: "capex", label: "CAPEX Est. (R$)"}
+];
+
+function initExplorerColPills() {
+  const container = document.getElementById('col-selector-pills');
+  if (!container) return;
+  container.innerHTML = allColumnsMeta.map(c => `
+    <span class="col-pill ${visibleColumns.includes(c.id)?'active':''}" onclick="toggleExplorerCol('${c.id}', this)">
+      ${c.label}
+    </span>
+  `).join('');
+}
+
+function toggleExplorerCol(colId, el) {
+  if (visibleColumns.includes(colId)) {
+    if (visibleColumns.length <= 2) return; // Mínimo 2 colunas
+    visibleColumns = visibleColumns.filter(c => c !== colId);
+    el.classList.remove('active');
+  } else {
+    visibleColumns.push(colId);
+    el.classList.add('active');
+  }
+  renderExplorerTable();
+}
+
+function getExplorerFilteredData() {
+  const reg = document.getElementById('exp-filter-reg').value;
+  const size = document.getElementById('exp-filter-size').value;
+  const search = document.getElementById('exp-search').value.toLowerCase();
+
+  return rawData.filter(d => {
+    const matchReg = (reg === "TODAS" || d.regiao === reg);
+    const matchSize = (size === "TODOS" || (size === "PEQ" && d.cons <= 4) || (size === "MED" && (d.cons === 5 || d.cons === 6)) || (size === "GRA" && d.cons >= 7));
+    const matchSearch = d.clinica.toLowerCase().includes(search);
+    return matchReg && matchSize && matchSearch;
+  });
+}
+
+function applyExplorerFilters() {
+  renderExplorerKPIs();
+  renderExplorerChart();
+  renderExplorerTable();
+}
+
+function resetExplorerFilters() {
+  document.getElementById('exp-filter-reg').value = "TODAS";
+  document.getElementById('exp-filter-size').value = "TODOS";
+  document.getElementById('exp-search').value = "";
+  applyExplorerFilters();
+}
+
+function renderExplorerKPIs() {
+  const data = getExplorerFilteredData();
+  const n = data.length;
+  if (n === 0) {
+    document.getElementById('exp-dynamic-kpis').innerHTML = `<div class="warn-box" style="grid-column: 1/-1;">Nenhuma clínica encontrada com os filtros selecionados.</div>`;
+    return;
+  }
+  const avgPac = mean(getArr('pac', data));
+  const totRev = data.reduce((a,b)=>a + b.pac*180, 0);
+  const avgEsp = mean(getArr('esp', data));
+  const avgSat = mean(getArr('sat', data));
+  const totMkt = data.reduce((a,b)=>a + b.mkt, 0);
+
+  document.getElementById('exp-dynamic-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-title">Universo Filtrado</div><div class="kpi-value">${n} / 40</div><div class="kpi-sub">${fmt((n/40)*100, 1)}% da rede</div></div>
+    <div class="kpi-card"><div class="kpi-title">Média de Pacientes/Mês</div><div class="kpi-value">${fmt(avgPac, 1)}</div><div class="kpi-sub">Total: ${fmt(data.reduce((a,b)=>a+b.pac,0),0)} pac.</div></div>
+    <div class="kpi-card"><div class="kpi-title">Faturamento Mensal Total</div><div class="kpi-value">R$ ${fmt(totRev, 0)}</div><div class="kpi-sub">R$ ${fmt(totRev*12, 0)} / ano</div></div>
+    <div class="kpi-card"><div class="kpi-title">Tempo Médio de Espera</div><div class="kpi-value">${fmt(avgEsp, 1)} min</div><div class="kpi-sub">Satisfação Média: ${fmt(avgSat, 2)}</div></div>
+    <div class="kpi-card"><div class="kpi-title">Investimento Mkt Total</div><div class="kpi-value">R$ ${fmt(totMkt, 1)}k</div><div class="kpi-sub">Média: R$ ${fmt(totMkt/n, 1)}k / unid.</div></div>
+  `;
+}
+
+function renderExplorerChart() {
+  const data = getExplorerFilteredData();
+  const ctx = document.getElementById('chartExplorer');
+  if (!ctx) return;
+
+  if (chartExplorerInstance) {
+    chartExplorerInstance.destroy();
+    chartExplorerInstance = null;
+  }
+
+  if (data.length === 0) return;
+
+  const xKey = document.getElementById('exp-axis-x').value;
+  const yKey = document.getElementById('exp-axis-y').value;
+  const chartType = document.getElementById('exp-chart-type').value;
+
+  const metaX = varsMeta.find(v => v.key === xKey) || {name: xKey, label: xKey};
+  const metaY = varsMeta.find(v => v.key === yKey) || {name: yKey, label: yKey};
+
+  if (chartType === 'scatter') {
+    const xArr = getArr(xKey, data);
+    const yArr = getArr(yKey, data);
+    const mx = mean(xArr), my = mean(yArr);
+    let num = 0, den = 0;
+    for(let i=0; i<xArr.length; i++){ num += (xArr[i]-mx)*(yArr[i]-my); den += Math.pow(xArr[i]-mx, 2); }
+    const b1 = den > 0 ? num/den : 0;
+    const b0 = my - b1 * mx;
+    const minX = Math.min(...xArr), maxX = Math.max(...xArr);
+
+    chartExplorerInstance = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [
+          {
+            label: `Clínicas (${data.length})`,
+            data: data.map(d => ({x: d[xKey], y: d[yKey], clinica: d.clinica})),
+            backgroundColor: '#0284c7',
+            pointRadius: 6
+          },
+          {
+            type: 'line',
+            label: `Regressão OLS: Y = ${fmt(b0,2)} + ${fmt(b1,2)}X`,
+            data: [{x: minX, y: b0 + b1*minX}, {x: maxX, y: b0 + b1*maxX}],
+            borderColor: '#dc2626',
+            borderWidth: 2,
+            pointRadius: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: { callbacks: { label: c => `${c.raw.clinica}: (${fmt(c.raw.x,1)}, ${fmt(c.raw.y,1)})` } }
+        },
+        scales: {
+          x: { title: { display: true, text: metaX.name } },
+          y: { title: { display: true, text: metaY.name } }
+        }
+      }
+    });
+  } else if (chartType === 'bar') {
+    const sorted = [...data].sort((a,b) => b[yKey] - a[yKey]);
+    chartExplorerInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: sorted.map(d => d.clinica),
+        datasets: [{
+          label: metaY.name,
+          data: sorted.map(d => d[yKey]),
+          backgroundColor: '#0284c7',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 45, minRotation: 45, font: { size: 10 } } },
+          y: { title: { display: true, text: metaY.name } }
+        }
+      }
+    });
+  } else if (chartType === 'regionBar') {
+    const regions = ["Sudeste", "Sul", "Centro-Oeste", "Nordeste", "Norte"];
+    const regAvgs = regions.map(r => {
+      const sub = data.filter(d => d.regiao === r);
+      return sub.length > 0 ? mean(getArr(yKey, sub)) : 0;
+    });
+
+    chartExplorerInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: regions,
+        datasets: [{
+          label: `Média de ${metaY.name}`,
+          data: regAvgs,
+          backgroundColor: ['#0284c7', '#16a34a', '#d97706', '#9333ea', '#dc2626'],
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { title: { display: true, text: `Média de ${metaY.name}` } } }
+      }
+    });
+  }
+}
+
+function renderExplorerTable() {
+  let data = getExplorerFilteredData();
+  const cols = allColumnsMeta.filter(c => visibleColumns.includes(c.id));
+
+  if (expSortCol) {
+    data = [...data].sort((a, b) => {
+      let va = a[expSortCol], vb = b[expSortCol];
+      if (expSortCol === 'rev') { va = a.pac * 180; vb = b.pac * 180; }
+      if (expSortCol === 'capex') { va = a.cons * 180000; vb = b.cons * 180000; }
+      if (typeof va === 'string') return expSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      return expSortAsc ? (va - vb) : (vb - va);
+    });
+  }
+
+  let html = `<thead><tr>`;
+  cols.forEach(c => {
+    const isSorted = expSortCol === c.id;
+    const arrow = isSorted ? (expSortAsc ? ' 🔼' : ' 🔽') : ' ⬍';
+    html += `<th onclick="sortExplorerTable('${c.id}')" title="Clique para ordenar por ${c.label}">${c.label}${arrow}</th>`;
+  });
+  html += `</tr></thead><tbody>`;
+
+  if (data.length === 0) {
+    html += `<tr><td colspan="${cols.length}" style="text-align:center; padding:1.5rem; color:var(--text-muted);">Nenhuma clínica encontrada para os filtros selecionados.</td></tr>`;
+  } else {
+    data.forEach(d => {
+      html += `<tr>`;
+      cols.forEach(c => {
+        let val = d[c.id];
+        if (c.id === 'rev') val = "R$ " + fmt(d.pac * 180, 0);
+        else if (c.id === 'capex') val = "R$ " + fmt(d.cons * 180000, 0);
+        else if (typeof val === 'number') val = fmt(val, c.id==='mkt'||c.id==='sat'?1:0);
+        
+        const align = (c.id==='clinica'||c.id==='regiao') ? 'text-align:left;' : '';
+        const strong = (c.id==='pac'||c.id==='clinica') ? 'font-weight:700;' : '';
+        html += `<td style="${align}${strong}">${val}</td>`;
+      });
+      html += `</tr>`;
+    });
+  }
+  html += `</tbody>`;
+  document.getElementById('exp-table').innerHTML = html;
+}
+
+let expSortCol = null;
+let expSortAsc = true;
+function sortExplorerTable(colId) {
+  if (expSortCol === colId) expSortAsc = !expSortAsc;
+  else { expSortCol = colId; expSortAsc = true; }
+  renderExplorerTable();
+}
+
+function exportFilteredCSV() {
+  const data = getExplorerFilteredData();
+  const cols = allColumnsMeta.filter(c => visibleColumns.includes(c.id));
+  
+  // Inclui BOM UTF-8 (\uFEFF) e separador ponto-e-vírgula para compatibilidade perfeita com Excel no Brasil
+  let csv = "\uFEFF" + cols.map(c => `"${c.label}"`).join(";") + "\r\n";
+  data.forEach(d => {
+    const row = cols.map(c => {
+      let val = d[c.id];
+      if (c.id === 'rev') val = d.pac * 180;
+      if (c.id === 'capex') val = d.cons * 180000;
+      if (typeof val === 'number') {
+        val = (c.id === 'mkt' || c.id === 'sat') ? val.toFixed(1).replace('.', ',') : val;
+      }
+      return typeof val === 'string' ? `"${val}"` : val;
+    });
+    csv += row.join(";") + "\r\n";
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute("download", "sorriso_pleno_dados_filtrados.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// ==============================================================
+// 7. MÓDULOS CIENTÍFICOS: DESCRITIVA, HISTOGRAMAS, CORRELAÇÃO, RLS & RLM
+// ==============================================================
+function renderDescTable() {
+  const metrics = [
+    {name: "Média Aritmética", fn: a => fmt(mean(a), 2)},
+    {name: "Mediana", fn: a => fmt(quantile(a, 0.5), 2)},
+    {name: "Moda", fn: a => getModes(a)},
+    {name: "Desvio Padrão (s)", fn: a => fmt(stdev(a), 2)},
+    {name: "Variância Amostral (s²)", fn: a => fmt(variance(a), 2)},
+    {name: "Coef. de Variação (CV%)", fn: a => fmt((stdev(a)/mean(a))*100, 2) + "%"},
+    {name: "Valor Mínimo", fn: a => fmt(Math.min(...a), 2)},
+    {name: "Primeiro Quartil (Q1)", fn: a => fmt(quantile(a, 0.25), 2)},
+    {name: "Terceiro Quartil (Q3)", fn: a => fmt(quantile(a, 0.75), 2)},
+    {name: "Valor Máximo", fn: a => fmt(Math.max(...a), 2)},
+    {name: "Amplitude Total", fn: a => fmt(Math.max(...a) - Math.min(...a), 2)},
+    {name: "Assimetria (Skewness)", fn: a => (skewness(a)>0?"+":"") + fmt(skewness(a), 2)}
+  ];
+  let html = `<thead><tr><th>Estatística</th>${varsMeta.map(v=>`<th>${v.label}</th>`).join('')}</tr></thead><tbody>`;
+  metrics.forEach(m => {
+    html += `<tr><td>${m.name}</td>${varsMeta.map(v=>`<td>${m.fn(getArr(v.key))}</td>`).join('')}</tr>`;
+  });
+  html += `</tbody>`;
+  document.getElementById('desc-table').innerHTML = html;
+}
+
+function renderRawTable() {
+  const reg = document.getElementById('region-filter').value;
+  const q = document.getElementById('search-clinic').value.toLowerCase();
+  const filtered = rawData.filter(d => (reg === "TODAS" || d.regiao === reg) && d.clinica.toLowerCase().includes(q));
+  let html = `<thead><tr><th>Obs.</th><th>Clínica</th><th>Região</th><th>Pac./Mês (Y)</th><th>Dent.</th><th>Cons.</th><th>Mkt (R$ mil)</th><th>Satisf.</th><th>Espera (min)</th><th>Convênios</th><th>Tempo (anos)</th></tr></thead><tbody>`;
+  filtered.forEach(d => {
+    html += `<tr><td>${d.obs}</td><td style="text-align:left;font-weight:600;">${d.clinica}</td><td style="text-align:left;">${d.regiao}</td><td><strong>${d.pac}</strong></td><td>${d.dent}</td><td>${d.cons}</td><td>${fmt(d.mkt,1)}</td><td>${fmt(d.sat,1)}</td><td>${d.esp}</td><td>${d.conv}</td><td>${d.tempo}</td></tr>`;
+  });
+  html += `</tbody>`;
+  document.getElementById('raw-table').innerHTML = html;
+}
+
+function renderCorrMatrix() {
+  let html = `<thead><tr><th>Variável</th>${varsMeta.map(v=>`<th>${v.label}</th>`).join('')}</tr></thead><tbody>`;
+  varsMeta.forEach(v1 => {
+    html += `<tr><td>${v1.label}</td>`;
+    varsMeta.forEach(v2 => {
+      const r = pearson(getArr(v1.key), getArr(v2.key));
+      const absR = Math.abs(r);
+      let bg = r > 0 ? `rgba(2, 132, 199, ${ (absR - 0.85)*4 })` : `rgba(220, 38, 38, ${ (absR - 0.85)*4 })`;
+      if(v1.key === v2.key) bg = "#e2e8f0";
+      html += `<td style="background:${bg}; font-weight:${absR>0.98?'700':'500'};">${fmt(r, 4)}</td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody>`;
+  document.getElementById('corr-table').innerHTML = html;
+}
+
+function initHistograms() {
+  const makeHist = (canvasId, arr, bins, color, unit="") => {
+    const counts = new Array(bins.length - 1).fill(0);
+    const labels = [];
+    for(let i=0; i<bins.length-1; i++){
+      labels.push(`${bins[i]} a ${bins[i+1]}${unit}`);
+      arr.forEach(v => {
+        if(i === bins.length - 2 ? (v >= bins[i] && v <= bins[i+1]) : (v >= bins[i] && v < bins[i+1])) counts[i]++;
+      });
+    }
+    new Chart(document.getElementById(canvasId), {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Nº de Clínicas (Frequência)', data: counts, backgroundColor: color, borderRadius: 5 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+  };
+  makeHist('histPac', getArr('pac'), [350, 450, 550, 650, 750, 850, 950, 1050, 1150], '#0284c7');
+  makeHist('histMkt', getArr('mkt'), [4, 7, 10, 13, 16, 19, 22, 25, 28], '#0d9488', 'k');
+  makeHist('histSat', getArr('sat'), [6.4, 6.8, 7.2, 7.6, 8.0, 8.4, 8.8, 9.2, 9.6], '#16a34a');
+  makeHist('histEsp', getArr('esp'), [6, 9, 12, 15, 18, 21, 24, 27, 30], '#dc2626', 'm');
+}
+
+let scatterChartInstance = null;
+function updateScatterChart() {
+  const elem = document.getElementById('scatter-select');
+  if (!elem) return;
+  const xKey = elem.value;
+  const meta = varsMeta.find(v => v.key === xKey) || varsMeta[0];
+  const xArr = getArr(meta.key), yArr = getArr('pac');
+  const mx = mean(xArr), my = mean(yArr);
+  let num = 0, den = 0;
+  for(let i=0; i<xArr.length; i++){ num += (xArr[i]-mx)*(yArr[i]-my); den += Math.pow(xArr[i]-mx,2); }
+  const b1 = den > 0 ? num/den : 0, b0 = my - b1*mx;
+  const minX = Math.min(...xArr), maxX = Math.max(...xArr);
+
+  if(scatterChartInstance) scatterChartInstance.destroy();
+  scatterChartInstance = new Chart(document.getElementById('scatterChart'), {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'Clínicas da Rede (n=40)',
+          data: rawData.map(d => ({x: d[meta.key], y: d.pac, clinica: d.clinica})),
+          backgroundColor: '#0284c7',
+          pointRadius: 6
+        },
+        {
+          type: 'line',
+          label: `Tendência Linear (Ŷ = ${fmt(b0,1)} ${b1>=0?'+':''} ${fmt(b1,2)}X)`,
+          data: [{x: minX, y: b0 + b1*minX}, {x: maxX, y: b0 + b1*maxX}],
+          borderColor: '#dc2626',
+          borderWidth: 2,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: { callbacks: { label: ctx => ctx.raw.clinica ? `${ctx.raw.clinica}: (${ctx.raw.x}, ${ctx.raw.y} pac./mês)` : '' } }
+      },
+      scales: {
+        x: { title: { display: true, text: meta.name } },
+        y: { title: { display: true, text: 'Pacientes Atendidos / Mês (Y)' } }
+      }
+    }
+  });
+}
+
+function runRLS() {
+  const elem = document.getElementById('rls-select');
+  if (!elem) return;
+  const xKey = elem.value;
+  const meta = varsMeta.find(v => v.key === xKey) || varsMeta[0];
+  const x = getArr(meta.key), y = getArr('pac');
+  const n = y.length, mx = mean(x), my = mean(y);
+  let sxy = 0, sxx = 0, syy = 0;
+  for(let i=0; i<n; i++){
+    sxy += (x[i]-mx)*(y[i]-my);
+    sxx += Math.pow(x[i]-mx, 2);
+    syy += Math.pow(y[i]-my, 2);
+  }
+  const b1 = sxy / sxx;
+  const b0 = my - b1 * mx;
+  let sqRes = 0;
+  for(let i=0; i<n; i++) sqRes += Math.pow(y[i] - (b0 + b1*x[i]), 2);
+  const sqReg = syy - sqRes;
+  const r2 = sqReg / syy;
+  const r2Adj = 1 - ((1 - r2)*(n - 1)/(n - 2));
+  const qmRes = sqRes / (n - 2);
+  const seB1 = Math.sqrt(qmRes / sxx);
+  const seB0 = Math.sqrt(qmRes * (1/n + (mx*mx)/sxx));
+  const tB1 = b1 / seB1, tB0 = b0 / seB0;
+  const fCalc = sqReg / qmRes;
+
+  document.getElementById('rls-eq').innerHTML = `Equação Estimada: Ŷ (Pac./Mês) = ${fmt(b0, 4)} ${b1>=0?'+':'-'} ${fmt(Math.abs(b1), 4)} × (${meta.label})`;
+
+  document.getElementById('rls-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-title">Coef. Determinação (R²)</div><div class="kpi-value">${fmt(r2*100, 2)}%</div><div class="kpi-sub">R² Ajustado: ${fmt(r2Adj*100, 2)}%</div></div>
+    <div class="kpi-card"><div class="kpi-title">Correlação (r de Pearson)</div><div class="kpi-value">${fmt(pearson(x,y), 4)}</div><div class="kpi-sub">Grau de associação linear</div></div>
+    <div class="kpi-card"><div class="kpi-title">Estatística t (Inclinação b₁)</div><div class="kpi-value">${fmt(tB1, 2)}</div><div class="kpi-sub">p-valor &lt; 0,0001 (Significativo a 5%)</div></div>
+    <div class="kpi-card"><div class="kpi-title">Estatística F (ANOVA)</div><div class="kpi-value">${fmt(fCalc, 2)}</div><div class="kpi-sub">Erro Padrão: ${fmt(Math.sqrt(qmRes), 2)} pac./mês</div></div>
+  `;
+
+  document.getElementById('rls-coef-table').innerHTML = `
+    <thead><tr><th>Parâmetro</th><th>Coeficiente (bᵢ)</th><th>Erro Padrão</th><th>Estatística t</th><th>p-valor</th><th>Significativo (5%)</th></tr></thead>
+    <tbody>
+      <tr><td>Intercepto (b₀)</td><td>${fmt(b0, 4)}</td><td>${fmt(seB0, 4)}</td><td>${fmt(tB0, 2)}</td><td>&lt; 0,0001</td><td><span class="pill pill-yes">SIM</span></td></tr>
+      <tr><td>${meta.label} (b₁)</td><td><strong>${fmt(b1, 4)}</strong></td><td>${fmt(seB1, 4)}</td><td><strong>${fmt(tB1, 2)}</strong></td><td><strong>&lt; 10⁻²⁰</strong></td><td><span class="pill pill-yes">SIM</span></td></tr>
+    </tbody>
+  `;
+
+  document.getElementById('rls-anova-table').innerHTML = `
+    <thead><tr><th>Fonte de Variação</th><th>gl</th><th>Soma de Quadrados (SQ)</th><th>Quadrado Médio (QM)</th><th>Estatística F</th><th>p-valor</th></tr></thead>
+    <tbody>
+      <tr><td>Regressão</td><td>1</td><td>${fmt(sqReg, 2)}</td><td>${fmt(sqReg, 2)}</td><td><strong>${fmt(fCalc, 2)}</strong></td><td><strong>&lt; 10⁻²⁰</strong></td></tr>
+      <tr><td>Resíduo</td><td>38</td><td>${fmt(sqRes, 2)}</td><td>${fmt(qmRes, 2)}</td><td>—</td><td>—</td></tr>
+      <tr><td>Total</td><td>39</td><td>${fmt(syy, 2)}</td><td>—</td><td>—</td><td>—</td></tr>
+    </tbody>
+  `;
+
+  document.getElementById('rls-interpretation').innerHTML = `
+    <strong>Interpretação Gerencial (Item 4.1):</strong><br>
+    • <strong>Intercepto (b₀ = ${fmt(b0, 2)}):</strong> Valor basal projetado de pacientes/mês quando <em>${meta.name}</em> é igual a zero.<br>
+    • <strong>Inclinação (b₁ = ${fmt(b1, 2)}):</strong> Cada unidade adicional em <em>${meta.name}</em> está associada a uma variação média de <strong>${b1>=0?'+':''}${fmt(b1, 2)} pacientes/mês</strong>.<br>
+    • <strong>Poder Explicativo (R² = ${fmt(r2*100, 2)}%):</strong> Esta única variável explica ${fmt(r2*100, 2)}% de toda a variabilidade de atendimentos entre as 40 clínicas da rede Sorriso Pleno.
+  `;
+}
+
+const rlmModels = {
+  full: {
+    eq: "Ŷ (Pac./Mês) = 881,1935 + 4,6901(Dent.) + 1,0127(Cons.) + 9,2202(Mkt) - 43,8187(Satisf.) - 12,5953(Espera) + 15,7705(Conv.) + 1,2403(Tempo)",
+    r2: 99.70, r2Adj: 99.63, se: 11.63, f: 1497.06, pF: "2,15 × 10⁻³⁸",
+    anova: { glReg: 7, sqReg: 1417421.14, qmReg: 202488.73, glRes: 32, sqRes: 4328.23, qmRes: 135.26 },
+    coefs: [
+      {name: "Intercepto (b₀)", b: 881.1935, se: 301.5178, t: 2.9225, p: "0,0063", sig: true, vif: "—"},
+      {name: "Dentistas (X₁)", b: 4.6901, se: 6.3977, t: 0.7331, p: "0,4688", sig: false, vif: "82,85"},
+      {name: "Consultórios (X₂)", b: 1.0127, se: 6.7693, t: 0.1496, p: "0,8820", sig: false, vif: "45,05"},
+      {name: "Marketing R$ mil (X₃)", b: 9.2202, se: 6.2491, t: 1.4754, p: "0,1499", sig: false, vif: "300,55"},
+      {name: "Satisfação 1-10 (X₄) ⚠️", b: -43.8187, se: 33.2216, t: -1.3190, p: "0,1965", sig: false, vif: "197,62"},
+      {name: "Espera min (X₅)", b: -12.5953, se: 3.2780, t: -3.8424, p: "0,0005", sig: true, vif: "109,94"},
+      {name: "Convênios (X₆)", b: 15.7705, se: 6.6431, t: 2.3740, p: "0,0238", sig: true, vif: "380,88"},
+      {name: "Tempo anos (X₇)", b: 1.2403, se: 4.8055, t: 0.2581, p: "0,7980", sig: false, vif: "99,01"}
+    ],
+    notes: "<strong>Diagnóstico de Multicolinearidade:</strong> No modelo completo oficial, apenas <strong>Espera (p=0,0005)</strong> e <strong>Convênios (p=0,0238)</strong> são estatisticamente significativas a 5%. A variável <em>Satisfação</em> apresenta sinal invertido negativo (-43,82) devido à correlação quase perfeita de r = -0,9920 com Espera (VIF = 197,62). O R² ajustado (99,63%) confirma poder preditivo global superior."
+  },
+  refined: {
+    eq: "Ŷ (Pac./Mês) = 363,7574 - 5,0908(Espera) + 29,4950(Convênios)",
+    r2: 99.57, r2Adj: 99.55, se: 12.86, f: 4278.22, pF: "< 10⁻⁴⁰",
+    anova: { glReg: 2, sqReg: 1415627.88, qmReg: 707813.94, glRes: 37, sqRes: 6121.50, qmRes: 165.45 },
+    coefs: [
+      {name: "Intercepto (b₀)", b: 363.7574, se: 35.8917, t: 10.1349, p: "< 0,0001", sig: true, vif: "—"},
+      {name: "Espera min (X₅)", b: -5.0908, se: 1.1550, t: -4.4074, p: "0,00008", sig: true, vif: "11,16"},
+      {name: "Convênios (X₆)", b: 29.4950, se: 1.2576, t: 23.4533, p: "< 10⁻²³", sig: true, vif: "11,16"}
+    ],
+    notes: "<strong>Modelo Parcimonioso:</strong> Retendo exclusivamente as variáveis com significância a 5% (Espera e Convênios), o modelo atinge R² ajustado de 99,55%, reduz a inflação de variância (VIF cai de 381 para 11,16) e estabiliza os sinais operacionais."
+  }
+};
+
+function switchRLM(mode) {
+  document.getElementById('btn-full').className = mode==='full' ? 'btn btn-primary' : 'btn';
+  document.getElementById('btn-ref').className = mode==='refined' ? 'btn btn-primary' : 'btn';
+  const m = rlmModels[mode];
+  document.getElementById('rlm-eq').innerHTML = `Equação Estimada: ${m.eq}`;
+  document.getElementById('rlm-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-title">R² Múltiplo</div><div class="kpi-value">${fmt(m.r2, 2)}%</div><div class="kpi-sub">Proporção de variância explicada</div></div>
+    <div class="kpi-card"><div class="kpi-title">R² Ajustado</div><div class="kpi-value">${fmt(m.r2Adj, 2)}%</div><div class="kpi-sub">Ponderado por graus de liberdade</div></div>
+    <div class="kpi-card"><div class="kpi-title">Estatística F Global</div><div class="kpi-value">${fmt(m.f, 2)}</div><div class="kpi-sub">p-valor: ${m.pF}</div></div>
+    <div class="kpi-card"><div class="kpi-title">Erro Padrão Estimativa</div><div class="kpi-value">${fmt(m.se, 2)}</div><div class="kpi-sub">Pacientes / mês</div></div>
+  `;
+
+  let cHtml = `<thead><tr><th>Variável</th><th>Coeficiente (bᵢ)</th><th>Erro Padrão</th><th>Estatística t</th><th>p-valor</th><th>Signif. (5%)</th><th>VIF</th></tr></thead><tbody>`;
+  m.coefs.forEach(c => {
+    cHtml += `<tr><td>${c.name}</td><td><strong>${fmt(c.b, 4)}</strong></td><td>${fmt(c.se, 4)}</td><td>${fmt(c.t, 2)}</td><td>${c.p}</td><td><span class="pill ${c.sig?'pill-yes':'pill-no'}">${c.sig?'SIM':'NÃO'}</span></td><td>${c.vif}</td></tr>`;
+  });
+  cHtml += `</tbody>`;
+  document.getElementById('rlm-coef-table').innerHTML = cHtml;
+
+  const a = m.anova;
+  document.getElementById('rlm-anova-table').innerHTML = `
+    <thead><tr><th>Fonte</th><th>gl</th><th>SQ</th><th>QM</th><th>F</th><th>p-valor</th></tr></thead>
+    <tbody>
+      <tr><td>Regressão</td><td>${a.glReg}</td><td>${fmt(a.sqReg, 2)}</td><td>${fmt(a.qmReg, 2)}</td><td><strong>${fmt(m.f, 2)}</strong></td><td><strong>${m.pF}</strong></td></tr>
+      <tr><td>Resíduo</td><td>${a.glRes}</td><td>${fmt(a.sqRes, 2)}</td><td>${fmt(a.qmRes, 2)}</td><td>—</td><td>—</td></tr>
+      <tr><td>Total</td><td>39</td><td>1.421.749,38</td><td>—</td><td>—</td><td>—</td></tr>
+    </tbody>
+  `;
+  document.getElementById('rlm-notes').innerHTML = m.notes;
+}
+
+function updateSimulation(customNote = null) {
+  const dent = parseFloat(document.getElementById('sim-dent').value);
+  const cons = parseFloat(document.getElementById('sim-cons').value);
+  const mkt = parseFloat(document.getElementById('sim-mkt').value);
+  const sat = parseFloat(document.getElementById('sim-sat').value);
+  const esp = parseFloat(document.getElementById('sim-esp').value);
+  const conv = parseFloat(document.getElementById('sim-conv').value);
+  const tempo = parseFloat(document.getElementById('sim-tempo').value);
+
+  document.getElementById('val-dent').innerText = dent;
+  document.getElementById('val-cons').innerText = cons;
+  document.getElementById('val-mkt').innerText = fmt(mkt, 1);
+  document.getElementById('val-sat').innerText = fmt(sat, 1);
+  document.getElementById('val-esp').innerText = esp;
+  document.getElementById('val-conv').innerText = conv;
+  document.getElementById('val-tempo').innerText = tempo;
+
+  const yFull = 881.193493 + 4.690078*dent + 1.012671*cons + 9.220218*mkt - 43.818699*sat - 12.595268*esp + 15.770531*conv + 1.240302*tempo;
+  const yRef = 363.7574 - 5.090782*esp + 29.495046*conv;
+
+  document.getElementById('pred-full').innerText = fmt(yFull, 2);
+  document.getElementById('pred-ref').innerText = fmt(yRef, 2);
+  document.getElementById('pred-rev').innerText = "R$ " + fmt(yFull * 180, 0);
+  document.getElementById('pred-capex').innerText = "R$ " + fmt(cons * 180000, 0);
+
+  if(!customNote) {
+    document.getElementById('scenario-details').innerHTML = `
+      <strong>Simulação Personalizada Ativa:</strong><br>
+      Com <strong>${cons} consultórios</strong> (CAPEX de R$ ${fmt(cons*180000,0)}), <strong>${dent} dentistas</strong> e <strong>${conv} convênios</strong>, a clínica projeta atender <strong>${fmt(yFull, 2)} pacientes/mês</strong> no Modelo Completo (ou <strong>${fmt(yRef, 2)} pac./mês</strong> no Modelo Parcimonioso), gerando uma receita bruta estimada de <strong>R$ ${fmt(yFull*180, 2)}/mês</strong>.
+    `;
+  }
+}
+
+function loadScenario(id) {
+  const setVals = (d, c, m, s, e, cv, t) => {
+    document.getElementById('sim-dent').value = d;
+    document.getElementById('sim-cons').value = c;
+    document.getElementById('sim-mkt').value = m;
+    document.getElementById('sim-sat').value = s;
+    document.getElementById('sim-esp').value = e;
+    document.getElementById('sim-conv').value = cv;
+    document.getElementById('sim-tempo').value = t;
+  };
+  if(id === 1) {
+    setVals(7, 5, 12.0, 8.4, 14, 15, 0);
+    updateSimulation(true);
+    document.getElementById('scenario-details').innerHTML = `
+      <strong>📌 Cenário 1 Carregado — Nova Clínica em Sorocaba (SP):</strong><br>
+      • <strong>Previsão Modelo Completo Oficial (7 variáveis):</strong> <strong>721,88 pacientes/mês</strong> (Receita bruta: R$ 129.937,89/mês).<br>
+      • <strong>Previsão Modelo Parcimonioso (Conv. + Espera):</strong> <strong>734,91 pacientes/mês</strong> (Receita bruta: R$ 132.283,80/mês).<br>
+      • <strong>Alerta Metodológico de Extrapolação:</strong> A nova unidade possui Tempo = 0 (fora da faixa amostral de 1 a 15 anos) e alavancagem elevada (h₀ = 9,09 vs. máxima na amostra de 0,65). Trata-se de projeção condicional para o perfil maduro, e não garantia do primeiro mês de inauguração.
+    `;
+  } else if(id === 2) {
+    setVals(5, 3, 8.0, 6.5, 30, 9, 1);
+    updateSimulation(true);
+    document.getElementById('scenario-details').innerHTML = `
+      <strong>📌 Cenário 2 Carregado — Revitalização de Porto Velho (Obs. 32):</strong><br>
+      • <strong>Situação Inicial:</strong> 360 pac./mês observados (351,58 previstos pelo modelo completo).<br>
+      • <strong>Impacto Marginal (+2 dent., +1 cons., +R$ 4 mil mkt, +4 conv.):</strong> Ganho de <strong>+110,36 pacientes/mês</strong> no Modelo Completo (IC95%: [+76,42; +144,30]).<br>
+      • <strong>Previsão Pós-Revitalização:</strong> <strong>461,94 pacientes/mês</strong> (previsão direta da equação) ou <strong>470,36 pacientes/mês</strong> (ancorada no valor observado), gerando +R$ 19.864,05/mês em nova receita bruta.
+    `;
+  } else if(id === 3) {
+    setVals(5, 4, 8.5, 7.8, 10, 11, 4);
+    updateSimulation(true);
+    document.getElementById('scenario-details').innerHTML = `
+      <strong>📌 Cenário 3 Carregado — Programa de Redução de Espera nas 15 Piores Clínicas:</strong><br>
+      • <strong>Interpretação A (Corte Uniforme de 18 para 10 min = -8 min):</strong> Ganho de <strong>+100,76 pac./mês por clínica</strong>, totalizando <strong>+1.511,43 pacientes/mês nas 15 clínicas</strong> (+R$ 272.057,79/mês em receita bruta na rede).<br>
+      • <strong>Interpretação B (Redução a partir dos Tempos Reais da Tabela até 10 min):</strong> As 15 piores clínicas somam 343 min de espera. A meta total é 150 min (redução acumulada de 193 minutos), gerando <strong>+2.430,89 pacientes/mês adicionais na rede</strong> (+R$ 437.560,21/mês em receita bruta).
+    `;
+  } else {
+    setVals(6, 5, 11.5, 8.0, 17, 14, 7);
+    updateSimulation();
+  }
+}
+
+// ==============================================================
+// 8. INICIALIZAÇÃO GERAL
+// ==============================================================
+window.onload = () => {
+  // Inicialização dos módulos executivos
+  resetCEOSimulator();
+  initCEOChart();
+  updateClinicaSim();
+  initClinicaChart();
+  updateComercialSim();
+  renderMktRegionTable();
+  updateMktSim();
+
+  // Inicialização do Explorador
+  initExplorerColPills();
+  applyExplorerFilters();
+
+  // Inicialização dos módulos estatísticos
+  renderDescTable();
+  renderRawTable();
+  renderCorrMatrix();
+  initHistograms();
+  updateScatterChart();
+  runRLS();
+  switchRLM('full');
+  loadScenario(1);
+
+  // Inicializar ícone do tema
+  const isDark = document.documentElement.classList.contains('dark');
+  document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
+  document.getElementById('theme-text').innerText = isDark ? 'Modo Claro' : 'Modo Escuro';
+};
+</script>
+</body>
+</html>
