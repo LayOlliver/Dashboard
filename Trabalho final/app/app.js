@@ -1,5 +1,7 @@
 /**
- * TechNova Analytics & Decision Suite — Main Application Controller
+ * TechNova Analytics & Decision Suite — Automated Application Controller
+ * Recalculates all 3 tabs, 5 statistical stages, and dynamic SVG charts automatically
+ * for any uploaded CSV or XLSX dataset.
  */
 (function () {
   'use strict';
@@ -8,52 +10,52 @@
     {
       id: 'felipe',
       name: 'Felipe Drummond',
-      role: 'CEO & Co-fundador',
+      role: 'CEO • Visão Executiva',
       avatar: '👔',
       bg: '#DBEAFE',
       color: '#1D4ED8',
-      tag: 'Decisão Board 45 Dias & ROI',
-      desc: 'Simulador What-If para o Board, proteção de 40% do ARR e alocação ótima dos R$ 4 milhões.'
+      tag: 'Simulador What-If & Segmentos',
+      desc: 'Simulador dinâmico pela equação OLS e diagnóstico objetivo dos segmentos (clusters) recalculados.'
     },
     {
       id: 'caio',
       name: 'Caio Ventura',
-      role: 'CTO & Co-fundador',
+      role: 'CTO • Estrutura & Categorias',
       avatar: '🖥️',
       bg: '#FEF3C7',
       color: '#B45309',
-      tag: 'Ambiente (F1) & Modalidade',
-      desc: 'Auditoria empírica do RTO (Presencial vs Remoto) e onde infraestrutura/ferramentas realmente importam.'
+      tag: 'Categorias (ANOVA/χ²) & Fatores',
+      desc: 'Auditoria estatística por variável categórica e impacto segmentado de qualquer fator por cluster.'
     },
     {
       id: 'juliana',
       name: 'Juliana Braga',
-      role: 'VP de People (RH)',
+      role: 'VP de People • Indicadores',
       avatar: '🧠',
       bg: '#CCFBF1',
       color: '#0F766E',
-      tag: 'Liderança (F2) & Burnout (F4)',
-      desc: 'Impacto de Liderança e Equilíbrio, retenção dos 16 Staffs em risco no Cluster 1 e programa de R$ 4M.'
+      tag: 'Raio-X de Itens & Prioridades',
+      desc: 'Mapeamento dos principais fatores preditores, médias por cluster e registros prioritários no Cluster 1.'
     },
     {
       id: 'lucas',
       name: 'Lucas Ferreira',
-      role: 'Tech Lead — Squad Alpha',
+      role: 'Tech Lead • Grupos & Desempenho',
       avatar: '🚀',
       bg: '#EDE9FE',
       color: '#6D28D9',
-      tag: 'Performance Remota & Squads',
-      desc: 'Auditoria dos Squads Alpha (1º lugar: Y=183,75) e Beta (40% do ARR), autonomia técnica e risco de churn.'
+      tag: 'Ranking de Grupos & Top 10',
+      desc: 'Comparativo dinâmico entre grupos categóricos e listagem dos registros de maior desempenho na base.'
     },
     {
       id: 'priya',
       name: 'Priya Sharma',
-      role: 'Eng. Manager — Squad Theta',
+      role: 'Eng. Manager • Classificador',
       avatar: '🌟',
       bg: '#DCFCE7',
       color: '#15803D',
-      tag: 'Benchmark 360 & Classificador IA',
-      desc: 'Playbook do Cluster 3 (Y=192,92) e Classificador Individual de Colaboradores (V1–V15 → Cluster e Ŷ).'
+      tag: 'Simulador & Classificador Individual',
+      desc: 'Cálculo em tempo real de escores fatoriais, classificação no cluster mais próximo e previsão Ŷ.'
     }
   ];
 
@@ -62,29 +64,43 @@
     { id: 2, title: 'Etapa 2: Análise Fatorial (ACP + AFE)' },
     { id: 3, title: 'Etapa 3: Análise de Cluster (Ward + K-Means)' },
     { id: 4, title: 'Etapa 4: Regressão Linear Múltipla (OLS)' },
-    { id: 5, title: 'Etapa 5: Integração & Galeria Gráfica' }
+    { id: 5, title: 'Etapa 5: Integração & Painel Gráfico Dinâmico' }
   ];
 
+  const PALETTE = ['#0F766E', '#1D4ED8', '#B45309', '#6D28D9', '#DC2626', '#0284C7'];
+  const CLUSTER_COLORS = ['#DC2626', '#D97706', '#15803D', '#1D4ED8', '#6D28D9', '#0F766E'];
+
   const state = {
-    datasetName: 'Base Oficial TechNova (N = 150)',
+    datasetName: 'Base Padrão (N = 150)',
     isCustomUpload: false,
-    summary: window.TECHNOVA_DEFAULT_SUMMARY,
-    rows: window.TECHNOVA_ENRICHED_ROWS,
-    rawRows: window.TECHNOVA_RAW_ROWS,
+    summary: null,
+    rows: [],
+    rawRows: window.TECHNOVA_RAW_ROWS || [],
     pendingUploadRows: null,
+    pendingFileName: '',
     mode: 'personas',
     activePersona: 'felipe',
     activeStage: 1,
-    // Simulator state for Felipe Drummond
-    sim: { dF1: 0.6, dF2: 1.0, dF3: 0.5, dF4: 0.9, preset: 'consultoria', rtoForced: false },
-    // Individual Collaborator Simulator state for Priya Sharma
-    priyaSelectedId: 21,
-    priyaVScores: { V1:8, V2:10, V3:10, V4:10, V5:10, V6:8, V7:10, V8:10, V9:7, V10:8, V11:5, V12:9, V13:10, V14:9, V15:9 },
-    // Explorer filters
-    filterCluster: 'ALL',
-    filterModalidade: 'ALL',
-    filterSquad: 'ALL'
+    // Dynamic UI controls
+    simDeltas: {},
+    simPreset: 'base',
+    caioCatCol: null,
+    caioFactorCode: null,
+    lucasGroupCol: null,
+    lucasFilterVal: 'ALL',
+    priyaSelectedId: null,
+    priyaVScores: {},
+    explorerFilters: { cluster: 'ALL', cat1: 'ALL', cat2: 'ALL', search: '' }
   };
+
+  // --- Formatting & HTML Escape Helpers ---
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
 
   function fmt(num, digits = 2) {
     if (num === undefined || num === null || isNaN(num)) return '—';
@@ -97,22 +113,65 @@
     return Number(p).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
   }
 
+  function clusterBadgeClass(cid, totalK) {
+    if (cid === totalK) return 'badge-green';
+    if (cid === 1) return 'badge-red';
+    return 'badge-amber';
+  }
+
+  // --- Unified Dataset Application (Default & Upload) ---
+  function applyDataset(rows, datasetName, config = {}, isCustom = false) {
+    const res = window.TechNovaStatsEngine.runAdaptivePipeline(rows, config);
+    state.datasetName = datasetName;
+    state.isCustomUpload = isCustom;
+    state.summary = res.summary;
+    state.rows = res.enrichedRows;
+
+    const meta = res.summary.meta;
+    // Reset dynamic simulator state
+    state.simDeltas = {};
+    meta.factorCodes.forEach(fc => { state.simDeltas[fc] = 0; });
+    state.simPreset = 'base';
+
+    // Reset persona selectors to match active dataset columns
+    state.caioCatCol = meta.primaryCatCol || meta.catCols[0] || null;
+    state.caioFactorCode = meta.factorCodes[0] || null;
+    state.lucasGroupCol = meta.defaultGroupCol || meta.catCols[0] || null;
+    state.lucasFilterVal = 'ALL';
+
+    // Reset Priya individual classifier to first row of active dataset
+    const firstRow = state.rows[0];
+    state.priyaSelectedId = firstRow ? firstRow.ID : null;
+    state.priyaVScores = {};
+    meta.featureCols.forEach(col => {
+      state.priyaVScores[col] = firstRow ? Number(firstRow[col]) : 0;
+    });
+
+    // Reset Explorer filters
+    state.explorerFilters = { cluster: 'ALL', cat1: 'ALL', cat2: 'ALL', search: '' };
+
+    renderTelemetry();
+    setMode(state.mode);
+  }
+
   // --- Telemetry Header ---
   function renderTelemetry() {
     const s = state.summary;
+    if (!s) return;
     const ef = s.etapa2_fatorial;
     const er = s.etapa4_regressao;
     const ec = s.etapa3_cluster;
     const el = document.getElementById('telemetryPills');
     el.innerHTML = `
-      <span class="tpill">🗄️ Base: <strong>${state.datasetName}</strong></span>
-      <span class="tpill">👥 Amostra: <strong>N = ${s.meta.n}</strong></span>
+      <span class="tpill">🗄️ Base: <strong>${esc(state.datasetName)}</strong></span>
+      <span class="tpill">👥 Amostra: <strong>N = ${s.meta.n}</strong> (${s.meta.n_vars_likert} vars → ${esc(s.meta.targetCol)})</span>
       <span class="tpill">🧪 KMO: <strong>${fmt(ef.kmo_global, 4)}</strong> | Bartlett: <strong>p ${fmtP(ef.bartlett_p)}</strong></span>
-      <span class="tpill">📐 4 Fatores Varimax: <strong>${fmt(ef.variancia_total_explicada_acp_pct, 2)}% var.</strong></span>
+      <span class="tpill">📐 ${s.meta.n_fatores} Fatores Varimax: <strong>${fmt(ef.variancia_total_explicada_acp_pct, 2)}% var.</strong></span>
       <span class="tpill">🎯 Clusters: <strong>K = ${ec.perfis_k3.length}</strong></span>
       <span class="tpill">📈 Regressão R²: <strong>${fmt(er.r2 * 100, 2)}%</strong> (F = ${fmt(er.f_anova, 1)})</span>
     `;
-    document.getElementById('btnRestoreDefault').style.display = state.isCustomUpload ? 'inline-flex' : 'none';
+    const btnRestore = document.getElementById('btnRestoreDefault');
+    if (btnRestore) btnRestore.style.display = state.isCustomUpload ? 'inline-flex' : 'none';
   }
 
   // --- Mode Switcher ---
@@ -120,19 +179,352 @@
     state.mode = mode;
     document.getElementById('tabPersonas').classList.toggle('active', mode === 'personas');
     document.getElementById('tabFlow').classList.toggle('active', mode === 'flow');
-    document.getElementById('tabQaData').classList.toggle('active', mode === 'qadata');
+    document.getElementById('tabDataExplorer').classList.toggle('active', mode === 'explorer');
 
     document.getElementById('viewPersonas').style.display = mode === 'personas' ? 'block' : 'none';
     document.getElementById('viewFlow').style.display = mode === 'flow' ? 'block' : 'none';
-    document.getElementById('viewQaData').style.display = mode === 'qadata' ? 'block' : 'none';
+    document.getElementById('viewDataExplorer').style.display = mode === 'explorer' ? 'block' : 'none';
 
     if (mode === 'personas') renderPersonasView();
     if (mode === 'flow') renderFlowView();
-    if (mode === 'qadata') renderQaDataView();
+    if (mode === 'explorer') renderDataExplorerView();
   }
 
   // =========================================================================
-  // VIEW 1: PERSONAS HUB (5 CHARACTERS)
+  // DYNAMIC SVG CHART BUILDERS (100% RECALCULATED ON ANY DATASET)
+  // =========================================================================
+  function buildHistogramSVG(values, label) {
+    const W = 540, H = 240, padL = 44, padR = 16, padT = 18, padB = 36;
+    const minV = Math.min(...values), maxV = Math.max(...values);
+    const span = (maxV - minV) || 1;
+    const bins = Math.min(12, Math.max(6, Math.round(Math.sqrt(values.length))));
+    const counts = new Array(bins).fill(0);
+    values.forEach(v => {
+      const idx = Math.min(bins - 1, Math.floor(((v - minV) / span) * bins));
+      counts[idx]++;
+    });
+    const maxC = Math.max(...counts, 1);
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const bw = plotW / bins;
+    const meanV = values.reduce((a, b) => a + b, 0) / values.length;
+    const meanX = padL + ((meanV - minV) / span) * plotW;
+
+    const bars = counts.map((c, i) => {
+      const bh = (c / maxC) * plotH;
+      const x = padL + i * bw + 2;
+      const y = padT + plotH - bh;
+      const bStart = minV + (i / bins) * span;
+      return `
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(4, bw - 4).toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="#0F766E" opacity="0.85"></rect>
+        ${c > 0 ? `<text x="${(x + (bw - 4) / 2).toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="#334155" font-weight="700">${c}</text>` : ''}
+        ${i % 2 === 0 ? `<text x="${x.toFixed(1)}" y="${H - 16}" font-size="9.5" fill="#64748B">${fmt(bStart, 1)}</text>` : ''}
+      `;
+    }).join('');
+
+    return `
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        ${bars}
+        <line x1="${meanX.toFixed(1)}" y1="${padT}" x2="${meanX.toFixed(1)}" y2="${padT + plotH}" stroke="#DC2626" stroke-width="2" stroke-dasharray="4 3" />
+        <text x="${Math.min(W - 85, meanX + 5).toFixed(1)}" y="${padT + 12}" font-size="10" fill="#DC2626" font-weight="700">Média = ${fmt(meanV, 2)}</text>
+        <text x="${W / 2}" y="${H - 2}" text-anchor="middle" font-size="10.5" fill="#475569" font-weight="700">${esc(label)}</text>
+      </svg>
+    `;
+  }
+
+  function buildScreeSVG(autovalores) {
+    const W = 540, H = 240, padL = 44, padR = 20, padT = 18, padB = 34;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const maxEig = Math.max(...autovalores.map(a => Math.max(a.autovalor, a.pa_p95)), 1.5) * 1.1;
+    const n = autovalores.length;
+    const xAt = (i) => padL + (n > 1 ? (i / (n - 1)) * plotW : plotW / 2);
+    const yAt = (v) => padT + plotH - (v / maxEig) * plotH;
+
+    const eigPts = autovalores.map((a, i) => `${xAt(i).toFixed(1)},${yAt(a.autovalor).toFixed(1)}`).join(' ');
+    const paPts = autovalores.map((a, i) => `${xAt(i).toFixed(1)},${yAt(a.pa_p95).toFixed(1)}`).join(' ');
+    const yKaiser = yAt(1.0);
+
+    const dots = autovalores.map((a, i) => {
+      const cx = xAt(i), cy = yAt(a.autovalor);
+      return `
+        <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${a.retido ? 5 : 3.5}" fill="${a.retido ? '#0F766E' : '#94A3B8'}" stroke="#FFF" stroke-width="1.5" />
+        ${a.retido ? `<text x="${cx.toFixed(1)}" y="${(cy - 8).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="#0F766E" font-weight="700">${fmt(a.autovalor, 2)}</text>` : ''}
+        <text x="${cx.toFixed(1)}" y="${H - 14}" text-anchor="middle" font-size="9.5" fill="#64748B">${a.componente}</text>
+      `;
+    }).join('');
+
+    return `
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        <line x1="${padL}" y1="${yKaiser.toFixed(1)}" x2="${W - padR}" y2="${yKaiser.toFixed(1)}" stroke="#DC2626" stroke-dasharray="5 4" stroke-width="1.5" />
+        <text x="${W - padR - 4}" y="${(yKaiser - 4).toFixed(1)}" text-anchor="end" font-size="9.5" fill="#DC2626" font-weight="700">Kaiser (λ = 1,0)</text>
+        <polyline fill="none" stroke="#1D4ED8" stroke-width="2" stroke-dasharray="4 3" points="${paPts}" />
+        <polyline fill="none" stroke="#0F766E" stroke-width="2.5" points="${eigPts}" />
+        ${dots}
+        <text x="12" y="${padT + 10}" font-size="9.5" fill="#64748B">${fmt(maxEig, 1)}</text>
+        <text x="${W / 2}" y="${H - 1}" text-anchor="middle" font-size="10" fill="#475569" font-weight="700">Componente</text>
+      </svg>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#0F766E;"></span>Autovalor Observado</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1D4ED8;"></span>Análise Paralela (Horn P95)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#DC2626;"></span>Critério de Kaiser (λ = 1)</span>
+      </div>
+    `;
+  }
+
+  function buildLoadingsHeatmapSVG(cargas, factorMeta) {
+    const k = factorMeta.length;
+    const rows = cargas.length;
+    const cellW = Math.max(64, Math.min(96, Math.floor(380 / k)));
+    const cellH = 22;
+    const padL = 90, padT = 30, padR = 12, padB = 10;
+    const W = padL + k * cellW + padR;
+    const H = padT + rows * cellH + padB;
+
+    const headers = factorMeta.map((fm, c) =>
+      `<text x="${padL + c * cellW + cellW / 2}" y="19" text-anchor="middle" font-size="10.5" fill="#0F172A" font-weight="800">${esc(fm.nome_curto.slice(0, 12))}</text>`
+    ).join('');
+
+    const cells = cargas.map((row, r) => {
+      const y = padT + r * cellH;
+      const rowLabel = `<text x="${padL - 8}" y="${y + 15}" text-anchor="end" font-size="10.5" fill="#334155" font-weight="700">${esc(row.variavel.slice(0, 12))}</text>`;
+      const cols = factorMeta.map((fm, c) => {
+        const val = row[fm.codigo] ?? 0;
+        const abs = Math.abs(val);
+        const alpha = Math.min(0.95, abs);
+        const fill = val >= 0
+          ? `rgba(15, 118, 110, ${(alpha * 0.85).toFixed(2)})`
+          : `rgba(220, 38, 38, ${(alpha * 0.85).toFixed(2)})`;
+        const txtCol = abs >= 0.5 ? '#FFFFFF' : '#334155';
+        const x = padL + c * cellW;
+        return `
+          <rect x="${x + 1}" y="${y + 1}" width="${cellW - 2}" height="${cellH - 2}" rx="3" fill="${fill}" />
+          <text x="${x + cellW / 2}" y="${y + 15}" text-anchor="middle" font-size="10" fill="${txtCol}" font-weight="${abs >= 0.5 ? '800' : '500'}">${fmt(val, 2)}</text>
+        `;
+      }).join('');
+      return rowLabel + cols;
+    }).join('');
+
+    return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}">${headers}${cells}</svg>`;
+  }
+
+  function buildClusterMetricsSVG(metricas, selectedK) {
+    const W = 540, H = 240, padL = 48, padR = 48, padT = 20, padB = 34;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const n = metricas.length;
+    const maxWcss = Math.max(...metricas.map(m => m.wcss_inercia), 1) * 1.08;
+    const maxSil = Math.max(...metricas.map(m => m.silhueta), 0.3) * 1.15;
+    const minSil = Math.min(0, ...metricas.map(m => m.silhueta));
+    const silSpan = (maxSil - minSil) || 1;
+
+    const xAt = (i) => padL + (n > 1 ? (i / (n - 1)) * plotW : plotW / 2);
+    const yWcss = (v) => padT + plotH - (v / maxWcss) * plotH;
+    const ySil = (v) => padT + plotH - ((v - minSil) / silSpan) * plotH;
+
+    const wcssPts = metricas.map((m, i) => `${xAt(i).toFixed(1)},${yWcss(m.wcss_inercia).toFixed(1)}`).join(' ');
+    const silPts = metricas.map((m, i) => `${xAt(i).toFixed(1)},${ySil(m.silhueta).toFixed(1)}`).join(' ');
+
+    const markers = metricas.map((m, i) => {
+      const x = xAt(i), y1 = yWcss(m.wcss_inercia), y2 = ySil(m.silhueta);
+      const isSel = m.k === selectedK;
+      return `
+        ${isSel ? `<line x1="${x.toFixed(1)}" y1="${padT}" x2="${x.toFixed(1)}" y2="${padT + plotH}" stroke="#0F766E" stroke-dasharray="3 3" stroke-width="1.5" />` : ''}
+        <circle cx="${x.toFixed(1)}" cy="${y1.toFixed(1)}" r="${isSel ? 5.5 : 4}" fill="#1D4ED8" stroke="#FFF" stroke-width="1.5" />
+        <circle cx="${x.toFixed(1)}" cy="${y2.toFixed(1)}" r="${isSel ? 5.5 : 4}" fill="#0F766E" stroke="#FFF" stroke-width="1.5" />
+        <text x="${x.toFixed(1)}" y="${(y2 - 8).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="#0F766E" font-weight="700">${fmt(m.silhueta, 3)}</text>
+        <text x="${x.toFixed(1)}" y="${H - 14}" text-anchor="middle" font-size="10.5" fill="${isSel ? '#0F766E' : '#475569'}" font-weight="${isSel ? '800' : '600'}">K=${m.k}</text>
+      `;
+    }).join('');
+
+    return `
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#1D4ED8" opacity="0.4" />
+        <line x1="${W - padR}" y1="${padT}" x2="${W - padR}" y2="${padT + plotH}" stroke="#0F766E" opacity="0.4" />
+        <polyline fill="none" stroke="#1D4ED8" stroke-width="2.2" points="${wcssPts}" />
+        <polyline fill="none" stroke="#0F766E" stroke-width="2.2" points="${silPts}" />
+        ${markers}
+        <text x="6" y="${padT + 8}" font-size="9.5" fill="#1D4ED8" font-weight="700">WCSS</text>
+        <text x="${W - 4}" y="${padT + 8}" text-anchor="end" font-size="9.5" fill="#0F766E" font-weight="700">Silhueta</text>
+      </svg>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1D4ED8;"></span>WCSS / Inércia (Cotovelo)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0F766E;"></span>Índice de Silhueta (Ativo: K=${selectedK})</span>
+      </div>
+    `;
+  }
+
+  function buildCentroidsBarSVG(perfis, factorMeta) {
+    const W = 540, H = 250, padL = 44, padR = 16, padT = 18, padB = 42;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const kFactors = factorMeta.length;
+    const K = perfis.length;
+    const allVals = perfis.flatMap(p => factorMeta.map(fm => p.centroides_fatores[fm.codigo] || 0));
+    const maxAbs = Math.max(1.2, ...allVals.map(v => Math.abs(v))) * 1.15;
+    const yZero = padT + plotH / 2;
+    const scaleY = (plotH / 2) / maxAbs;
+    const groupW = plotW / kFactors;
+    const barW = Math.min(28, (groupW - 14) / K);
+
+    const groups = factorMeta.map((fm, fi) => {
+      const gx = padL + fi * groupW + (groupW - K * barW) / 2;
+      const bars = perfis.map((p, ci) => {
+        const val = p.centroides_fatores[fm.codigo] || 0;
+        const h = Math.abs(val) * scaleY;
+        const y = val >= 0 ? yZero - h : yZero;
+        const x = gx + ci * barW;
+        const col = CLUSTER_COLORS[ci % CLUSTER_COLORS.length];
+        return `
+          <rect x="${(x + 1).toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(4, barW - 2).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${col}" opacity="0.88" />
+          <text x="${(x + barW / 2).toFixed(1)}" y="${(val >= 0 ? y - 3 : y + h + 9).toFixed(1)}" text-anchor="middle" font-size="8.5" fill="${col}" font-weight="700">${fmt(val, 2)}</text>
+        `;
+      }).join('');
+      return `
+        ${bars}
+        <text x="${(padL + fi * groupW + groupW / 2).toFixed(1)}" y="${H - 14}" text-anchor="middle" font-size="10" fill="#334155" font-weight="700">${esc(fm.nome_curto.slice(0, 14))}</text>
+      `;
+    }).join('');
+
+    const legend = perfis.map((p, ci) =>
+      `<span class="legend-item"><span class="legend-dot" style="background:${CLUSTER_COLORS[ci % CLUSTER_COLORS.length]};"></span>C${p.cluster_id} (n=${p.n})</span>`
+    ).join('');
+
+    return `
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        <line x1="${padL}" y1="${yZero.toFixed(1)}" x2="${W - padR}" y2="${yZero.toFixed(1)}" stroke="#64748B" stroke-width="1.2" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        <text x="${padL - 6}" y="${padT + 8}" text-anchor="end" font-size="9" fill="#64748B">+${fmt(maxAbs, 1)}</text>
+        <text x="${padL - 6}" y="${yZero + 3}" text-anchor="end" font-size="9" fill="#64748B">0</text>
+        <text x="${padL - 6}" y="${padT + plotH}" text-anchor="end" font-size="9" fill="#64748B">-${fmt(maxAbs, 1)}</text>
+        ${groups}
+      </svg>
+      <div class="chart-legend">${legend}</div>
+    `;
+  }
+
+  function buildClusterTargetBarSVG(perfis, targetCol) {
+    const W = 540, H = 230, padL = 52, padR = 20, padT = 22, padB = 42;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const maxVal = Math.max(...perfis.map(p => p.y_media + p.y_dp), 1) * 1.08;
+    const minVal = Math.min(0, ...perfis.map(p => p.y_media - p.y_dp));
+    const span = (maxVal - minVal) || 1;
+    const yAt = (v) => padT + plotH - ((v - minVal) / span) * plotH;
+    const slotW = plotW / perfis.length;
+    const barW = Math.min(64, slotW * 0.55);
+
+    const items = perfis.map((p, idx) => {
+      const cx = padL + idx * slotW + slotW / 2;
+      const yTop = yAt(p.y_media);
+      const yBase = yAt(minVal);
+      const yHi = yAt(p.y_media + p.y_dp);
+      const yLo = yAt(Math.max(minVal, p.y_media - p.y_dp));
+      const col = CLUSTER_COLORS[idx % CLUSTER_COLORS.length];
+      return `
+        <rect x="${(cx - barW / 2).toFixed(1)}" y="${yTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(2, yBase - yTop).toFixed(1)}" rx="5" fill="${col}" opacity="0.82" />
+        <line x1="${cx.toFixed(1)}" y1="${yHi.toFixed(1)}" x2="${cx.toFixed(1)}" y2="${yLo.toFixed(1)}" stroke="#0F172A" stroke-width="1.8" />
+        <line x1="${(cx - 7).toFixed(1)}" y1="${yHi.toFixed(1)}" x2="${(cx + 7).toFixed(1)}" y2="${yHi.toFixed(1)}" stroke="#0F172A" stroke-width="1.8" />
+        <line x1="${(cx - 7).toFixed(1)}" y1="${yLo.toFixed(1)}" x2="${(cx + 7).toFixed(1)}" y2="${yLo.toFixed(1)}" stroke="#0F172A" stroke-width="1.8" />
+        <text x="${cx.toFixed(1)}" y="${(yHi - 6).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="#0F172A" font-weight="800">${fmt(p.y_media, 2)}</text>
+        <text x="${cx.toFixed(1)}" y="${H - 22}" text-anchor="middle" font-size="10.5" fill="#334155" font-weight="700">Cluster ${p.cluster_id}</text>
+        <text x="${cx.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9.5" fill="#64748B">n=${p.n} (${fmt(p.pct, 1)}%)</text>
+      `;
+    }).join('');
+
+    return `
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        <text x="${padL - 6}" y="${padT + 8}" text-anchor="end" font-size="9.5" fill="#64748B">${fmt(maxVal, 0)}</text>
+        <text x="${padL - 6}" y="${padT + plotH}" text-anchor="end" font-size="9.5" fill="#64748B">${fmt(minVal, 0)}</text>
+        ${items}
+      </svg>
+      <div class="chart-legend"><span class="legend-item">Média de ${esc(targetCol)} ± 1 Desvio-Padrão por Cluster</span></div>
+    `;
+  }
+
+  function buildBetasBarSVG(coeficientes) {
+    const preds = [...coeficientes.slice(1)].sort((a, b) => Math.abs(b.beta_padronizado) - Math.abs(a.beta_padronizado));
+    const rowH = 34;
+    const W = 540, H = Math.max(170, 44 + preds.length * rowH);
+    const padL = 175, padR = 54, padT = 16, padB = 26;
+    const plotW = W - padL - padR;
+    const maxAbs = Math.max(0.2, ...preds.map(p => Math.abs(p.beta_padronizado))) * 1.15;
+    const hasNeg = preds.some(p => p.beta_padronizado < 0);
+    const xZero = hasNeg ? padL + plotW / 2 : padL;
+    const scaleX = (hasNeg ? plotW / 2 : plotW) / maxAbs;
+
+    const bars = preds.map((c, idx) => {
+      const y = padT + idx * rowH;
+      const beta = c.beta_padronizado;
+      const bw = Math.abs(beta) * scaleX;
+      const x = beta >= 0 ? xZero : xZero - bw;
+      const col = beta >= 0 ? PALETTE[idx % PALETTE.length] : '#DC2626';
+      const lbl = (c.rotulo || c.termo).slice(0, 26);
+      return `
+        <text x="${padL - 8}" y="${y + 17}" text-anchor="end" font-size="11" fill="#1E293B" font-weight="700">${esc(lbl)}</text>
+        <rect x="${x.toFixed(1)}" y="${y + 4}" width="${Math.max(3, bw).toFixed(1)}" height="20" rx="4" fill="${col}" opacity="0.88" />
+        <text x="${(beta >= 0 ? x + bw + 6 : x - 6).toFixed(1)}" y="${y + 18}" text-anchor="${beta >= 0 ? 'start' : 'end'}" font-size="10.5" fill="#0F172A" font-weight="800">${beta >= 0 ? '+' : ''}${fmt(beta, 3)}</text>
+      `;
+    }).join('');
+
+    return `
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        <line x1="${xZero.toFixed(1)}" y1="${padT - 4}" x2="${xZero.toFixed(1)}" y2="${H - padB}" stroke="#64748B" stroke-width="1.2" />
+        ${bars}
+        <text x="${W / 2}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#475569" font-weight="700">Coeficiente Padronizado (Beta)</text>
+      </svg>
+    `;
+  }
+
+  function buildScatterSVG(points, xLabel, yLabel, opts = {}) {
+    const W = 540, H = 240, padL = 48, padR = 18, padT = 18, padB = 36;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const xs = points.map(p => p.x), ys = points.map(p => p.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = opts.forceZeroSymmetric ? -Math.max(3.2, ...ys.map(Math.abs)) : Math.min(...ys);
+    const maxY = opts.forceZeroSymmetric ? Math.max(3.2, ...ys.map(Math.abs)) : Math.max(...ys);
+    const spanX = (maxX - minX) || 1, spanY = (maxY - minY) || 1;
+    const xAt = (v) => padL + ((v - minX) / spanX) * plotW;
+    const yAt = (v) => padT + plotH - ((v - minY) / spanY) * plotH;
+
+    let refLine = '';
+    if (opts.diagonal) {
+      const lo = Math.max(minX, minY), hi = Math.min(maxX, maxY);
+      refLine = `<line x1="${xAt(lo).toFixed(1)}" y1="${yAt(lo).toFixed(1)}" x2="${xAt(hi).toFixed(1)}" y2="${yAt(hi).toFixed(1)}" stroke="#DC2626" stroke-dasharray="5 4" stroke-width="1.6" />`;
+    }
+    if (opts.zeroLine) {
+      const y0 = yAt(0);
+      refLine += `<line x1="${padL}" y1="${y0.toFixed(1)}" x2="${W - padR}" y2="${y0.toFixed(1)}" stroke="#DC2626" stroke-dasharray="5 4" stroke-width="1.5" />`;
+      if (minY < -3 && maxY > 3) {
+        refLine += `<line x1="${padL}" y1="${yAt(3).toFixed(1)}" x2="${W - padR}" y2="${yAt(3).toFixed(1)}" stroke="#94A3B8" stroke-dasharray="2 3" />`;
+        refLine += `<line x1="${padL}" y1="${yAt(-3).toFixed(1)}" x2="${W - padR}" y2="${yAt(-3).toFixed(1)}" stroke="#94A3B8" stroke-dasharray="2 3" />`;
+      }
+    }
+
+    const dots = points.map(pt => {
+      const col = CLUSTER_COLORS[((pt.cluster || 1) - 1) % CLUSTER_COLORS.length];
+      return `<circle cx="${xAt(pt.x).toFixed(1)}" cy="${yAt(pt.y).toFixed(1)}" r="3.4" fill="${col}" opacity="0.72" />`;
+    }).join('');
+
+    return `
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#CBD5E1" />
+        ${refLine}
+        ${dots}
+        <text x="${padL - 6}" y="${padT + 8}" text-anchor="end" font-size="9" fill="#64748B">${fmt(maxY, 1)}</text>
+        <text x="${padL - 6}" y="${padT + plotH}" text-anchor="end" font-size="9" fill="#64748B">${fmt(minY, 1)}</text>
+        <text x="${padL}" y="${H - 18}" font-size="9" fill="#64748B">${fmt(minX, 1)}</text>
+        <text x="${W - padR}" y="${H - 18}" text-anchor="end" font-size="9" fill="#64748B">${fmt(maxX, 1)}</text>
+        <text x="${W / 2}" y="${H - 4}" text-anchor="middle" font-size="10" fill="#475569" font-weight="700">${esc(xLabel)} vs. ${esc(yLabel)}</text>
+      </svg>
+    `;
+  }
+
+  // =========================================================================
+  // VIEW 1: PERSONAS HUB (5 ADAPTIVE PANELS — ZERO HARDCODED VERDICTS)
   // =========================================================================
   function renderPersonasView() {
     const cardsEl = document.getElementById('personaCards');
@@ -163,131 +555,110 @@
     renderPersonasView();
   }
 
-  // --- 1. FELIPE DRUMMOND (CEO & BOARD ROOM) ---
+  // --- 1. FELIPE DRUMMOND (EXECUTIVE WHAT-IF & SEGMENTS) ---
   function renderFelipeView() {
     const s = state.summary;
     const er = s.etapa4_regressao;
     const ec = s.etapa3_cluster;
     const aud = s.etapa1_descritiva.auditoria;
-    const modAnova = s.etapa1_descritiva.categoricas.Modalidade || { anova_y_f: 0.0122, anova_y_p: 0.9879 };
+    const targetCol = s.meta.targetCol;
+    const factorMeta = s.meta.factorMeta;
+    const predCoefs = er.coeficientes.slice(1);
+    const sortedByBeta = [...predCoefs].sort((a, b) => Math.abs(b.beta_padronizado) - Math.abs(a.beta_padronizado));
+    const topFactor = sortedByBeta[0];
 
-    const b0 = er.coeficientes[0]?.b_nao_padronizado || 172.85;
-    const b1 = er.coeficientes[1]?.b_nao_padronizado || 9.75;
-    const b2 = er.coeficientes[2]?.b_nao_padronizado || 13.44;
-    const b3 = er.coeficientes[3]?.b_nao_padronizado || 4.56;
-    const b4 = er.coeficientes[4]?.b_nao_padronizado || 11.85;
-
-    const deltaY = b1 * state.sim.dF1 + b2 * state.sim.dF2 + b3 * state.sim.dF3 + b4 * state.sim.dF4;
+    const b0 = er.coeficientes[0]?.b_nao_padronizado ?? 0;
+    let deltaY = 0;
+    predCoefs.forEach(c => {
+      const d = state.simDeltas[c.termo] || 0;
+      deltaY += c.b_nao_padronizado * d;
+    });
     const newY = b0 + deltaY;
-    const ySpan = (aud.y_max_observado - aud.y_min_observado) || 125;
+    const ySpan = (aud.y_max_observado - aud.y_min_observado) || 1;
     const deltaNorm100 = (deltaY / ySpan) * 100;
-    const pctGain = (deltaY / b0) * 100;
+    const pctGain = b0 !== 0 ? (deltaY / Math.abs(b0)) * 100 : 0;
+
+    const eqTerms = predCoefs.map(c => {
+      const d = state.simDeltas[c.termo] || 0;
+      return `${c.b_nao_padronizado >= 0 ? '+' : '−'} ${fmt(Math.abs(c.b_nao_padronizado), 2)}·(${fmt(d, 1)})`;
+    }).join(' ');
+
+    const getFactorShort = (code) => factorMeta.find(f => f.codigo === code)?.nome_curto || code;
 
     return `
-      <div class="callout">
-        <h4>👔 Painel Decisório de Felipe Drummond (CEO) — Reunião do Board em 45 Dias</h4>
-        <p>
-          <strong>Diagnóstico Imparcial da Consultoria:</strong> Os 4 fatores latentes explicam <strong>${fmt(er.r2 * 100, 2)}%</strong> da variação da produtividade (F = ${fmt(er.f_anova, 2)}, p &lt; 0,0001).
-          A modalidade de trabalho (Presencial vs. Híbrido vs. Remoto) <strong>não possui efeito sobre a produtividade</strong> (ANOVA F = ${fmt(modAnova.anova_y_f, 4)}, p = ${fmt(modAnova.anova_y_p, 4)}).
-          O principal motor de produtividade da TechNova é o <strong>Fator 2 — Liderança e Cultura (Beta = ${fmt(er.coeficientes[2]?.beta_padronizado, 4)})</strong>, seguido pelo <strong>Fator 4 — Equilíbrio Vida-Trabalho (Beta = ${fmt(er.coeficientes[4]?.beta_padronizado, 4)})</strong>.
-        </p>
-      </div>
-
       <div class="grid-4" style="margin-bottom:18px;">
         <div class="kpi-card">
-          <div class="kpi-label">Produtividade Atual (Média Y)</div>
+          <div class="kpi-label">Média Atual (${esc(targetCol)})</div>
           <div class="kpi-value">${fmt(aud.y_media_observada, 2)}</div>
-          <div class="kpi-foot">Escala observada: ${aud.y_min_observado} a ${aud.y_max_observado} (DP = ${fmt(aud.y_dp_observado, 2)})</div>
+          <div class="kpi-foot">Faixa: ${fmt(aud.y_min_observado, 1)} a ${fmt(aud.y_max_observado, 1)} (DP = ${fmt(aud.y_dp_observado, 2)})</div>
         </div>
         <div class="kpi-card" style="background:#F0FDFA; border-color:#5EEAD4;">
-          <div class="kpi-label" style="color:#0F766E;">Produtividade Projetada (Ŷ)</div>
-          <div class="kpi-value" style="color:#0F766E;">${fmt(newY, 2)} <span style="font-size:14px;">(${deltaY >= 0 ? '+' : ''}${fmt(deltaY, 2)} pts)</span></div>
-          <div class="kpi-foot">Equivalente a <strong>${deltaNorm100 >= 0 ? '+' : ''}${fmt(deltaNorm100, 2)} pts</strong> na escala 0–100 (${pctGain >= 0 ? '+' : ''}${fmt(pctGain, 1)}%)</div>
+          <div class="kpi-label" style="color:#0F766E;">Projeção Simulada (Ŷ)</div>
+          <div class="kpi-value" style="color:#0F766E;">${fmt(newY, 2)} <span style="font-size:14px;">(${deltaY >= 0 ? '+' : ''}${fmt(deltaY, 2)})</span></div>
+          <div class="kpi-foot">${deltaNorm100 >= 0 ? '+' : ''}${fmt(deltaNorm100, 2)} pts na escala 0–100 (${pctGain >= 0 ? '+' : ''}${fmt(pctGain, 1)}%)</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Risco de Receita Recorrente (ARR)</div>
-          <div class="kpi-value" style="color:${state.sim.rtoForced ? 'var(--danger)' : 'var(--success)'};">
-            ${state.sim.rtoForced ? '⚠️ 28% ARR em Risco' : '✅ 40% ARR Protegido'}
-          </div>
-          <div class="kpi-foot">${state.sim.rtoForced ? 'Rebelião Squads Alpha e Beta (70% churn de 40% ARR)' : 'Retenção dos Squads Alpha e Beta garantida'}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Poder Explicativo do Modelo (R²)</div>
+          <div class="kpi-label">Poder Explicativo (R²)</div>
           <div class="kpi-value">${fmt(er.r2 * 100, 2)}%</div>
-          <div class="kpi-foot">R² Ajustado = ${fmt(er.r2_ajustado * 100, 2)}% | VIF = 1,000</div>
+          <div class="kpi-foot">R² Ajust. = ${fmt(er.r2_ajustado * 100, 2)}% | F = ${fmt(er.f_anova, 2)} (p ${fmtP(er.p_anova)})</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Principal Fator Preditor</div>
+          <div class="kpi-value" style="font-size:17px; color:var(--secondary); margin-top:8px;">${esc(topFactor?.nome_curto || topFactor?.termo || '—')}</div>
+          <div class="kpi-foot">Beta = ${fmt(topFactor?.beta_padronizado, 4)} | B = ${topFactor?.b_nao_padronizado >= 0 ? '+' : ''}${fmt(topFactor?.b_nao_padronizado, 2)}/DP</div>
         </div>
       </div>
 
       <div class="grid-2">
-        <!-- Simulador What-If -->
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🎛️ Simulador Estratégico What-If para o Board (Equação OLS)</div>
-              <div class="card-subtitle">Simule choques em desvios-padrão (DP) nos 4 fatores ou teste as propostas de Caio, Juliana e da Consultoria</div>
+              <div class="card-title">🎛️ Simulador What-If Dinâmico (Equação OLS — ${predCoefs.length} Fatores)</div>
+              <div class="card-subtitle">Simule variações em desvios-padrão (DP) nos fatores extraídos automaticamente da base ativa</div>
             </div>
           </div>
 
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
-            <button class="btn ${state.sim.preset === 'caio' ? 'btn-primary' : 'btn-outline'}" onclick="window.AppUI.applySimPreset('caio')">
-              🏢 Cenário A: RTO Obrigatório (Tese Caio)
+            <button class="btn ${state.simPreset === 'base' ? 'btn-primary' : 'btn-outline'}" onclick="window.AppUI.applySimPreset('base')">
+              ↺ Base (0 DP)
             </button>
-            <button class="btn ${state.sim.preset === 'juliana' ? 'btn-primary' : 'btn-outline'}" onclick="window.AppUI.applySimPreset('juliana')">
-              🧠 Cenário B: Programa Liderança (Tese Juliana)
+            <button class="btn ${state.simPreset === 'top1' ? 'btn-primary' : 'btn-outline'}" onclick="window.AppUI.applySimPreset('top1')">
+              🎯 Foco no #1 Fator (+1,0 DP)
             </button>
-            <button class="btn ${state.sim.preset === 'consultoria' ? 'btn-primary' : 'btn-outline'}" onclick="window.AppUI.applySimPreset('consultoria')">
-              ⭐ Cenário C: Plano Integrado por Cluster (Recomendado)
+            <button class="btn ${state.simPreset === 'balanced' ? 'btn-primary' : 'btn-outline'}" onclick="window.AppUI.applySimPreset('balanced')">
+              ⚖️ Melhoria Equilibrada (+0,5 DP)
+            </button>
+            <button class="btn ${state.simPreset === 'adverse' ? 'btn-primary' : 'btn-outline'}" onclick="window.AppUI.applySimPreset('adverse')">
+              📉 Cenário Adverso (−0,5 DP)
             </button>
           </div>
 
-          <div class="slider-group">
-            <div class="slider-head">
-              <span>Fator 2 — Liderança e Cultura (B = +${fmt(b2, 2)} pts/DP | Beta = ${fmt(er.coeficientes[2]?.beta_padronizado, 3)})</span>
-              <span style="color:var(--secondary);">${state.sim.dF2 >= 0 ? '+' : ''}${fmt(state.sim.dF2, 2)} DP → ${b2 * state.sim.dF2 >= 0 ? '+' : ''}${fmt(b2 * state.sim.dF2, 2)} pts</span>
-            </div>
-            <input type="range" min="-1.5" max="2.0" step="0.1" value="${state.sim.dF2}" oninput="window.AppUI.updateSimSlider('dF2', this.value)" />
-          </div>
+          ${sortedByBeta.map((c, idx) => {
+            const d = state.simDeltas[c.termo] || 0;
+            const contrib = c.b_nao_padronizado * d;
+            const col = PALETTE[idx % PALETTE.length];
+            return `
+              <div class="slider-group">
+                <div class="slider-head">
+                  <span>${esc(c.rotulo)} (B = ${c.b_nao_padronizado >= 0 ? '+' : ''}${fmt(c.b_nao_padronizado, 2)} | β = ${fmt(c.beta_padronizado, 3)})</span>
+                  <span style="color:${col}; white-space:nowrap;">${d >= 0 ? '+' : ''}${fmt(d, 1)} DP → ${contrib >= 0 ? '+' : ''}${fmt(contrib, 2)}</span>
+                </div>
+                <input type="range" min="-2.0" max="2.0" step="0.1" value="${d}" oninput="window.AppUI.updateSimSlider('${esc(c.termo)}', this.value)" />
+              </div>
+            `;
+          }).join('')}
 
-          <div class="slider-group">
-            <div class="slider-head">
-              <span>Fator 4 — Equilíbrio Vida-Trabalho (B = +${fmt(b4, 2)} pts/DP | Beta = ${fmt(er.coeficientes[4]?.beta_padronizado, 3)})</span>
-              <span style="color:var(--purple);">${state.sim.dF4 >= 0 ? '+' : ''}${fmt(state.sim.dF4, 2)} DP → ${b4 * state.sim.dF4 >= 0 ? '+' : ''}${fmt(b4 * state.sim.dF4, 2)} pts</span>
-            </div>
-            <input type="range" min="-1.5" max="2.0" step="0.1" value="${state.sim.dF4}" oninput="window.AppUI.updateSimSlider('dF4', this.value)" />
-          </div>
-
-          <div class="slider-group">
-            <div class="slider-head">
-              <span>Fator 1 — Ambiente e Ferramentas (B = +${fmt(b1, 2)} pts/DP | Beta = ${fmt(er.coeficientes[1]?.beta_padronizado, 3)})</span>
-              <span style="color:var(--primary);">${state.sim.dF1 >= 0 ? '+' : ''}${fmt(state.sim.dF1, 2)} DP → ${b1 * state.sim.dF1 >= 0 ? '+' : ''}${fmt(b1 * state.sim.dF1, 2)} pts</span>
-            </div>
-            <input type="range" min="-1.5" max="2.0" step="0.1" value="${state.sim.dF1}" oninput="window.AppUI.updateSimSlider('dF1', this.value)" />
-          </div>
-
-          <div class="slider-group">
-            <div class="slider-head">
-              <span>Fator 3 — Crescimento e Aprendizado (B = +${fmt(b3, 2)} pts/DP | Beta = ${fmt(er.coeficientes[3]?.beta_padronizado, 3)})</span>
-              <span style="color:var(--amber);">${state.sim.dF3 >= 0 ? '+' : ''}${fmt(state.sim.dF3, 2)} DP → ${b3 * state.sim.dF3 >= 0 ? '+' : ''}${fmt(b3 * state.sim.dF3, 2)} pts</span>
-            </div>
-            <input type="range" min="-1.5" max="2.0" step="0.1" value="${state.sim.dF3}" oninput="window.AppUI.updateSimSlider('dF3', this.value)" />
-          </div>
-
-          <div class="callout ${state.sim.rtoForced ? 'danger' : 'info'}" style="margin-top:14px; margin-bottom:0;">
-            <h4>${state.sim.rtoForced ? '🚨 Alerta do Cenário RTO Obrigatório' : '💡 Equação Preditiva Aplicada'}</h4>
-            <p>
-              ${state.sim.rtoForced
-                ? 'Forçar o retorno presencial gera choque negativo em Autonomia (F2) e Flexibilidade (F4), reduzindo a produtividade líquida para ' + fmt(newY, 2) + ' pontos e provocando demissão em massa nos Squads Alpha e Beta.'
-                : `Ŷ = ${fmt(b0, 2)} + ${fmt(b1, 2)}·(${state.sim.dF1}) + ${fmt(b2, 2)}·(${state.sim.dF2}) + ${fmt(b3, 2)}·(${state.sim.dF3}) + ${fmt(b4, 2)}·(${state.sim.dF4}) = <strong>${fmt(newY, 2)} pontos</strong>.`}
-            </p>
+          <div class="callout info" style="margin-top:14px; margin-bottom:0;">
+            <h4>💡 Equação OLS Aplicada</h4>
+            <p>Ŷ = ${fmt(b0, 2)} ${eqTerms} = <strong>${fmt(newY, 2)}</strong></p>
           </div>
         </div>
 
-        <!-- Plano de Alocação de Orçamento R$ 4 Milhões por Cluster -->
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">💰 Alocação Cirúrgica dos R$ 4,0 Milhões por Cluster (Plano 45 Dias)</div>
-              <div class="card-subtitle">Em vez de uma política única, a TechNova deve intervir na dor específica de cada segmento</div>
+              <div class="card-title">🎯 Mapa Automático de Segmentos (K = ${ec.perfis_k3.length} Clusters)</div>
+              <div class="card-subtitle">Resumo quantitativo dos centróides e médias de ${esc(targetCol)} calculados na base ativa</div>
             </div>
           </div>
 
@@ -295,33 +666,24 @@
             <table>
               <thead>
                 <tr>
-                  <th>Segmento (Cluster)</th>
-                  <th>Média Y Atual</th>
-                  <th>Dor Crítica (Centróide)</th>
-                  <th>Alocação (R$ 4M)</th>
-                  <th>Ação & Meta Projetada</th>
+                  <th>Segmento</th>
+                  <th class="num">n (%)</th>
+                  <th class="num">Média ${esc(targetCol)}</th>
+                  <th>Menor Centróide (Déficit)</th>
+                  <th>Maior Centróide (Destaque)</th>
                 </tr>
               </thead>
               <tbody>
-                ${ec.perfis_k3.map((p, idx) => {
-                  const budgets = ['R$ 1,80M (45%)', 'R$ 1,40M (35%)', 'R$ 0,80M (20%)'];
-                  const pains = [
-                    `Liderança (${fmt(p.centroides_fatores.F2_Lideranca, 2)}) & Burnout (${fmt(p.centroides_fatores.F4_Equilibrio, 2)})`,
-                    `Ambiente/Tools (${fmt(p.centroides_fatores.F1_Ambiente, 2)}) & Carga (${fmt(p.centroides_fatores.F4_Equilibrio, 2)})`,
-                    `Crescimento/Mentoria (${fmt(p.centroides_fatores.F3_Crescimento, 2)})`
-                  ];
-                  const actions = [
-                    'Coaching executivo de líderes + Retenção dos 16 Staffs (Meta Y → 184+)',
-                    'Voucher Ergonomia/Hardware + Redesenho de Sprints (Meta Y → 185+)',
-                    'Manter flexibilidade remota/híbrida + Mentoria e Carreira (Meta Y → 201+)'
-                  ];
+                ${ec.perfis_k3.map(p => {
+                  const minCode = p.fator_menor_centroide;
+                  const maxCode = p.fator_maior_centroide;
                   return `
                     <tr>
-                      <td><strong>${p.rotulo_curto}</strong><br/><span style="font-size:11px; color:var(--text-muted);">n = ${p.n} (${fmt(p.pct, 1)}%)</span></td>
-                      <td class="num"><span class="badge ${idx === 2 ? 'badge-green' : 'badge-amber'}">${fmt(p.y_media, 2)}</span></td>
-                      <td>${pains[idx] || 'Multidimensional'}</td>
-                      <td class="num"><strong>${budgets[idx] || 'Proporcional'}</strong></td>
-                      <td>${actions[idx] || 'Plano focado nos fatores dominantes'}</td>
+                      <td><strong>Cluster ${p.cluster_id}</strong><br/><span style="font-size:11px; color:var(--text-muted);">${esc(p.rotulo_curto)}</span></td>
+                      <td class="num"><strong>${p.n}</strong> (${fmt(p.pct, 1)}%)</td>
+                      <td class="num"><span class="badge ${clusterBadgeClass(p.cluster_id, ec.perfis_k3.length)}">${fmt(p.y_media, 2)}</span></td>
+                      <td>${esc(getFactorShort(minCode))} <strong style="color:var(--danger);">(${fmt(p.centroides_fatores[minCode], 2)})</strong></td>
+                      <td>${esc(getFactorShort(maxCode))} <strong style="color:var(--success);">(${fmt(p.centroides_fatores[maxCode], 2)})</strong></td>
                     </tr>
                   `;
                 }).join('')}
@@ -330,21 +692,7 @@
           </div>
 
           <div style="margin-top:16px;">
-            <div style="font-weight:800; font-size:13px; margin-bottom:8px;">📊 Quem tinha razão? Veredito Final para o Board:</div>
-            <div class="grid-3">
-              <div class="kpi-card" style="padding:10px;">
-                <span class="badge badge-green">1º Priya Sharma & Juliana</span>
-                <p style="font-size:11.5px; margin-top:6px;"><strong>Tese Confirmada:</strong> Liderança (Beta=0,532) e Equilíbrio (Beta=0,469) respondem pelos dois maiores efeitos na produtividade.</p>
-              </div>
-              <div class="kpi-card" style="padding:10px;">
-                <span class="badge badge-amber">2º Caio Ventura (Parcial)</span>
-                <p style="font-size:11.5px; margin-top:6px;"><strong>Razão Localizada:</strong> Ferramentas e ergonomia (F1: Beta=0,386) são críticas no Cluster 1 e gargalo do Cluster 2, mas independem de RTO.</p>
-              </div>
-              <div class="kpi-card" style="padding:10px;">
-                <span class="badge badge-purple">3º Lucas Ferreira</span>
-                <p style="font-size:11.5px; margin-top:6px;"><strong>Comprovado:</strong> Squad Alpha é o #1 em produtividade (183,75) e 40% do Cluster de Alta Performance é 100% remoto.</p>
-              </div>
-            </div>
+            ${buildClusterTargetBarSVG(ec.perfis_k3, targetCol)}
           </div>
         </div>
       </div>
@@ -352,198 +700,209 @@
   }
 
   function applySimPreset(preset) {
-    state.sim.preset = preset;
-    if (preset === 'caio') {
-      state.sim.dF1 = 0.3;
-      state.sim.dF2 = -0.6;
-      state.sim.dF3 = 0.0;
-      state.sim.dF4 = -0.9;
-      state.sim.rtoForced = true;
-    } else if (preset === 'juliana') {
-      state.sim.dF1 = 0.0;
-      state.sim.dF2 = 1.1;
-      state.sim.dF3 = 0.5;
-      state.sim.dF4 = 0.7;
-      state.sim.rtoForced = false;
-    } else {
-      state.sim.dF1 = 0.6;
-      state.sim.dF2 = 1.0;
-      state.sim.dF3 = 0.5;
-      state.sim.dF4 = 0.9;
-      state.sim.rtoForced = false;
-    }
+    const s = state.summary;
+    const preds = s.etapa4_regressao.coeficientes.slice(1);
+    const sorted = [...preds].sort((a, b) => Math.abs(b.beta_padronizado) - Math.abs(a.beta_padronizado));
+    state.simPreset = preset;
+    preds.forEach(c => {
+      if (preset === 'base') state.simDeltas[c.termo] = 0;
+      else if (preset === 'top1') state.simDeltas[c.termo] = (c.termo === sorted[0]?.termo) ? 1.0 : 0;
+      else if (preset === 'balanced') state.simDeltas[c.termo] = 0.5;
+      else if (preset === 'adverse') state.simDeltas[c.termo] = -0.5;
+    });
     renderPersonasView();
   }
 
-  function updateSimSlider(key, val) {
-    state.sim[key] = parseFloat(val);
-    state.sim.preset = 'custom';
-    state.sim.rtoForced = false;
+  function updateSimSlider(factorCode, val) {
+    state.simDeltas[factorCode] = parseFloat(val);
+    state.simPreset = 'custom';
     renderPersonasView();
   }
 
-  // --- 2. CAIO VENTURA (CTO — INFRAESTRUTURA, AMBIENTE & MODALIDADE) ---
+  // --- 2. CAIO VENTURA (CATEGORICAL AUDIT & FACTOR IMPACT BY CLUSTER) ---
   function renderCaioView() {
     const s = state.summary;
-    const modCat = s.etapa1_descritiva.categoricas.Modalidade;
-    const ctMod = s.etapa3_cluster.crosstabs_qui_quadrado.Modalidade;
-    const segC = s.etapa5_integracao.regressao_por_cluster;
+    const meta = s.meta;
     const ec = s.etapa3_cluster;
+    const segC = s.etapa5_integracao.regressao_por_cluster;
+    const catCols = meta.catCols;
+    const activeCatCol = catCols.includes(state.caioCatCol) ? state.caioCatCol : (catCols[0] || null);
+    const activeFactor = meta.factorCodes.includes(state.caioFactorCode) ? state.caioFactorCode : meta.factorCodes[0];
+    const activeFactorMeta = meta.factorMeta.find(f => f.codigo === activeFactor) || { codigo: activeFactor, nome: activeFactor };
+
+    let catCardHtml = `
+      <div class="callout info" style="margin-bottom:0;">
+        <h4>Sem variáveis categóricas detectadas</h4>
+        <p>A base carregada contém apenas variáveis numéricas. O painel ao lado permanece ativo com a regressão segmentada por cluster.</p>
+      </div>
+    `;
+
+    if (activeCatCol) {
+      const catInfo = s.etapa1_descritiva.categoricas[activeCatCol];
+      const ct = ec.crosstabs_qui_quadrado[activeCatCol];
+      catCardHtml = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>${esc(activeCatCol)}</th>
+                <th class="num">n (%)</th>
+                <th class="num">Média ${esc(meta.targetCol)} (DP)</th>
+                ${ec.perfis_k3.map(p => `<th class="num">C${p.cluster_id}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${(catInfo?.table || []).map(row => {
+                const key = row.categoria;
+                return `
+                  <tr>
+                    <td><strong>${esc(key)}</strong></td>
+                    <td class="num">${row.freq} (${fmt(row.pct, 1)}%)</td>
+                    <td class="num"><strong>${fmt(row.y_media, 2)}</strong> (DP=${fmt(row.y_dp, 1)})</td>
+                    ${ec.perfis_k3.map(p => {
+                      const cnt = ct?.contagem?.[key]?.[String(p.cluster_id)] || 0;
+                      const pct = row.freq ? (cnt / row.freq) * 100 : 0;
+                      return `<td class="num">${cnt} (${fmt(pct, 1)}%)</td>`;
+                    }).join('')}
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="callout ${catInfo?.anova_y_p < 0.05 ? '' : 'info'}" style="margin-top:14px; margin-bottom:0;">
+          <h4>Resultado dos Testes Estatísticos (${esc(activeCatCol)})</h4>
+          <p>
+            <strong>ANOVA sobre ${esc(meta.targetCol)}:</strong> F = ${fmt(catInfo?.anova_y_f, 4)}, p = ${fmtP(catInfo?.anova_y_p)}
+            (${catInfo?.anova_y_p < 0.05 ? 'diferença estatisticamente significativa a 5%' : 'sem diferença significativa entre categorias a 5%'}).<br/>
+            <strong>Qui-Quadrado vs. Clusters:</strong> χ² = ${fmt(ct?.chi2, 4)} (gl = ${ct?.gl}), p = ${fmtP(ct?.p_valor)}
+            (${ct?.significativo_5pct ? 'associação significativa a 5%' : 'distribuição independente dos clusters a 5%'}).
+          </p>
+        </div>
+      `;
+    }
 
     return `
-      <div class="callout warn">
-        <h4>🖥️ Painel Técnico de Caio Ventura (CTO) — Teste Empírico do RTO vs. Infraestrutura Distribuída (Fator 1)</h4>
-        <p>
-          <strong>Mensagem da Equipe Analítica para o CTO:</strong> Caio, testamos sua hipótese com rigor estatístico.
-          A presença física no escritório (Modalidade Presencial) <strong>não gera maior produtividade</strong> (Média Presencial = 172,36 vs. Remoto = 172,96 vs. Híbrido = 173,15; ANOVA p = 0,9879).
-          Contudo, <strong>você tem razão parcial e valiosa sobre o Fator 1 (Ambiente, Ferramentas, Ruído e Ergonomia)</strong>: na Regressão Segmentada, o Fator 1 é o <strong>preditor nº 1 dentro do Cluster 1 (Beta = 0,4231)</strong> e o maior déficit estrutural do <strong>Cluster 2 (Centróide F1 = −0,896, média Likert 4,91)</strong>!
-        </p>
-      </div>
-
       <div class="grid-2">
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🏢 1. Teste de Hipótese: Produtividade e Clusters por Modalidade</div>
-              <div class="card-subtitle">ANOVA One-Way (F = ${fmt(modCat?.anova_y_f, 4)}, p = ${fmt(modCat?.anova_y_p, 4)}) e Qui-Quadrado (χ² = ${fmt(ctMod?.chi2, 4)}, p = ${fmt(ctMod?.p_valor, 4)})</div>
+              <div class="card-title">🏢 1. Auditoria Categórica: ${esc(meta.targetCol)} & Clusters</div>
+              <div class="card-subtitle">Testes ANOVA One-Way e Qui-Quadrado recalculados automaticamente</div>
             </div>
+            ${catCols.length ? `
+              <select class="control-select" onchange="window.AppUI.setCaioCatCol(this.value)">
+                ${catCols.map(c => `<option value="${esc(c)}" ${c === activeCatCol ? 'selected' : ''}>Coluna: ${esc(c)}</option>`).join('')}
+              </select>
+            ` : ''}
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Modalidade</th>
-                  <th class="num">Colaboradores (n)</th>
-                  <th class="num">Média Produtividade (Y)</th>
-                  <th class="num">Cluster 1 (Baixa Y)</th>
-                  <th class="num">Cluster 2 (Média Y)</th>
-                  <th class="num">Cluster 3 (Alta Y=192,9)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${(modCat?.table || []).map(m => {
-                  const mName = m.Modalidade;
-                  const c1 = ctMod?.contagem?.[mName]?.['1'] || 0;
-                  const c2 = ctMod?.contagem?.[mName]?.['2'] || 0;
-                  const c3 = ctMod?.contagem?.[mName]?.['3'] || 0;
-                  return `
-                    <tr>
-                      <td><strong>${mName}</strong></td>
-                      <td class="num">${m.freq} (${fmt(m.pct, 1)}%)</td>
-                      <td class="num"><strong>${fmt(m.y_media, 2)}</strong> (DP=${fmt(m.y_dp, 1)})</td>
-                      <td class="num">${c1} (${fmt(c1 / m.freq * 100, 1)}%)</td>
-                      <td class="num">${c2} (${fmt(c2 / m.freq * 100, 1)}%)</td>
-                      <td class="num"><span class="badge badge-green">${c3} (${fmt(c3 / m.freq * 100, 1)}%)</span></td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
-          </div>
-          <p style="font-size:12px; color:var(--text-muted); margin-top:12px;">
-            🔍 <strong>Evidência Crítica:</strong> Dos 50 colaboradores do <strong>Cluster 3 (Alta Performance)</strong>, <strong>20 (40%) são 100% Remotos</strong> e <strong>18 (36%) são Híbridos</strong>. Já entre os 44 colaboradores 100% Presenciais, <strong>18 (40,9%) caíram no Cluster 1 (baixa produtividade)</strong> devido a falhas de liderança.
-          </p>
+          ${catCardHtml}
         </div>
 
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🛠️ 2. Onde Caio Tem Razão: O Peso de F1 (Ambiente & Ferramentas) por Cluster</div>
-              <div class="card-subtitle">Resultados da Regressão Segmentada (Parte 7.2 e Questão 10)</div>
+              <div class="card-title">🛠️ 2. Impacto Segmentado por Cluster (${esc(activeFactorMeta.nome_curto || activeFactor)})</div>
+              <div class="card-subtitle">Centróide e regressão OLS segmentada dentro de cada cluster</div>
             </div>
+            <select class="control-select" onchange="window.AppUI.setCaioFactor(this.value)">
+              ${meta.factorMeta.map(fm => `<option value="${esc(fm.codigo)}" ${fm.codigo === activeFactor ? 'selected' : ''}>${esc(fm.nome)}</option>`).join('')}
+            </select>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Segmento</th>
-                  <th class="num">Centróide F1 (Ambiente)</th>
-                  <th class="num">Média Likert (V1–V4)</th>
-                  <th class="num">Coef. B de F1</th>
-                  <th class="num">Beta Padronizado F1</th>
-                  <th>Diagnóstico para o CTO</th>
+                  <th>Cluster</th>
+                  <th class="num">n</th>
+                  <th class="num">Centróide Z</th>
+                  <th class="num">Média Itens</th>
+                  <th class="num">Coef. B</th>
+                  <th class="num">Beta (p-valor)</th>
+                  <th class="num">R² Cluster</th>
                 </tr>
               </thead>
               <tbody>
                 ${ec.perfis_k3.map(p => {
-                  const sc = segC[`Cluster_${p.cluster_id}`]?.coeficientes?.F1_Ambiente || { b: 9.75, beta: 0.38, p: 0.001 };
+                  const seg = segC[`Cluster_${p.cluster_id}`];
+                  const sc = seg?.coeficientes?.[activeFactor];
+                  const z = p.centroides_fatores[activeFactor] ?? 0;
                   return `
                     <tr>
-                      <td><strong>${p.rotulo_curto}</strong></td>
-                      <td class="num"><span class="badge ${p.centroides_fatores.F1_Ambiente < 0 ? 'badge-red' : 'badge-teal'}">${fmt(p.centroides_fatores.F1_Ambiente, 3)}</span></td>
-                      <td class="num">${fmt(p.medias_blocos_likert.Ambiente_V1_V4, 2)} / 10</td>
-                      <td class="num">+${fmt(sc.b, 2)} pts</td>
-                      <td class="num"><strong>${fmt(sc.beta, 4)}</strong> (p=${fmt(sc.p, 3)})</td>
-                      <td style="font-size:11.5px;">
-                        ${p.cluster_id === 1 ? '<strong>1º Fator no Grupo!</strong> Boa infra sustenta entrega apesar da má liderança.' :
-                          p.cluster_id === 2 ? '<strong>Gargalo Crítico!</strong> V1=5,02; V2=4,62; V3=4,94; V4=5,06. Precisa upgrade imediato!' :
-                          'Infra saudável (7,08/10) potencializada por forte liderança.'}
-                      </td>
+                      <td><strong>Cluster ${p.cluster_id}</strong></td>
+                      <td class="num">${p.n}</td>
+                      <td class="num"><span class="badge ${z < 0 ? 'badge-red' : 'badge-teal'}">${z >= 0 ? '+' : ''}${fmt(z, 3)}</span></td>
+                      <td class="num">${fmt(p.medias_por_fator_original?.[activeFactor], 2)}</td>
+                      <td class="num">${sc && sc.b !== null ? (sc.b >= 0 ? '+' : '') + fmt(sc.b, 2) : '—'}</td>
+                      <td class="num">${sc && sc.beta !== null ? `<strong>${fmt(sc.beta, 3)}</strong> (p=${fmtP(sc.p)})` : 'n insuf.'}</td>
+                      <td class="num">${seg && seg.r2 !== null ? fmt(seg.r2 * 100, 1) + '%' : '—'}</td>
                     </tr>
                   `;
                 }).join('')}
               </tbody>
             </table>
           </div>
-          <div class="callout info" style="margin-top:14px; margin-bottom:0;">
-            <h4>🎯 Proposta Alternativa para Caio Liderar (Sem RTO Obrigatório):</h4>
-            <p>
-              Em vez de obrigar 360 pessoas a irem ao escritório em 60 dias, Caio deve liderar o <strong>Programa TechNova DX (Developer Experience & Ergonomia — R$ 1,40M)</strong> focado nos 50 engenheiros do <strong>Cluster 2</strong> (que têm nota 4,62 em ferramentas V2 e 4,94 em ruído V3) e em rituais técnicos de arquitetura assíncrona + encontros presenciais trimestrais de alto impacto.
-            </p>
+          <div style="margin-top:14px;">
+            ${buildCentroidsBarSVG(ec.perfis_k3, meta.factorMeta)}
           </div>
         </div>
       </div>
     `;
   }
 
-  // --- 3. JULIANA BRAGA (VP DE PEOPLE) ---
+  function setCaioCatCol(col) {
+    state.caioCatCol = col;
+    renderPersonasView();
+  }
+
+  function setCaioFactor(fc) {
+    state.caioFactorCode = fc;
+    renderPersonasView();
+  }
+
+  // --- 3. JULIANA BRAGA (CRITICAL INDICATORS & PRIORITY LIST) ---
   function renderJulianaView() {
     const s = state.summary;
-    const ef = s.etapa2_fatorial;
+    const meta = s.meta;
     const er = s.etapa4_regressao;
     const ec = s.etapa3_cluster;
-    const ctSen = ec.crosstabs_qui_quadrado.Senioridade;
+    const descFeatures = s.etapa1_descritiva.tabela_descritiva.filter(d => d.variavel !== meta.targetCol);
+    const lowestVar = [...descFeatures].sort((a, b) => a.media - b.media)[0];
+    const sortedPreds = [...er.coeficientes.slice(1)].sort((a, b) => Math.abs(b.beta_padronizado) - Math.abs(a.beta_padronizado));
+    const top1 = sortedPreds[0];
+    const top2 = sortedPreds[1] || sortedPreds[0];
+    const c1 = ec.perfis_k3[0];
 
-    const c1Staffs = ctSen?.contagem?.Staff?.['1'] || 16;
-    const totalStaffs = (ctSen?.contagem?.Staff?.['1'] || 0) + (ctSen?.contagem?.Staff?.['2'] || 0) + (ctSen?.contagem?.Staff?.['3'] || 0) || 39;
-
-    // Top critical collaborators in Cluster 1 (lowest F2 and F4)
+    const f1Code = top1?.termo;
+    const f2Code = top2?.termo;
     const criticalRows = [...state.rows]
-      .filter(r => r.Cluster_K3 === 1)
-      .sort((a, b) => (a.F2_Lideranca + a.F4_Equilibrio) - (b.F2_Lideranca + b.F4_Equilibrio))
-      .slice(0, 8);
+      .filter(r => r.Cluster_K === 1)
+      .sort((a, b) => ((a[f1Code] || 0) + (a[f2Code] || 0)) - ((b[f1Code] || 0) + (b[f2Code] || 0)))
+      .slice(0, 10);
+
+    const showCats = meta.catCols.slice(0, 2);
 
     return `
-      <div class="callout">
-        <h4>🧠 Painel Estratégico de Juliana Braga (VP de People) — Validação Psicométrica de Liderança, Carreira e Burnout</h4>
-        <p>
-          <strong>Tese Comprovada pelos Dados:</strong> Juliana, a análise multivariada valida integralmente sua proposta ao Board.
-          O <strong>Fator 2 — Liderança e Cultura (Alfa = ${fmt(ef.fatores_resumo[1]?.alfa_cronbach, 4)}, Beta = ${fmt(er.coeficientes[2]?.beta_padronizado, 4)})</strong> e o
-          <strong>Fator 4 — Equilíbrio Vida-Trabalho / Prevenção ao Burnout (Alfa = ${fmt(ef.fatores_resumo[3]?.alfa_cronbach, 4)}, Beta = ${fmt(er.coeficientes[4]?.beta_padronizado, 4)})</strong>
-          são as duas maiores forças determinantes da produtividade na TechNova.
-        </p>
-      </div>
-
       <div class="grid-4" style="margin-bottom:18px;">
         <div class="kpi-card">
-          <div class="kpi-label">Impacto de +1 DP em Liderança (F2)</div>
-          <div class="kpi-value" style="color:var(--secondary);">+${fmt(er.coeficientes[2]?.b_nao_padronizado, 2)} pts</div>
-          <div class="kpi-foot">1º Preditor Global (t = ${fmt(er.coeficientes[2]?.t_stat, 2)}, p &lt; 0,0001)</div>
+          <div class="kpi-label">1º Preditor (${esc(top1?.nome_curto || '—')})</div>
+          <div class="kpi-value" style="color:var(--secondary);">${top1?.b_nao_padronizado >= 0 ? '+' : ''}${fmt(top1?.b_nao_padronizado, 2)} / DP</div>
+          <div class="kpi-foot">Beta = ${fmt(top1?.beta_padronizado, 4)} | p ${fmtP(top1?.p_valor)}</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Impacto de +1 DP em Equilíbrio (F4)</div>
-          <div class="kpi-value" style="color:var(--purple);">+${fmt(er.coeficientes[4]?.b_nao_padronizado, 2)} pts</div>
-          <div class="kpi-foot">2º Preditor Global (t = ${fmt(er.coeficientes[4]?.t_stat, 2)}, p &lt; 0,0001)</div>
+          <div class="kpi-label">2º Preditor (${esc(top2?.nome_curto || '—')})</div>
+          <div class="kpi-value" style="color:var(--purple);">${top2?.b_nao_padronizado >= 0 ? '+' : ''}${fmt(top2?.b_nao_padronizado, 2)} / DP</div>
+          <div class="kpi-foot">Beta = ${fmt(top2?.beta_padronizado, 4)} | p ${fmtP(top2?.p_valor)}</div>
         </div>
         <div class="kpi-card" style="background:#FEF2F2; border-color:#FCA5A5;">
-          <div class="kpi-label" style="color:var(--danger);">Staff Engineers no Cluster 1</div>
-          <div class="kpi-value" style="color:var(--danger);">${c1Staffs} de ${totalStaffs} (${fmt(c1Staffs / totalStaffs * 100, 1)}%)</div>
-          <div class="kpi-foot">Explica o pedido de demissão dos 3 Staffs no LinkedIn!</div>
+          <div class="kpi-label" style="color:var(--danger);">Cluster 1 (Menor ${esc(meta.targetCol)})</div>
+          <div class="kpi-value" style="color:var(--danger);">${c1?.n || 0} reg. (${fmt(c1?.pct, 1)}%)</div>
+          <div class="kpi-foot">Média ${esc(meta.targetCol)} = ${fmt(c1?.y_media, 2)} (DP = ${fmt(c1?.y_dp, 2)})</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Menor Média Likert da Empresa</div>
-          <div class="kpi-value" style="color:var(--amber);">V11 = 5,53</div>
-          <div class="kpi-foot">Mentoria (5,53), Suporte Gestor (5,90) e Treinamento (5,97)</div>
+          <div class="kpi-label">Menor Média Entre Preditores</div>
+          <div class="kpi-value" style="color:var(--amber);">${esc(lowestVar?.variavel || '—')} = ${fmt(lowestVar?.media, 2)}</div>
+          <div class="kpi-foot">${esc(lowestVar?.descricao || '')} (DP = ${fmt(lowestVar?.dp, 2)})</div>
         </div>
       </div>
 
@@ -551,306 +910,280 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">📉 Raio-X Psicométrico dos Itens de People (V5 a V15) por Cluster</div>
-              <div class="card-subtitle">Comparação das médias Likert (1–10) entre os 3 segmentos</div>
+              <div class="card-title">📉 Raio-X das Variáveis Preditoras por Cluster (${meta.featureCols.length} itens)</div>
+              <div class="card-subtitle">Médias originais em cada cluster (C1..C${ec.perfis_k3.length}) e correlação de Pearson com ${esc(meta.targetCol)}</div>
             </div>
           </div>
-          <div class="table-wrap">
+          <div class="table-wrap" style="max-height:460px; overflow-y:auto;">
             <table>
               <thead>
                 <tr>
                   <th>Var</th>
-                  <th>Indicador Organizacional</th>
-                  <th>Dimensão</th>
-                  <th class="num">C1: Crise Liderança</th>
-                  <th class="num">C2: Limitados Infra</th>
-                  <th class="num">C3: Alta Perf.</th>
-                  <th class="num">Correl. c/ Y</th>
+                  <th>Indicador</th>
+                  ${ec.perfis_k3.map(p => `<th class="num">C${p.cluster_id}</th>`).join('')}
+                  <th class="num">r c/ ${esc(meta.targetCol)}</th>
                 </tr>
               </thead>
               <tbody>
-                ${s.etapa1_descritiva.correlacoes_com_y.filter(c => !['V1','V2','V3','V4'].includes(c.variavel)).map(c => {
-                  const m1 = ec.perfis_k3[0]?.medias_originais?.[c.variavel] || 0;
-                  const m2 = ec.perfis_k3[1]?.medias_originais?.[c.variavel] || 0;
-                  const m3 = ec.perfis_k3[2]?.medias_originais?.[c.variavel] || 0;
-                  return `
-                    <tr>
-                      <td><strong>${c.variavel}</strong></td>
-                      <td>${c.descricao}</td>
-                      <td><span class="badge ${c.dimensao === 'Liderança' ? 'badge-blue' : c.dimensao === 'Equilíbrio' ? 'badge-purple' : 'badge-amber'}">${c.dimensao}</span></td>
-                      <td class="num" style="color:${m1 < 5.2 ? 'var(--danger)' : 'inherit'}; font-weight:700;">${fmt(m1, 2)}</td>
-                      <td class="num">${fmt(m2, 2)}</td>
-                      <td class="num" style="color:var(--success); font-weight:700;">${fmt(m3, 2)}</td>
-                      <td class="num"><strong>r = ${fmt(c.r, 3)}</strong></td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">🚨 Lista Prioritária de Retenção (Top 8 Colaboradores em Risco Crítico — Cluster 1)</div>
-              <div class="card-subtitle">Colaboradores com piores escores combinados de Liderança (F2) e Equilíbrio/Burnout (F4)</div>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Squad</th>
-                  <th>Senioridade</th>
-                  <th>Modalidade</th>
-                  <th class="num">F2 Liderança</th>
-                  <th class="num">F4 Equilíbrio</th>
-                  <th class="num">Produtiv. Y</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${criticalRows.map(r => `
+                ${s.etapa1_descritiva.correlacoes_com_y.map(c => `
                   <tr>
-                    <td><strong>#${r.ID}</strong></td>
-                    <td>${r.Squad}</td>
-                    <td><span class="badge ${r.Senioridade === 'Staff' || r.Senioridade === 'Sênior' ? 'badge-red' : 'badge-amber'}">${r.Senioridade}</span></td>
-                    <td>${r.Modalidade}</td>
-                    <td class="num" style="color:var(--danger);">${fmt(r.F2_Lideranca, 2)}</td>
-                    <td class="num" style="color:var(--danger);">${fmt(r.F4_Equilibrio, 2)}</td>
-                    <td class="num"><strong>${r.Y}</strong></td>
+                    <td><strong>${esc(c.variavel)}</strong></td>
+                    <td>${esc(c.descricao)}</td>
+                    ${ec.perfis_k3.map(p => {
+                      const val = p.medias_originais?.[c.variavel];
+                      return `<td class="num">${fmt(val, 2)}</td>`;
+                    }).join('')}
+                    <td class="num"><span class="badge ${Math.abs(c.r) > 0.4 ? 'badge-green' : Math.abs(c.r) > 0.25 ? 'badge-blue' : 'badge-amber'}">${fmt(c.r, 3)}</span></td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
           </div>
-          <div class="callout" style="margin-top:14px; margin-bottom:0;">
-            <h4>📋 Diretriz de Execução para o Programa de R$ 4 Milhões de Juliana:</h4>
-            <p>
-              1. <strong>Squads com maior concentração no Cluster 1:</strong> Squad Iota (8 casos), Squad Kappa (8 casos), Squad Gamma (7 casos) e Squad Zeta (7 casos). Substituir ou treinar imediatamente essas lideranças.<br/>
-              2. <strong>Destravar Mentoria (V11 = 5,53):</strong> Na Regressão Segmentada, o Fator 3 (Crescimento/Mentoria) tem Beta = 0,242 (p = 0,007) dentro do Cluster 3. Usar os Staffs do Cluster 3 como mentores remunerados.
-            </p>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // --- 4. LUCAS FERREIRA (TECH LEAD — SQUAD ALPHA) ---
-  function renderLucasView() {
-    const s = state.summary;
-    const sqProfiles = s.etapa5_integracao.perfis_por_squad || [];
-    const alpha = sqProfiles.find(sq => sq.squad === 'Squad Alpha') || sqProfiles[0];
-    const beta = sqProfiles.find(sq => sq.squad === 'Squad Beta') || sqProfiles[1];
-
-    return `
-      <div class="callout info">
-        <h4>🚀 Painel de Lucas Ferreira (Tech Lead — Squad Alpha) — Evidência Empírica da Rebelião Anti-RTO (40% do ARR)</h4>
-        <p>
-          <strong>Os Números Sustentam a Carta dos Squads Alpha e Beta:</strong> O <strong>Squad Alpha é o 1º colocado em produtividade de toda a TechNova (Média Y = ${fmt(alpha?.y_media, 2)})</strong>,
-          com forte avaliação em Liderança e Autonomia (F2 = +${fmt(alpha?.F2_Lideranca, 3)}) e 41,7% de seus membros no Cluster 3 de Alta Performance.
-          Já o <strong>Squad Beta (Média Y = ${fmt(beta?.y_media, 2)}, n = ${beta?.n})</strong> tem 44,4% de sua equipe presa no <strong>Cluster 2 (déficit severo de ferramentas/ergonomia F1 = −0,225)</strong> — ou seja, o Squad Beta precisa de melhores ferramentas e equilíbrio de carga, não de RTO obrigatório!
-        </p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">🏆 Ranking Oficial de Produtividade e Fatores dos 10 Squads</div>
-              <div class="card-subtitle">Comparativo auditado de todos os squads de produto da TechNova</div>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Pos.</th>
-                  <th>Squad</th>
-                  <th class="num">n</th>
-                  <th class="num">Média Y</th>
-                  <th class="num">F1 Amb.</th>
-                  <th class="num">F2 Lid.</th>
-                  <th class="num">F3 Cresc.</th>
-                  <th class="num">F4 Equil.</th>
-                  <th class="center">Clusters (C1/C2/C3)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${sqProfiles.map((sq, idx) => {
-                  const isRebel = sq.squad === 'Squad Alpha' || sq.squad === 'Squad Beta';
-                  const isTheta = sq.squad === 'Squad Theta';
-                  return `
-                    <tr style="${isRebel ? 'background:#EFF6FF;' : isTheta ? 'background:#F0FDF4;' : ''}">
-                      <td class="center"><strong>${idx + 1}º</strong></td>
-                      <td>
-                        <strong>${sq.squad}</strong>
-                        ${sq.squad === 'Squad Alpha' ? '<span class="badge badge-purple">Lucas (ARR)</span>' : ''}
-                        ${sq.squad === 'Squad Beta' ? '<span class="badge badge-blue">ARR 40%</span>' : ''}
-                        ${sq.squad === 'Squad Theta' ? '<span class="badge badge-green">Priya</span>' : ''}
-                      </td>
-                      <td class="num">${sq.n}</td>
-                      <td class="num"><strong>${fmt(sq.y_media, 2)}</strong></td>
-                      <td class="num">${fmt(sq.F1_Ambiente, 2)}</td>
-                      <td class="num">${fmt(sq.F2_Lideranca, 2)}</td>
-                      <td class="num">${fmt(sq.F3_Crescimento, 2)}</td>
-                      <td class="num">${fmt(sq.F4_Equilibrio, 2)}</td>
-                      <td class="center">${sq.clusters_dist?.C1 || 0} / ${sq.clusters_dist?.C2 || 0} / <strong>${sq.clusters_dist?.C3 || 0}</strong></td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
-          </div>
         </div>
 
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">💻 Colaboradores 100% Remotos de Alta Performance (Top 10 da Base)</div>
-              <div class="card-subtitle">Evidência contra o argumento de que "o trabalho remoto matou a velocidade de entrega"</div>
+              <div class="card-title">🚨 Registros Prioritários no Cluster 1 (Top 10 Menores Escores)</div>
+              <div class="card-subtitle">Ordenados pela soma combinada dos 2 principais preditores (${esc(top1?.nome_curto || f1Code)} e ${esc(top2?.nome_curto || f2Code)})</div>
             </div>
           </div>
-          <div class="table-wrap">
+          <div class="table-wrap" style="max-height:460px; overflow-y:auto;">
             <table>
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Squad</th>
-                  <th>Senioridade</th>
-                  <th class="num">V6 Autonomia</th>
-                  <th class="num">V8 Seg. Psic.</th>
-                  <th class="num">V13 Flexib.</th>
-                  <th class="num">Produtividade Y</th>
+                  ${showCats.map(cc => `<th>${esc(cc)}</th>`).join('')}
+                  <th class="num">${esc(top1?.nome_curto || f1Code)}</th>
+                  ${f2Code !== f1Code ? `<th class="num">${esc(top2?.nome_curto || f2Code)}</th>` : ''}
+                  <th class="num">${esc(meta.targetCol)}</th>
+                  <th class="num">Ŷ</th>
                 </tr>
               </thead>
               <tbody>
-                ${[...state.rows]
-                  .filter(r => r.Modalidade === 'Remoto')
-                  .sort((a, b) => b.Y - a.Y)
-                  .slice(0, 10)
-                  .map(r => `
-                    <tr>
-                      <td><strong>#${r.ID}</strong></td>
-                      <td><strong>${r.Squad}</strong></td>
-                      <td>${r.Senioridade}</td>
-                      <td class="num">${r.V6} / 10</td>
-                      <td class="num">${r.V8} / 10</td>
-                      <td class="num">${r.V13} / 10</td>
-                      <td class="num"><span class="badge badge-green">${r.Y} pts</span></td>
-                    </tr>
-                  `).join('')}
+                ${criticalRows.map(r => `
+                  <tr>
+                    <td><strong>#${esc(r.ID)}</strong></td>
+                    ${showCats.map(cc => `<td>${esc(r[cc] ?? '—')}</td>`).join('')}
+                    <td class="num" style="color:${r[f1Code] < 0 ? 'var(--danger)' : 'inherit'};">${fmt(r[f1Code], 2)}</td>
+                    ${f2Code !== f1Code ? `<td class="num" style="color:${r[f2Code] < 0 ? 'var(--danger)' : 'inherit'};">${fmt(r[f2Code], 2)}</td>` : ''}
+                    <td class="num"><strong>${fmt(r[meta.targetCol], 2)}</strong></td>
+                    <td class="num">${fmt(r.Y_Predito, 1)}</td>
+                  </tr>
+                `).join('')}
               </tbody>
             </table>
-          </div>
-          <div class="callout" style="margin-top:14px; margin-bottom:0;">
-            <h4>🤝 Acordo Recomendado para Lucas Ferreira e Squads Alpha & Beta:</h4>
-            <p>
-              1. <strong>Garantia Formal de Trabalho Remoto/Flexível:</strong> Contratos aditivados garantindo regime remoto por performance medida em output/KPIs.<br/>
-              2. <strong>Correção de Mentoria e Carreira no Squad Alpha:</strong> O Squad Alpha tem F3 = −0,309 (sentem falta de plano de carreira claro após o layoff). Incluir Lucas e os seniores do Alpha no comitê técnico de arquitetura junto com Caio Ventura.
-            </p>
           </div>
         </div>
       </div>
     `;
   }
 
-  // --- 5. PRIYA SHARMA (ENGINEERING MANAGER — SQUAD THETA & AI CLASSIFIER) ---
-  function renderPriyaView() {
-    const pred = window.TechNovaStatsEngine.predictIndividualCollaborator(
-      state.priyaVScores,
-      state.summary,
-      state.rows
-    );
-    const currentEmp = state.rows.find(r => Number(r.ID) === Number(state.priyaSelectedId));
+  // --- 4. LUCAS FERREIRA (GROUPS RANKING & TOP PERFORMERS) ---
+  function renderLucasView() {
+    const s = state.summary;
+    const meta = s.meta;
+    const catCols = meta.catCols;
+    const groupCol = catCols.includes(state.lucasGroupCol) ? state.lucasGroupCol : (catCols[0] || null);
+    const profiles = groupCol ? (s.etapa5_integracao.perfis_por_coluna_categorica[groupCol] || []) : [];
+    const K = s.etapa3_cluster.perfis_k3.length;
 
-    // Generate automatic 1-on-1 recommendations based on factor scores
-    const recs = [];
-    if (pred.fScores.F2_Lideranca < 0) {
-      recs.push('🔴 <strong>Ação em Liderança e Segurança Psicológica (F2 baixo):</strong> Agendar 1-on-1 semanal estruturado, ampliar autonomia nas decisões de sprint (V6) e instituir reconhecimento explícito nas entregas (V7).');
-    } else {
-      recs.push('🟢 <strong>Liderança Saudável (F2 positivo):</strong> Manter rituais de feedback contínuo e autonomia técnica.');
-    }
-    if (pred.fScores.F4_Equilibrio < 0) {
-      recs.push('🔴 <strong>Alerta de Sobrecarga / Burnout (F4 baixo):</strong> Renegociar imediatamente o volume de story points (V12), flexibilizar janelas de horário (V13) e bloquear acionamentos fora do expediente (pós-19h).');
-    } else {
-      recs.push('🟢 <strong>Equilíbrio Vida-Trabalho Sustentável (F4 positivo):</strong> Colaborador com baixa exposição ao burnout.');
-    }
-    if (pred.fScores.F1_Ambiente < 0) {
-      recs.push('🟠 <strong>Gargalo de Ambiente e Ferramentas (F1 baixo):</strong> Liberar voucher de upgrade de hardware/ergonomia (V2/V4) e criar janelas de foco sem reuniões (no-meeting blocks para V3).');
-    }
-    if (pred.fScores.F3_Crescimento < 0.2) {
-      recs.push('🔵 <strong>Alavanca de Crescimento e Mentoria (F3):</strong> Conectar colaborador a um Staff Engineer mentor (V11) e formalizar PDI com critérios claros de promoção (V10).');
-    }
+    const filterCatCol = meta.primaryCatCol;
+    const filterOptions = filterCatCol
+      ? [...new Set(state.rows.map(r => String(r[filterCatCol] ?? 'N/A')))].sort()
+      : [];
+    const activeFilter = (filterCatCol && filterOptions.includes(state.lucasFilterVal)) ? state.lucasFilterVal : 'ALL';
+
+    const topVars = s.etapa1_descritiva.correlacoes_com_y.slice(0, 3);
+    const topRows = [...state.rows]
+      .filter(r => activeFilter === 'ALL' || String(r[filterCatCol] ?? 'N/A') === activeFilter)
+      .sort((a, b) => Number(b[meta.targetCol]) - Number(a[meta.targetCol]))
+      .slice(0, 10);
 
     return `
-      <div class="callout">
-        <h4>🌟 Laboratório de Gestão 360 de Priya Sharma & Classificador Preditivo Individual (IA Decision Support)</h4>
-        <p>
-          <strong>Como escalar o modelo de Priya para toda a TechNova:</strong> Selecione abaixo qualquer um dos <strong>${state.rows.length} colaboradores</strong> da base (ou ajuste livremente os 15 indicadores V1–V15)
-          para calcular em tempo real seus <strong>4 Escores Fatoriais</strong>, classificá-lo automaticamente em seu <strong>Cluster</strong>, prever sua <strong>Produtividade (Ŷ)</strong> e gerar o roteiro de <em>one-on-one</em>.
-        </p>
-      </div>
-
       <div class="grid-2">
-        <!-- Sliders V1..V15 -->
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🎚️ Simulador & Classificador Individual de Colaborador (V1 a V15)</div>
-              <div class="card-subtitle">Selecione um colaborador real da base ou personalize as notas Likert (1 a 10)</div>
+              <div class="card-title">🏆 Ranking de Desempenho por Grupo (${esc(groupCol || 'Sem agrupamento')})</div>
+              <div class="card-subtitle">Média de ${esc(meta.targetCol)}, escores fatoriais médios e distribuição de clusters</div>
+            </div>
+            ${catCols.length ? `
+              <select class="control-select" onchange="window.AppUI.setLucasGroupCol(this.value)">
+                ${catCols.map(c => `<option value="${esc(c)}" ${c === groupCol ? 'selected' : ''}>Agrupar por: ${esc(c)}</option>`).join('')}
+              </select>
+            ` : ''}
+          </div>
+          ${groupCol ? `
+            <div class="table-wrap" style="max-height:460px; overflow-y:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Pos.</th>
+                    <th>${esc(groupCol)}</th>
+                    <th class="num">n</th>
+                    <th class="num">Média ${esc(meta.targetCol)}</th>
+                    ${meta.factorMeta.map(fm => `<th class="num">${esc(fm.nome_curto.slice(0, 9))}</th>`).join('')}
+                    <th class="center">Clusters (${Array.from({ length: K }, (_, i) => `C${i + 1}`).join('/')})</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${profiles.map((g, idx) => `
+                    <tr>
+                      <td class="center"><strong>${idx + 1}º</strong></td>
+                      <td><strong>${esc(g.grupo)}</strong></td>
+                      <td class="num">${g.n}</td>
+                      <td class="num"><strong>${fmt(g.y_media, 2)}</strong></td>
+                      ${meta.factorCodes.map(fc => `<td class="num">${fmt(g[fc], 2)}</td>`).join('')}
+                      <td class="center">${Array.from({ length: K }, (_, i) => g.clusters_dist[`C${i + 1}`] || 0).join(' / ')}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : `
+            <div class="callout info" style="margin-bottom:0;">
+              <h4>Sem coluna categórica para agrupamento</h4>
+              <p>A base enviada contém apenas colunas numéricas. Consulte os Top 10 registros individuais no painel ao lado.</p>
+            </div>
+          `}
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">⭐ Top 10 Registros de Maior ${esc(meta.targetCol)}</div>
+              <div class="card-subtitle">Exibindo as 3 variáveis mais correlacionadas com ${esc(meta.targetCol)} na base ativa</div>
+            </div>
+            ${filterCatCol ? `
+              <select class="control-select" onchange="window.AppUI.setLucasFilterVal(this.value)">
+                <option value="ALL">${esc(filterCatCol)}: Todos</option>
+                ${filterOptions.map(v => `<option value="${esc(v)}" ${v === activeFilter ? 'selected' : ''}>${esc(v)}</option>`).join('')}
+              </select>
+            ` : ''}
+          </div>
+          <div class="table-wrap" style="max-height:460px; overflow-y:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  ${groupCol ? `<th>${esc(groupCol)}</th>` : ''}
+                  ${topVars.map(tv => `<th class="num">${esc(tv.variavel)}</th>`).join('')}
+                  <th class="center">Cluster</th>
+                  <th class="num">${esc(meta.targetCol)}</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${topRows.map(r => `
+                  <tr>
+                    <td><strong>#${esc(r.ID)}</strong></td>
+                    ${groupCol ? `<td>${esc(r[groupCol] ?? '—')}</td>` : ''}
+                    ${topVars.map(tv => `<td class="num">${fmt(r[tv.variavel], 1)}</td>`).join('')}
+                    <td class="center"><span class="badge ${clusterBadgeClass(r.Cluster_K, K)}">C${r.Cluster_K}</span></td>
+                    <td class="num"><span class="badge badge-green">${fmt(r[meta.targetCol], 2)}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function setLucasGroupCol(col) {
+    state.lucasGroupCol = col;
+    renderPersonasView();
+  }
+
+  function setLucasFilterVal(val) {
+    state.lucasFilterVal = val;
+    renderPersonasView();
+  }
+
+  // --- 5. PRIYA SHARMA (DYNAMIC INDIVIDUAL CLASSIFIER) ---
+  function renderPriyaView() {
+    const s = state.summary;
+    const meta = s.meta;
+    const K = s.etapa3_cluster.perfis_k3.length;
+    const pred = window.TechNovaStatsEngine.predictIndividualCollaborator(state.priyaVScores, s);
+    const currentEmp = state.rows.find(r => String(r.ID) === String(state.priyaSelectedId));
+
+    const coefMap = {};
+    s.etapa4_regressao.coeficientes.slice(1).forEach(c => { coefMap[c.termo] = c; });
+
+    const alerts = meta.factorMeta.map(fm => {
+      const z = pred.fScores[fm.codigo] || 0;
+      const c = coefMap[fm.codigo];
+      const status = z < -0.5 ? '🔴 Abaixo da média' : z > 0.5 ? '🟢 Acima da média' : '🟡 Próximo à média';
+      return `${status} — <strong>${esc(fm.nome)}</strong>: escore Z = <strong>${z >= 0 ? '+' : ''}${fmt(z, 2)} DP</strong> (peso na regressão: β = ${fmt(c?.beta_padronizado, 3)}, B = ${c?.b_nao_padronizado >= 0 ? '+' : ''}${fmt(c?.b_nao_padronizado, 2)}/DP).`;
+    });
+
+    const descFeatures = s.etapa1_descritiva.tabela_descritiva.filter(d => d.variavel !== meta.targetCol);
+
+    return `
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">🎚️ Simulador & Classificador Individual (${meta.featureCols.length} Variáveis)</div>
+              <div class="card-subtitle">Carregue um registro da base ativa ou ajuste os sliders na escala real de cada coluna</div>
             </div>
           </div>
 
           <div style="margin-bottom:14px;">
-            <label style="font-weight:700; font-size:12.5px; display:block; margin-bottom:4px;">Carregar Colaborador da Base Ativa:</label>
-            <select style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-weight:600;" onchange="window.AppUI.loadCollaboratorIntoPriya(this.value)">
-              ${state.rows.map(r => `
-                <option value="${r.ID}" ${Number(r.ID) === Number(state.priyaSelectedId) ? 'selected' : ''}>
-                  ID #${r.ID} — ${r.Squad || 'Squad'} | ${r.Senioridade || ''} | ${r.Modalidade || ''} (Y Real = ${r.Y} | ${r.Cluster_Nome || 'Cluster ' + r.Cluster_K3})
-                </option>
-              `).join('')}
+            <label style="font-weight:700; font-size:12.5px; display:block; margin-bottom:4px;">Carregar Registro da Base Ativa (N = ${state.rows.length}):</label>
+            <select class="control-select" style="width:100%; padding:8px; font-weight:600;" onchange="window.AppUI.loadCollaboratorIntoPriya(this.value)">
+              <option value="__custom__" ${!currentEmp ? 'selected' : ''}>— Perfil Personalizado Manualmente —</option>
+              ${state.rows.map(r => {
+                const catPreview = meta.catCols.slice(0, 2).map(cc => r[cc]).filter(Boolean).join(' | ');
+                return `
+                  <option value="${esc(r.ID)}" ${String(r.ID) === String(state.priyaSelectedId) ? 'selected' : ''}>
+                    ID #${esc(r.ID)}${catPreview ? ' — ' + esc(catPreview) : ''} (${esc(meta.targetCol)} = ${fmt(r[meta.targetCol], 2)} | C${r.Cluster_K})
+                  </option>
+                `;
+              }).join('')}
             </select>
           </div>
 
-          <div class="grid-2" style="gap:10px; max-height:420px; overflow-y:auto; padding-right:6px;">
-            ${state.summary.etapa1_descritiva.tabela_descritiva.filter(d => d.variavel !== state.summary.meta?.targetCol && d.variavel !== 'Y').map(d => {
+          <div class="grid-2" style="gap:10px; max-height:430px; overflow-y:auto; padding-right:6px;">
+            ${descFeatures.map(d => {
               const v = d.variavel;
-              const val = state.priyaVScores[v] ?? 6;
+              const val = state.priyaVScores[v] ?? d.media;
+              const span = (d.max - d.min) || 1;
+              const step = (Number.isInteger(d.min) && Number.isInteger(d.max) && span <= 20) ? 1 : Number((span / 50).toFixed(2)) || 0.1;
               return `
                 <div style="background:var(--surface-alt); padding:8px 10px; border-radius:8px; border:1px solid var(--border);">
-                  <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700;">
-                    <span>${v}: ${d.descricao.slice(0, 26)}</span>
-                    <span style="color:var(--primary);">${val}/10</span>
+                  <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; gap:6px;">
+                    <span>${esc(v)}: ${esc(d.descricao.slice(0, 24))}</span>
+                    <span style="color:var(--primary); white-space:nowrap;">${fmt(val, step < 1 ? 1 : 0)}</span>
                   </div>
-                  <input type="range" min="1" max="10" step="1" value="${val}" oninput="window.AppUI.updatePriyaVScore('${v}', this.value)" />
+                  <input type="range" min="${d.min}" max="${d.max}" step="${step}" value="${val}" oninput="window.AppUI.updatePriyaVScore('${esc(v)}', this.value)" />
                 </div>
               `;
             }).join('')}
           </div>
         </div>
 
-        <!-- Resultado da Classificação e Prescrição de 1-on-1 -->
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🤖 Diagnóstico Automatizado & Plano de Ação 1-on-1</div>
-              <div class="card-subtitle">Cálculo instantâneo via Pesos Fatoriais Varimax + Distância Euclidiana aos Centróides + Equação OLS</div>
+              <div class="card-title">🤖 Classificação & Previsão Automatizada</div>
+              <div class="card-subtitle">Pesos Varimax exatos + Distância Euclidiana aos ${K} Centróides + Equação OLS ativa</div>
             </div>
           </div>
 
           <div class="grid-2" style="margin-bottom:16px;">
             <div class="kpi-card" style="background:#F0FDFA; border-color:#5EEAD4;">
-              <div class="kpi-label" style="color:#0F766E;">Produtividade Prevista (Ŷ OLS)</div>
-              <div class="kpi-value" style="color:#0F766E;">${fmt(pred.yPredito, 2)} pts</div>
-              <div class="kpi-foot">${currentEmp ? `Valor Real Observado no ID #${currentEmp.ID}: <strong>${currentEmp.Y} pts</strong>` : 'Predição pelo modelo linear múltiplo'}</div>
+              <div class="kpi-label" style="color:#0F766E;">${esc(meta.targetCol)} Previsto (Ŷ OLS)</div>
+              <div class="kpi-value" style="color:#0F766E;">${fmt(pred.yPredito, 2)}</div>
+              <div class="kpi-foot">${currentEmp ? `Valor real no ID #${esc(currentEmp.ID)}: <strong>${fmt(currentEmp[meta.targetCol], 2)}</strong>` : 'Cálculo em tempo real pelo modelo OLS'}</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-label">Cluster Identificado (Menor Distância)</div>
-              <div class="kpi-value" style="font-size:17px; margin-top:8px;">
-                <span class="badge ${pred.cluster.cluster_id === 3 ? 'badge-green' : pred.cluster.cluster_id === 2 ? 'badge-amber' : 'badge-red'}" style="font-size:13px; padding:4px 10px;">
-                  ${pred.cluster.rotulo_curto}
+              <div class="kpi-label">Cluster Classificado</div>
+              <div class="kpi-value" style="font-size:16px; margin-top:8px;">
+                <span class="badge ${clusterBadgeClass(pred.cluster.cluster_id, K)}" style="font-size:12.5px; padding:4px 10px;">
+                  ${esc(pred.cluster.rotulo_curto)}
                 </span>
               </div>
               <div class="kpi-foot" style="margin-top:6px;">Distância Euclidiana ao centróide: ${fmt(pred.distToCentroid, 3)}</div>
@@ -858,24 +1191,20 @@
           </div>
 
           <div style="margin-bottom:16px;">
-            <div style="font-weight:800; font-size:13px; margin-bottom:8px;">📐 Posição do Colaborador nos 4 Escores Fatoriais Padronizados (Z):</div>
+            <div style="font-weight:800; font-size:13px; margin-bottom:8px;">📐 Escores Fatoriais Padronizados (Z) — ${meta.n_fatores} Fatores:</div>
             <div class="grid-2" style="gap:10px;">
-              ${[
-                { k: 'F1_Ambiente', lbl: 'F1: Ambiente & Ferramentas', col: '#0F766E' },
-                { k: 'F2_Lideranca', lbl: 'F2: Liderança & Cultura', col: '#1D4ED8' },
-                { k: 'F3_Crescimento', lbl: 'F3: Crescimento & Mentoria', col: '#B45309' },
-                { k: 'F4_Equilibrio', lbl: 'F4: Equilíbrio & Burnout', col: '#6D28D9' }
-              ].map(f => {
-                const z = pred.fScores[f.k] || 0;
+              ${meta.factorMeta.map((fm, idx) => {
+                const z = pred.fScores[fm.codigo] || 0;
                 const pct = Math.max(5, Math.min(95, ((z + 2.5) / 5.0) * 100));
+                const col = PALETTE[idx % PALETTE.length];
                 return `
                   <div style="padding:10px; border:1px solid var(--border); border-radius:8px;">
-                    <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700;">
-                      <span>${f.lbl}</span>
+                    <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; gap:6px;">
+                      <span>${esc(fm.nome_curto)}</span>
                       <span style="color:${z >= 0 ? 'var(--success)' : 'var(--danger)'};">${z >= 0 ? '+' : ''}${fmt(z, 3)} DP</span>
                     </div>
                     <div class="bar-track">
-                      <div class="bar-fill" style="width:${pct}%; background:${f.col};"></div>
+                      <div class="bar-fill" style="width:${pct}%; background:${col};"></div>
                     </div>
                   </div>
                 `;
@@ -884,9 +1213,9 @@
           </div>
 
           <div class="callout info" style="margin-bottom:0;">
-            <h4>📝 Roteiro Prescritivo para a Próxima Reunião 1-on-1 (Playbook Priya Sharma):</h4>
-            <ul style="margin-left:18px; margin-top:6px; font-size:12.5px; line-height:1.6;">
-              ${recs.map(r => `<li>${r}</li>`).join('')}
+            <h4>📋 Leitura Automática dos Escores Fatoriais</h4>
+            <ul style="margin-left:18px; margin-top:6px; font-size:12.3px; line-height:1.6;">
+              ${alerts.map(a => `<li>${a}</li>`).join('')}
             </ul>
           </div>
         </div>
@@ -895,25 +1224,25 @@
   }
 
   function loadCollaboratorIntoPriya(idVal) {
-    state.priyaSelectedId = Number(idVal);
-    const emp = state.rows.find(r => Number(r.ID) === state.priyaSelectedId);
+    if (idVal === '__custom__') return;
+    const emp = state.rows.find(r => String(r.ID) === String(idVal));
     if (emp) {
-      for (let i = 1; i <= 15; i++) {
-        const k = `V${i}`;
-        if (emp[k] !== undefined) state.priyaVScores[k] = Number(emp[k]);
-      }
+      state.priyaSelectedId = emp.ID;
+      state.summary.meta.featureCols.forEach(col => {
+        state.priyaVScores[col] = Number(emp[col]);
+      });
       renderPersonasView();
     }
   }
 
   function updatePriyaVScore(vKey, val) {
     state.priyaVScores[vKey] = Number(val);
-    state.priyaSelectedId = -1;
+    state.priyaSelectedId = null;
     renderPersonasView();
   }
 
   // =========================================================================
-  // VIEW 2: 5-STAGE ANALYTICAL FLOW
+  // VIEW 2: 5-STAGE ANALYTICAL FLOW (100% AUTOMATIC RECALCULATION)
   // =========================================================================
   function renderFlowView() {
     const navEl = document.getElementById('stageNav');
@@ -938,21 +1267,24 @@
 
   // --- STAGE 1: DESCRIPTIVE & AUDIT ---
   function renderStage1() {
-    const e1 = state.summary.etapa1_descritiva;
+    const s = state.summary;
+    const meta = s.meta;
+    const e1 = s.etapa1_descritiva;
     const aud = e1.auditoria;
     const cols = Object.keys(e1.matriz_correlacao);
+    const catKeys = Object.keys(e1.categoricas || {});
 
     return `
       <div class="callout">
-        <h4>🔍 Etapa 1 — Auditoria Técnica da Base & Estatística Descritiva (Parte III)</h4>
-        <p>${aud.nota_auditoria_y}</p>
+        <h4>🔍 Etapa 1 — Auditoria Automática da Base & Estatística Descritiva</h4>
+        <p>${esc(aud.nota_auditoria_y)}</p>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">📋 1.1 Medidas de Tendência Central, Dispersão e Normalidade (V1 a V15 e Y)</div>
-            <div class="card-subtitle">Média, Mediana, Moda, Desvio-Padrão, Variância, Coeficiente de Variação (CV%), Assimetria e Curtose</div>
+            <div class="card-title">📋 1.1 Medidas de Tendência Central, Dispersão e Normalidade (${meta.featureCols.length} Preditores + ${esc(meta.targetCol)})</div>
+            <div class="card-subtitle">Recalculadas automaticamente: Média, Mediana, Moda, DP, Variância, CV%, Assimetria, Curtose e Teste KS</div>
           </div>
         </div>
         <div class="table-wrap">
@@ -960,34 +1292,34 @@
             <thead>
               <tr>
                 <th>Var</th>
-                <th>Descrição do Indicador</th>
-                <th>Dimensão</th>
+                <th>Descrição</th>
+                <th>Papel</th>
                 <th class="num">Média</th>
                 <th class="num">Mediana</th>
                 <th class="num">Moda</th>
                 <th class="num">DP</th>
-                <th class="num">Variância</th>
                 <th class="num">CV (%)</th>
                 <th class="center">Mín–Máx</th>
-                <th class="num">Assimetria</th>
+                <th class="num">Assim.</th>
                 <th class="num">Curtose</th>
+                <th class="num">KS (p)</th>
               </tr>
             </thead>
             <tbody>
               ${e1.tabela_descritiva.map(r => `
                 <tr>
-                  <td><strong>${r.variavel}</strong></td>
-                  <td>${r.descricao}</td>
-                  <td><span class="badge badge-teal">${r.dimensao_teorica}</span></td>
+                  <td><strong>${esc(r.variavel)}</strong></td>
+                  <td>${esc(r.descricao)}</td>
+                  <td><span class="badge ${r.variavel === meta.targetCol ? 'badge-blue' : 'badge-teal'}">${esc(r.dimensao_teorica)}</span></td>
                   <td class="num"><strong>${fmt(r.media, 2)}</strong></td>
-                  <td class="num">${fmt(r.mediana, 1)}</td>
+                  <td class="num">${fmt(r.mediana, 2)}</td>
                   <td class="num">${fmt(r.moda, 1)}</td>
                   <td class="num">${fmt(r.dp, 2)}</td>
-                  <td class="num">${fmt(r.variancia, 2)}</td>
                   <td class="num"><strong>${fmt(r.cv_pct, 1)}%</strong></td>
-                  <td class="center">${r.min} – ${r.max}</td>
+                  <td class="center">${fmt(r.min, 1)} – ${fmt(r.max, 1)}</td>
                   <td class="num">${fmt(r.assimetria, 2)}</td>
                   <td class="num">${fmt(r.curtose, 2)}</td>
+                  <td class="num">${fmtP(r.ks_p)}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -995,12 +1327,55 @@
         </div>
       </div>
 
+      ${catKeys.length ? `
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">🏷️ 1.2 Variáveis Categóricas & ANOVA sobre ${esc(meta.targetCol)}</div>
+              <div class="card-subtitle">Frequências, médias de ${esc(meta.targetCol)} e teste F One-Way recalculados para cada coluna categórica</div>
+            </div>
+          </div>
+          <div class="grid-${Math.min(3, catKeys.length)}">
+            ${catKeys.map(ck => {
+              const info = e1.categoricas[ck];
+              return `
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>${esc(ck)}</th>
+                        <th class="num">n (%)</th>
+                        <th class="num">Média ${esc(meta.targetCol)}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${info.table.map(row => `
+                        <tr>
+                          <td><strong>${esc(row.categoria)}</strong></td>
+                          <td class="num">${row.freq} (${fmt(row.pct, 1)}%)</td>
+                          <td class="num">${fmt(row.y_media, 2)} ± ${fmt(row.y_dp, 1)}</td>
+                        </tr>
+                      `).join('')}
+                      <tr style="background:#EFF6FF;">
+                        <td colspan="3" style="font-size:11.5px; font-weight:700; color:var(--secondary);">
+                          ANOVA: F = ${fmt(info.anova_y_f, 3)} | p = ${fmtP(info.anova_y_p)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       <div class="grid-2">
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">📊 1.2 Ranking de Correlações de Pearson com a Produtividade (Y)</div>
-              <div class="card-subtitle">Variáveis que mais impulsionam diretamente o Índice de Produtividade</div>
+              <div class="card-title">📊 1.3 Correlações de Pearson com ${esc(meta.targetCol)}</div>
+              <div class="card-subtitle">Ordenadas por magnitude absoluta de correlação |r|</div>
             </div>
           </div>
           <div class="table-wrap">
@@ -1010,7 +1385,6 @@
                   <th>Rank</th>
                   <th>Variável</th>
                   <th>Indicador</th>
-                  <th>Dimensão</th>
                   <th class="num">Correlação (r)</th>
                   <th class="num">Valor-p</th>
                 </tr>
@@ -1019,10 +1393,9 @@
                 ${e1.correlacoes_com_y.map((c, idx) => `
                   <tr>
                     <td class="center"><strong>${idx + 1}º</strong></td>
-                    <td><strong>${c.variavel}</strong></td>
-                    <td>${c.descricao}</td>
-                    <td>${c.dimensao}</td>
-                    <td class="num"><span class="badge ${c.r > 0.42 ? 'badge-green' : c.r > 0.25 ? 'badge-blue' : 'badge-amber'}">${fmt(c.r, 4)}</span></td>
+                    <td><strong>${esc(c.variavel)}</strong></td>
+                    <td>${esc(c.descricao)}</td>
+                    <td class="num"><span class="badge ${Math.abs(c.r) > 0.4 ? 'badge-green' : Math.abs(c.r) > 0.25 ? 'badge-blue' : 'badge-amber'}">${fmt(c.r, 4)}</span></td>
                     <td class="num">${fmtP(c.p_valor)}</td>
                   </tr>
                 `).join('')}
@@ -1034,8 +1407,8 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🔗 1.3 Top 15 Pares de Variáveis Likert Mais Correlacionados</div>
-              <div class="card-subtitle">Evidência empírica que justifica a extração dos 4 Fatores na Etapa 2</div>
+              <div class="card-title">🔗 1.4 Top 15 Pares de Preditores Mais Correlacionados</div>
+              <div class="card-subtitle">Covariação entre variáveis observadas que fundamenta a Análise Fatorial</div>
             </div>
           </div>
           <div class="table-wrap">
@@ -1044,17 +1417,17 @@
                 <tr>
                   <th>Ordem</th>
                   <th>Par de Variáveis</th>
-                  <th class="num">Correlação de Pearson (r)</th>
-                  <th>Bloco Latente Sugerido</th>
+                  <th class="num">Correlação (r)</th>
+                  <th>Intensidade</th>
                 </tr>
               </thead>
               <tbody>
                 ${e1.top_pares_likert.slice(0, 15).map((p, idx) => `
                   <tr>
                     <td class="center">${idx + 1}</td>
-                    <td><strong>${p.par}</strong></td>
+                    <td><strong>${esc(p.par)}</strong></td>
                     <td class="num"><strong>${fmt(p.r, 4)}</strong></td>
-                    <td><span class="badge badge-teal">Alta Covariação Intra-Fator</span></td>
+                    <td><span class="badge ${Math.abs(p.r) >= 0.5 ? 'badge-teal' : Math.abs(p.r) >= 0.3 ? 'badge-blue' : 'badge-amber'}">${Math.abs(p.r) >= 0.5 ? 'Forte' : Math.abs(p.r) >= 0.3 ? 'Moderada' : 'Fraca'}</span></td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -1066,8 +1439,8 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🌡️ 1.4 Matriz de Correlação de Pearson Completa (${cols.length} × ${cols.length})</div>
-            <div class="card-subtitle">Observe os 4 blocos diagonais bem definidos (V1–V4, V5–V8, V9–V11 e V12–V15)</div>
+            <div class="card-title">🌡️ 1.5 Matriz de Correlação de Pearson (${cols.length} × ${cols.length})</div>
+            <div class="card-subtitle">Valores ≥ 0,50 destacados em verde-água; valores ≤ −0,50 em vermelho claro</div>
           </div>
         </div>
         <div class="table-wrap">
@@ -1075,19 +1448,19 @@
             <thead>
               <tr>
                 <th>Var</th>
-                ${cols.map(c => `<th class="center">${c}</th>`).join('')}
+                ${cols.map(c => `<th class="center">${esc(c)}</th>`).join('')}
               </tr>
             </thead>
             <tbody>
               ${cols.map(rCol => `
                 <tr>
-                  <td><strong>${rCol}</strong></td>
+                  <td><strong>${esc(rCol)}</strong></td>
                   ${cols.map(cCol => {
                     const val = e1.matriz_correlacao[rCol]?.[cCol] ?? 0;
                     const abs = Math.abs(val);
-                    const bg = rCol === cCol ? '#0F172A' : (val > 0.5 ? '#CCFBF1' : val > 0.35 ? '#E0F2FE' : '#FFFFFF');
+                    const bg = rCol === cCol ? '#0F172A' : (val >= 0.5 ? '#CCFBF1' : val >= 0.35 ? '#E0F2FE' : val <= -0.5 ? '#FEE2E2' : '#FFFFFF');
                     const fg = rCol === cCol ? '#FFFFFF' : '#0F172A';
-                    return `<td class="center" style="background:${bg}; color:${fg}; font-weight:${abs > 0.5 ? '700' : '400'}; font-size:11px;">${fmt(val, 2)}</td>`;
+                    return `<td class="center" style="background:${bg}; color:${fg}; font-weight:${abs >= 0.5 ? '700' : '400'}; font-size:11px;">${fmt(val, 2)}</td>`;
                   }).join('')}
                 </tr>
               `).join('')}
@@ -1100,28 +1473,32 @@
 
   // --- STAGE 2: FACTOR ANALYSIS ---
   function renderStage2() {
-    const ef = state.summary.etapa2_fatorial;
+    const s = state.summary;
+    const meta = s.meta;
+    const ef = s.etapa2_fatorial;
+    const kmoLabel = ef.kmo_global >= 0.8 ? 'Ótimo (≥ 0,80)' : ef.kmo_global >= 0.7 ? 'Bom (0,70–0,79)' : ef.kmo_global >= 0.6 ? 'Mediano (0,60–0,69)' : ef.kmo_global >= 0.5 ? 'Aceitável (≥ 0,50)' : 'Baixo (< 0,50)';
+
     return `
       <div class="grid-4" style="margin-bottom:18px;">
         <div class="kpi-card">
           <div class="kpi-label">KMO Global (Adequação)</div>
           <div class="kpi-value" style="color:var(--primary);">${fmt(ef.kmo_global, 4)}</div>
-          <div class="kpi-foot">&gt; 0,70 Bom | Próximo de 0,80 (Ótimo)</div>
+          <div class="kpi-foot">${kmoLabel}</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Esfericidade de Bartlett</div>
           <div class="kpi-value">χ² = ${fmt(ef.bartlett_chi2, 1)}</div>
-          <div class="kpi-foot">gl = ${ef.bartlett_df} | p ${fmtP(ef.bartlett_p)} (Rejeita H₀)</div>
+          <div class="kpi-foot">gl = ${ef.bartlett_df} | p ${fmtP(ef.bartlett_p)}</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Variância Explicada (4 Fatores)</div>
+          <div class="kpi-label">Variância Explicada (${meta.n_fatores} Fatores)</div>
           <div class="kpi-value" style="color:var(--secondary);">${fmt(ef.variancia_total_explicada_acp_pct, 2)}%</div>
-          <div class="kpi-foot">ACP Varimax (AFE-ML Comum = ${fmt(ef.variancia_comum_afe_ml_pct, 2)}%)</div>
+          <div class="kpi-foot">ACP Varimax (AFE-PAF Comum = ${fmt(ef.variancia_comum_afe_ml_pct, 2)}%)</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">MSA Individual (Anti-Imagem)</div>
-          <div class="kpi-value" style="color:var(--success);">0,616 – 0,858</div>
-          <div class="kpi-foot">100% dos itens com MSA &gt; 0,50</div>
+          <div class="kpi-value" style="color:${ef.msa_min >= 0.5 ? 'var(--success)' : 'var(--amber)'};">${fmt(ef.msa_min, 3)} – ${fmt(ef.msa_max, 3)}</div>
+          <div class="kpi-foot">${ef.msa_acima_050} de ${meta.n_vars_likert} itens com MSA ≥ 0,50</div>
         </div>
       </div>
 
@@ -1129,31 +1506,34 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">📉 2.1 Autovalores, Critério de Kaiser (λ &gt; 1) e Análise Paralela de Horn</div>
-              <div class="card-subtitle">Convergência exata na retenção de 4 dimensões latentes</div>
+              <div class="card-title">📉 2.1 Scree Plot, Critério de Kaiser (λ &gt; 1) e Análise Paralela de Horn</div>
+              <div class="card-subtitle">${meta.n_fatores} dimensões latentes extraídas automaticamente (Monte Carlo P95)</div>
             </div>
           </div>
-          <div class="table-wrap">
+          <div style="margin-bottom:14px;">
+            ${buildScreeSVG(ef.autovalores_tabela)}
+          </div>
+          <div class="table-wrap" style="max-height:280px; overflow-y:auto;">
             <table>
               <thead>
                 <tr>
                   <th>Comp.</th>
                   <th class="num">Autovalor (λ)</th>
-                  <th class="num">% Variância</th>
-                  <th class="num">% Acumulada</th>
-                  <th class="num">Análise Paralela (P95)</th>
-                  <th class="center">Decisão</th>
+                  <th class="num">% Var.</th>
+                  <th class="num">% Acum.</th>
+                  <th class="num">Horn P95</th>
+                  <th class="center">Status</th>
                 </tr>
               </thead>
               <tbody>
                 ${ef.autovalores_tabela.map(e => `
-                  <tr style="${e.retido_kaiser ? 'background:#F0FDFA; font-weight:700;' : ''}">
+                  <tr style="${e.retido ? 'background:#F0FDFA; font-weight:700;' : ''}">
                     <td class="center">${e.componente}</td>
                     <td class="num">${fmt(e.autovalor, 4)}</td>
                     <td class="num">${fmt(e.var_pct, 2)}%</td>
                     <td class="num">${fmt(e.var_acum_pct, 2)}%</td>
                     <td class="num">${fmt(e.pa_p95, 4)}</td>
-                    <td class="center">${e.retido_kaiser ? '<span class="badge badge-green">RETIDO (Fator)</span>' : '<span class="badge">Descartado</span>'}</td>
+                    <td class="center">${e.retido ? '<span class="badge badge-green">RETIDO</span>' : '<span class="badge">Descartado</span>'}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -1164,41 +1544,43 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🏛️ 2.2 Resumo dos 4 Construtos Latentes e Confiabilidade (Alfa de Cronbach)</div>
-              <div class="card-subtitle">Variância rotacionada Varimax e consistência interna por bloco</div>
+              <div class="card-title">🏛️ 2.2 Resumo dos ${meta.n_fatores} Fatores Extraídos & Alfa de Cronbach Real</div>
+              <div class="card-subtitle">Variância rotacionada Varimax e consistência interna calculada sobre os itens dominantes</div>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Código</th>
-                  <th>Construto Latente</th>
-                  <th class="num">Soma Quadrados</th>
-                  <th class="num">% Var. Rot.</th>
-                  <th class="num">Alfa Cronbach (α)</th>
-                  <th class="num">Média Likert</th>
+                  <th>Fator</th>
+                  <th>Itens Dominantes</th>
+                  <th class="num">SS Rot.</th>
+                  <th class="num">% Var.</th>
+                  <th class="num">Cronbach (α)</th>
+                  <th class="num">Média Itens</th>
                 </tr>
               </thead>
               <tbody>
                 ${ef.fatores_resumo.map(f => `
                   <tr>
-                    <td><strong>${f.codigo}</strong></td>
-                    <td><strong>${f.nome}</strong></td>
+                    <td><strong>${esc(f.nome)}</strong></td>
+                    <td style="font-size:11.5px;">${esc((f.itens_dominantes || []).join(', ')) || '—'}</td>
                     <td class="num">${fmt(f.ss_loadings_rot, 3)}</td>
                     <td class="num"><strong>${fmt(f.var_rot_pct, 2)}%</strong></td>
-                    <td class="num"><span class="badge badge-green">${fmt(f.alfa_cronbach, 4)}</span></td>
-                    <td class="num">${fmt(f.media_itens_original, 2)} (DP=${fmt(f.dp_itens_original, 2)})</td>
+                    <td class="num">
+                      ${f.alfa_cronbach !== null
+                        ? `<span class="badge ${f.alfa_cronbach >= 0.7 ? 'badge-green' : f.alfa_cronbach >= 0.6 ? 'badge-amber' : 'badge-red'}">${fmt(f.alfa_cronbach, 4)}</span>`
+                        : '—'}
+                    </td>
+                    <td class="num">${f.media_itens_original !== null ? `${fmt(f.media_itens_original, 2)} (DP=${fmt(f.dp_itens_original, 2)})` : '—'}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
           </div>
-          <div class="callout info" style="margin-top:14px; margin-bottom:0;">
-            <h4>📌 Nota Metodológica (Apostila de Análise Fatorial):</h4>
-            <p>
-              Todos os 4 blocos superam α &gt; 0,82 (excelente consistência interna). Os escores fatoriais padronizados gerados pela rotação ortogonal Varimax possuem correlação exatamente zero entre si, garantindo ausência total de multicolinearidade nas Etapas 3 e 4.
-            </p>
+          <div style="margin-top:14px;">
+            <div class="chart-title">Mapa de Calor das Cargas Varimax</div>
+            ${buildLoadingsHeatmapSVG(ef.cargas_comunalidades, meta.factorMeta)}
           </div>
         </div>
       </div>
@@ -1207,7 +1589,7 @@
         <div class="card-header">
           <div>
             <div class="card-title">🎯 2.3 Matriz de Componentes Rotacionados (Varimax), Comunalidades (h²) e MSA Anti-Imagem</div>
-            <div class="card-subtitle">Cargas fatoriais ≥ 0,50 destacadas em verde — estrutura limpa sem cargas cruzadas</div>
+            <div class="card-subtitle">Cargas fatoriais |λ| ≥ 0,50 destacadas automaticamente — ${meta.n_fatores} colunas fatoriais dinâmicas</div>
           </div>
         </div>
         <div class="table-wrap">
@@ -1215,15 +1597,12 @@
             <thead>
               <tr>
                 <th>Var</th>
-                <th>Descrição do Item</th>
-                <th class="num">F1: Ambiente</th>
-                <th class="num">F2: Liderança</th>
-                <th class="num">F3: Crescimento</th>
-                <th class="num">F4: Equilíbrio</th>
-                <th class="num">Comunalidade (h²)</th>
-                <th class="num">Unicidade (u²)</th>
-                <th class="num">MSA Diagonal</th>
-                <th class="num">Carga AFE-ML</th>
+                <th>Descrição</th>
+                ${meta.factorMeta.map(fm => `<th class="num">${esc(fm.nome_curto)}</th>`).join('')}
+                <th class="num">h² (ACP)</th>
+                <th class="num">u²</th>
+                <th class="num">MSA</th>
+                <th class="num">Carga AFE-PAF</th>
               </tr>
             </thead>
             <tbody>
@@ -1231,15 +1610,15 @@
                 const cellStyle = (v) => Math.abs(v) >= 0.5 ? 'background:#CCFBF1; color:#0F766E; font-weight:800;' : 'color:#64748B;';
                 return `
                   <tr>
-                    <td><strong>${c.variavel}</strong></td>
-                    <td>${c.descricao}</td>
-                    <td class="num" style="${cellStyle(c.F1_Ambiente)}">${fmt(c.F1_Ambiente, 4)}</td>
-                    <td class="num" style="${cellStyle(c.F2_Lideranca)}">${fmt(c.F2_Lideranca, 4)}</td>
-                    <td class="num" style="${cellStyle(c.F3_Crescimento)}">${fmt(c.F3_Crescimento, 4)}</td>
-                    <td class="num" style="${cellStyle(c.F4_Equilibrio)}">${fmt(c.F4_Equilibrio, 4)}</td>
+                    <td><strong>${esc(c.variavel)}</strong></td>
+                    <td>${esc(c.descricao)}</td>
+                    ${meta.factorMeta.map(fm => {
+                      const v = c[fm.codigo] ?? 0;
+                      return `<td class="num" style="${cellStyle(v)}">${fmt(v, 4)}</td>`;
+                    }).join('')}
                     <td class="num"><strong>${fmt(c.comunalidade_acp, 4)}</strong></td>
                     <td class="num">${fmt(c.unicidade_acp, 4)}</td>
-                    <td class="num"><span class="badge badge-blue">${fmt(c.msa_anti_imagem, 4)}</span></td>
+                    <td class="num"><span class="badge ${c.msa_anti_imagem >= 0.5 ? 'badge-blue' : 'badge-red'}">${fmt(c.msa_anti_imagem, 4)}</span></td>
                     <td class="num">${fmt(c.carga_afe_ml_principal, 4)}</td>
                   </tr>
                 `;
@@ -1253,22 +1632,43 @@
 
   // --- STAGE 3: CLUSTER ANALYSIS ---
   function renderStage3() {
-    const ec = state.summary.etapa3_cluster;
+    const s = state.summary;
+    const meta = s.meta;
+    const ec = s.etapa3_cluster;
+    const K = ec.perfis_k3.length;
+    const factorAnovas = ec.anova_tukey_clusters.filter(a => meta.factorCodes.includes(a.variavel));
+    const targetAnova = ec.anova_tukey_clusters.find(a => a.variavel === meta.targetCol);
+
     return `
       <div class="callout">
-        <h4>🧩 Etapa 3 — Análise de Cluster sobre os Escores Fatoriais (Parte V)</h4>
+        <h4>🧩 Etapa 3 — Análise de Cluster sobre os ${meta.n_fatores} Escores Fatoriais (Ward Real + K-Means++)</h4>
         <p>
-          <strong>Verificação de Outliers Multivariados (Distância de Mahalanobis):</strong> D² máximo observado = <strong>${fmt(ec.mahalanobis_max_d2, 4)}</strong> (inferior ao valor crítico χ²(4; 0,99) = 13,277). Zero outliers severos; todos os N = ${state.summary.meta.n} registros foram mantidos.
-          No método hierárquico de Ward, o maior salto relativo no coeficiente de aglomeração ocorre na passagem de <strong>K = 3 para K = 2 clusters (+17,91%)</strong>, confirmando K = 3 grupos naturais de 50 colaboradores cada.
+          <strong>Verificação de Outliers Multivariados (Mahalanobis):</strong> D² máximo = <strong>${fmt(ec.mahalanobis_max_d2, 3)}</strong>
+          (crítico χ²(${meta.n_fatores}; 0,99) = ${fmt(ec.mahalanobis_critico_p01, 3)}).
+          Detectados <strong>${ec.outliers_mahalanobis_p01.length}</strong> registro(s) com p &lt; 0,01 e <strong>${ec.outliers_mahalanobis_p001.length}</strong> com p &lt; 0,001.<br/>
+          <strong>Aglomeração Hierárquica de Ward (calculada na base ativa):</strong> maior salto relativo de WSS ocorre em <strong>K = ${ec.ward_k_sugerido} → K = ${Math.max(1, ec.ward_k_sugerido - 1)} (+${fmt(ec.ward_salto_max_pct, 2)}%)</strong>. Solução ativa exibida: <strong>K = ${K} clusters</strong>.
         </p>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:18px;">
+        <div class="chart-card">
+          <div class="chart-title">📈 Curvas de Validação de Clusters (WCSS & Silhueta)</div>
+          <div class="chart-subtitle">Avaliação automática de K = 2 até K = ${ec.metricas_escolha_k[ec.metricas_escolha_k.length - 1]?.k || 6}</div>
+          ${buildClusterMetricsSVG(ec.metricas_escolha_k, K)}
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">🎯 Perfil dos Centróides dos ${K} Clusters por Fator</div>
+          <div class="chart-subtitle">Médias padronizadas (Z) de cada fator nos segmentos recalculados</div>
+          ${buildCentroidsBarSVG(ec.perfis_k3, meta.factorMeta)}
+        </div>
       </div>
 
       <div class="grid-2">
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">📏 3.1 Validação Multicritério do Número de Clusters (K = 2 a 6)</div>
-              <div class="card-subtitle">Cotovelo (WCSS), Silhueta, Calinski-Harabasz, Davies-Bouldin e Estatística Gap</div>
+              <div class="card-title">📏 3.1 Validação Multicritério de K (Cálculos Reais)</div>
+              <div class="card-subtitle">WCSS, Silhueta, Calinski-Harabasz, Davies-Bouldin e Gap Statistic</div>
             </div>
           </div>
           <div class="table-wrap">
@@ -1276,17 +1676,17 @@
               <thead>
                 <tr>
                   <th class="center">K</th>
-                  <th class="num">WCSS (Inércia)</th>
+                  <th class="num">WCSS</th>
                   <th class="num">Silhueta</th>
-                  <th class="num">Calinski-Harabasz</th>
-                  <th class="num">Davies-Bouldin</th>
-                  <th class="num">Gap Statistic</th>
+                  <th class="num">Calinski-H.</th>
+                  <th class="num">Davies-B.</th>
+                  <th class="num">Gap Stat.</th>
                   <th class="center">Tamanhos</th>
                 </tr>
               </thead>
               <tbody>
                 ${ec.metricas_escolha_k.map(m => `
-                  <tr style="${m.k === 3 ? 'background:#F0FDFA; font-weight:700;' : ''}">
+                  <tr style="${m.k === K ? 'background:#F0FDFA; font-weight:700;' : ''}">
                     <td class="center"><strong>K = ${m.k}</strong></td>
                     <td class="num">${fmt(m.wcss_inercia, 2)}</td>
                     <td class="num">${fmt(m.silhueta, 4)}</td>
@@ -1304,24 +1704,24 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🌿 3.2 Planejamento de Aglomeração Hierárquica (Método de Ward)</div>
-              <div class="card-subtitle">Últimas etapas de fusão e salto percentual no coeficiente WSS</div>
+              <div class="card-title">🌿 3.2 Planejamento de Aglomeração Hierárquica (Ward Real)</div>
+              <div class="card-subtitle">Últimas etapas de fusão calculadas diretamente sobre os escores fatoriais</div>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Etapa</th>
-                  <th class="center">Clusters Antes</th>
-                  <th class="num">Distância Ward</th>
-                  <th class="num">Coef. Aglomeração (WSS)</th>
-                  <th class="num">Salto Relativo (%)</th>
+                  <th class="center">Etapa</th>
+                  <th class="center">K Antes</th>
+                  <th class="num">Dist. Ward</th>
+                  <th class="num">Coef. WSS</th>
+                  <th class="num">Salto (%)</th>
                 </tr>
               </thead>
               <tbody>
                 ${(ec.agrupamento_ward_ultimas_10_etapas || []).slice(-6).map(w => `
-                  <tr style="${w.numero_clusters_antes_salto === 3 ? 'background:#FEF3C7; font-weight:800;' : ''}">
+                  <tr style="${w.numero_clusters_antes_salto === ec.ward_k_sugerido ? 'background:#FEF3C7; font-weight:800;' : ''}">
                     <td class="center">${w.etapa}</td>
                     <td class="center">K = ${w.numero_clusters_antes_salto}</td>
                     <td class="num">${fmt(w.distancia_fusao_ward, 4)}</td>
@@ -1338,33 +1738,34 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🎯 3.3 Centróides Finais do K-Means (K = 3), ANOVA dos Fatores e Médias Likert por Cluster</div>
-            <div class="card-subtitle">Fator 4 (F = 93,32) e Fator 1 (F = 58,57) e Fator 2 (F = 32,13) discriminam fortemente os grupos (p &lt; 0,0001)</div>
+            <div class="card-title">🎯 3.3 Centróides Finais do K-Means (K = ${K}) e ANOVA entre Clusters</div>
+            <div class="card-subtitle">
+              ANOVA ${esc(meta.targetCol)}: F = ${fmt(targetAnova?.f_stat, 2)} (p ${fmtP(targetAnova?.p_valor)}) |
+              Fatores: ${factorAnovas.map(fa => `${meta.factorMeta.find(fm => fm.codigo === fa.variavel)?.nome_curto || fa.variavel} (F=${fmt(fa.f_stat, 1)})`).join(' • ')}
+            </div>
           </div>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Cluster / Rótulo Gerencial</th>
+                <th>Cluster / Rótulo Automático</th>
                 <th class="num">Tamanho</th>
-                <th class="num">F1: Ambiente (Z / Likert)</th>
-                <th class="num">F2: Liderança (Z / Likert)</th>
-                <th class="num">F3: Crescimento (Z / Likert)</th>
-                <th class="num">F4: Equilíbrio (Z / Likert)</th>
-                <th class="num">Produtividade Média (Y)</th>
+                ${meta.factorMeta.map(fm => `<th class="num">${esc(fm.nome_curto)} (Z / Orig.)</th>`).join('')}
+                <th class="num">Média ${esc(meta.targetCol)} (DP)</th>
               </tr>
             </thead>
             <tbody>
               ${ec.perfis_k3.map(p => `
                 <tr>
-                  <td><strong>${p.rotulo}</strong></td>
+                  <td><strong>${esc(p.rotulo)}</strong></td>
                   <td class="num"><strong>n = ${p.n}</strong> (${fmt(p.pct, 1)}%)</td>
-                  <td class="num">${fmt(p.centroides_fatores.F1_Ambiente, 3)} (${fmt(p.medias_blocos_likert.Ambiente_V1_V4, 2)})</td>
-                  <td class="num">${fmt(p.centroides_fatores.F2_Lideranca, 3)} (${fmt(p.medias_blocos_likert.Lideranca_V5_V8, 2)})</td>
-                  <td class="num">${fmt(p.centroides_fatores.F3_Crescimento, 3)} (${fmt(p.medias_blocos_likert.Crescimento_V9_V11, 2)})</td>
-                  <td class="num">${fmt(p.centroides_fatores.F4_Equilibrio, 3)} (${fmt(p.medias_blocos_likert.Equilibrio_V12_V15, 2)})</td>
-                  <td class="num"><span class="badge ${p.cluster_id === 3 ? 'badge-green' : 'badge-amber'}" style="font-size:12.5px;">${fmt(p.y_media, 2)} (DP=${fmt(p.y_dp, 1)})</span></td>
+                  ${meta.factorMeta.map(fm => {
+                    const z = p.centroides_fatores[fm.codigo] ?? 0;
+                    const orig = p.medias_por_fator_original?.[fm.codigo];
+                    return `<td class="num">${fmt(z, 3)} ${orig !== null && orig !== undefined ? `(${fmt(orig, 2)})` : ''}</td>`;
+                  }).join('')}
+                  <td class="num"><span class="badge ${clusterBadgeClass(p.cluster_id, K)}" style="font-size:12.5px;">${fmt(p.y_media, 2)} (DP=${fmt(p.y_dp, 1)})</span></td>
                 </tr>
               `).join('')}
             </tbody>
@@ -1376,8 +1777,22 @@
 
   // --- STAGE 4: MULTIPLE LINEAR REGRESSION ---
   function renderStage4() {
-    const er = state.summary.etapa4_regressao;
+    const s = state.summary;
+    const meta = s.meta;
+    const er = s.etapa4_regressao;
     const pr = er.pressupostos;
+    const preds = er.coeficientes.slice(1);
+    const sigCount = preds.filter(c => c.p_valor < 0.05).length;
+
+    const normOk = pr.normalidade_shapiro_p >= 0.05 || pr.normalidade_ks_p >= 0.05;
+    const homoOk = pr.homocedasticidade_breusch_pagan_p >= 0.05;
+    const dwOk = pr.durbin_watson >= 1.5 && pr.durbin_watson <= 2.5;
+    const vifOk = pr.vif_maximo < 5;
+    const outOk = pr.outliers_residuo_maior_3dp.length === 0 && pr.cooks_distance_max < 1;
+
+    const eqStr = `${meta.targetCol} = β₀ ` + preds.map((_, i) => `+ β${i + 1}F${i + 1}`).join(' ');
+    const residScatter = state.rows.map(r => ({ x: r.Y_Predito, y: r.Residuo_Padronizado, cluster: r.Cluster_K }));
+
     return `
       <div class="grid-4" style="margin-bottom:18px;">
         <div class="kpi-card">
@@ -1391,22 +1806,22 @@
           <div class="kpi-foot">gl = (${er.gl_modelo}, ${er.gl_residuo}) | p ${fmtP(er.p_anova)}</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Multicolinearidade (VIF)</div>
-          <div class="kpi-value" style="color:var(--success);">VIF = ${fmt(pr.vif_maximo, 3)}</div>
-          <div class="kpi-foot">Ortogonalidade perfeita via Varimax</div>
+          <div class="kpi-label">Multicolinearidade (VIF Máx.)</div>
+          <div class="kpi-value" style="color:${vifOk ? 'var(--success)' : 'var(--danger)'};">VIF = ${fmt(pr.vif_maximo, 3)}</div>
+          <div class="kpi-foot">${vifOk ? 'Sem multicolinearidade (< 5,0)' : 'Atenção: VIF elevado'}</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Resíduos (Shapiro & DW)</div>
+          <div class="kpi-label">Durbin-Watson & Erro Padrão</div>
           <div class="kpi-value">DW = ${fmt(pr.durbin_watson, 3)}</div>
-          <div class="kpi-foot">Shapiro p = ${fmt(pr.normalidade_shapiro_p, 3)} | Breusch-Pagan p = ${fmt(pr.homocedasticidade_breusch_pagan_p, 3)}</div>
+          <div class="kpi-foot">Erro Padrão Estimativa = ${fmt(er.erro_padrao_estimativa, 2)}</div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">📈 4.1 Tabela de Coeficientes da Regressão Linear Múltipla (Y = β₀ + β₁F1 + β₂F2 + β₃F3 + β₄F4)</div>
-            <div class="card-subtitle">Todos os 4 fatores são estatisticamente significativos (p &lt; 0,001); Liderança (Beta = 0,5315) e Equilíbrio (Beta = 0,4688) lideram</div>
+            <div class="card-title">📈 4.1 Coeficientes da Regressão Linear Múltipla (${esc(eqStr)})</div>
+            <div class="card-subtitle">${sigCount} de ${preds.length} fator(es) estatisticamente significativo(s) a 5% (p &lt; 0,05)</div>
           </div>
         </div>
         <div class="table-wrap">
@@ -1414,20 +1829,20 @@
             <thead>
               <tr>
                 <th>Termo / Fator</th>
-                <th class="num">Coef. Não-Padronizado (B)</th>
+                <th class="num">Coef. B</th>
                 <th class="num">Erro Padrão</th>
-                <th class="num">Coef. Padronizado (Beta)</th>
+                <th class="num">Beta Padronizado</th>
                 <th class="num">Estatística t</th>
                 <th class="num">Valor-p</th>
                 <th class="center">IC 95% para B</th>
                 <th class="num">VIF</th>
-                <th class="num">Ganho +1 DP (Escala 0–100)</th>
+                <th class="num">+1 DP (Escala 0–100)</th>
               </tr>
             </thead>
             <tbody>
               ${er.coeficientes.map(c => `
                 <tr>
-                  <td><strong>${c.rotulo}</strong></td>
+                  <td><strong>${esc(c.rotulo)}</strong></td>
                   <td class="num"><strong>${c.b_nao_padronizado >= 0 ? '+' : ''}${fmt(c.b_nao_padronizado, 4)}</strong></td>
                   <td class="num">${fmt(c.erro_padrao, 4)}</td>
                   <td class="num">${c.termo === 'const' ? '—' : `<span class="badge badge-teal" style="font-size:12px;">${fmt(c.beta_padronizado, 4)}</span>`}</td>
@@ -1435,7 +1850,7 @@
                   <td class="num">${fmtP(c.p_valor)}</td>
                   <td class="center">[${fmt(c.ic95_inf, 2)} ; ${fmt(c.ic95_sup, 2)}]</td>
                   <td class="num">${fmt(c.vif, 3)}</td>
-                  <td class="num">${c.termo === 'const' ? '—' : `<strong>+${fmt(c.impacto_1dp_escala_0_100, 2)} pts</strong>`}</td>
+                  <td class="num">${c.termo === 'const' ? '—' : `<strong>${c.impacto_1dp_escala_0_100 >= 0 ? '+' : ''}${fmt(c.impacto_1dp_escala_0_100, 2)} pts</strong>`}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -1446,53 +1861,64 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">✅ 4.2 Checklist de Verificação dos 5 Pressupostos da Regressão (Item 6.1)</div>
+            <div class="card-title">✅ 4.2 Verificação Automatizada dos Pressupostos da Regressão (Testes Reais)</div>
+            <div class="card-subtitle">Todos os diagnósticos abaixo são recalculados diretamente sobre os resíduos da base ativa</div>
           </div>
         </div>
-        <div class="grid-3">
+        <div class="grid-4">
           <div class="kpi-card">
-            <span class="badge badge-green">1. Normalidade dos Resíduos — OK</span>
-            <p style="font-size:12px; margin-top:6px;">Shapiro-Wilk W = ${fmt(pr.normalidade_shapiro_w, 4)} (p = ${fmt(pr.normalidade_shapiro_p, 4)} &gt; 0,05) e Kolmogorov-Smirnov D = ${fmt(pr.normalidade_ks_d, 4)} (p = ${fmt(pr.normalidade_ks_p, 4)} &gt; 0,05).</p>
+            <span class="badge ${normOk ? 'badge-green' : 'badge-amber'}">1. Normalidade — ${normOk ? 'OK' : 'Atenção'}</span>
+            <p style="font-size:12px; margin-top:6px;">Shapiro-Francia W' = ${fmt(pr.normalidade_shapiro_w, 4)} (p = ${fmtP(pr.normalidade_shapiro_p)}) | KS D = ${fmt(pr.normalidade_ks_d, 4)} (p = ${fmtP(pr.normalidade_ks_p)}).</p>
           </div>
           <div class="kpi-card">
-            <span class="badge badge-green">2. Homocedasticidade — OK</span>
-            <p style="font-size:12px; margin-top:6px;">Teste de Breusch-Pagan LM = ${fmt(pr.homocedasticidade_breusch_pagan_lm, 4)} (p = ${fmt(pr.homocedasticidade_breusch_pagan_p, 4)} &gt; 0,05). Variância dos resíduos é constante.</p>
+            <span class="badge ${homoOk ? 'badge-green' : 'badge-amber'}">2. Homocedasticidade — ${homoOk ? 'OK' : 'Atenção'}</span>
+            <p style="font-size:12px; margin-top:6px;">Breusch-Pagan LM = ${fmt(pr.homocedasticidade_breusch_pagan_lm, 4)} (p = ${fmtP(pr.homocedasticidade_breusch_pagan_p)}) | F = ${fmt(pr.homocedasticidade_bp_f, 3)}.</p>
           </div>
           <div class="kpi-card">
-            <span class="badge badge-green">3. Independência & Ausência de Outliers — OK</span>
-            <p style="font-size:12px; margin-top:6px;">Durbin-Watson = ${fmt(pr.durbin_watson, 4)} (próximo de 2,0). Zero observações com resíduo padronizado &gt; |3| (Cook's D máx = ${fmt(pr.cooks_distance_max, 4)}).</p>
+            <span class="badge ${dwOk ? 'badge-green' : 'badge-amber'}">3. Independência — ${dwOk ? 'OK' : 'Atenção'}</span>
+            <p style="font-size:12px; margin-top:6px;">Durbin-Watson = ${fmt(pr.durbin_watson, 4)} (faixa ideal de independência: 1,50 a 2,50).</p>
           </div>
+          <div class="kpi-card">
+            <span class="badge ${outOk ? 'badge-green' : 'badge-amber'}">4. Outliers & Influência — ${outOk ? 'OK' : 'Atenção'}</span>
+            <p style="font-size:12px; margin-top:6px;">Resíduos |Z| &gt; 3: <strong>${pr.outliers_residuo_maior_3dp.length}</strong> | Distância de Cook máx.: <strong>${fmt(pr.cooks_distance_max, 4)}</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-title">📊 Importância Relativa dos Fatores (Betas Padronizados)</div>
+          <div class="chart-subtitle">Impacto padronizado de cada fator sobre ${esc(meta.targetCol)}</div>
+          ${buildBetasBarSVG(er.coeficientes)}
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">🔍 Resíduos Padronizados vs. Valores Previstos (Ŷ)</div>
+          <div class="chart-subtitle">Verificação visual de homocedasticidade e ausência de padrão nos resíduos</div>
+          ${buildScatterSVG(residScatter, 'Ŷ Previsto', 'Resíduo Z', { zeroLine: true, forceZeroSymmetric: true })}
         </div>
       </div>
     `;
   }
 
-  // --- STAGE 5: INTEGRATION & FIGURES GALLERY ---
+  // --- STAGE 5: INTEGRATION & DYNAMIC VISUAL PANEL ---
   function renderStage5() {
-    const ei = state.summary.etapa5_integracao;
+    const s = state.summary;
+    const meta = s.meta;
+    const ei = s.etapa5_integracao;
     const segC = ei.regressao_por_cluster;
+    const segCat = ei.regressao_por_categoria || {};
+    const segCatKeys = Object.keys(segCat);
 
-    const figures = [
-      { file: 'fig01_histogramas_likert_y.png', title: 'Figura 1 — Histogramas e Curvas Normais (V1–V15 e Y)' },
-      { file: 'fig02_frequencias_categoricas.png', title: 'Figura 2 — Frequências e Produtividade por Modalidade, Senioridade e Squad' },
-      { file: 'fig03_matriz_correlacao.png', title: 'Figura 3 — Matriz de Correlação de Pearson (16 × 16)' },
-      { file: 'fig04_scree_analise_paralela.png', title: 'Figura 4 — Scree Plot, Critério de Kaiser e Análise Paralela de Horn' },
-      { file: 'fig05_cargas_fatoriais_varimax.png', title: 'Figura 5 — Cargas Fatoriais Rotacionadas (Varimax) e Comunalidades (h²)' },
-      { file: 'fig06_dendrogramas_ward_variaveis.png', title: 'Figura 6 — Dendrograma de Variáveis (1−r) e Dendrograma de Casos (Ward)' },
-      { file: 'fig07_metricas_escolha_k.png', title: 'Figura 7 — Validação Multicritério de K (Cotovelo, Silhueta, CH e Gap)' },
-      { file: 'fig08_perfis_clusters_centroides.png', title: 'Figura 8 — Centróides Finais dos Clusters e Mapa de Segmentação' },
-      { file: 'fig09_pressupostos_regressao.png', title: 'Figura 9 — Diagnóstico dos Pressupostos da Regressão e Ranking de Betas' },
-      { file: 'fig10_dispersao_fatores_y.png', title: 'Figura 10 — Dispersão Linear de Y contra os 4 Escores Fatoriais' },
-      { file: 'fig11_integracao_y_clusters_modalidade.png', title: 'Figura 11 — Comparação de Produtividade (Y) por Cluster e por Modalidade' },
-      { file: 'fig12_regressao_segmentada_clusters.png', title: 'Figura 12 — Regressão Segmentada por Cluster: Comparação dos Betas' }
-    ];
+    const yValues = state.rows.map(r => Number(r[meta.targetCol]));
+    const obsVsPred = state.rows.map(r => ({ x: r.Y_Predito, y: Number(r[meta.targetCol]), cluster: r.Cluster_K }));
+    const residVsPred = state.rows.map(r => ({ x: r.Y_Predito, y: r.Residuo_Padronizado, cluster: r.Cluster_K }));
 
     return `
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🔬 5.1 Regressão Segmentada por Cluster (Parte 7.2 e Questão 10)</div>
-            <div class="card-subtitle">Como a importância dos 4 fatores muda conforme o perfil do grupo</div>
+            <div class="card-title">🔬 5.1 Regressão Segmentada por Cluster (K = ${meta.n_clusters})</div>
+            <div class="card-subtitle">Comparação dinâmica dos coeficientes padronizados (Beta) e R² dentro de cada cluster</div>
           </div>
         </div>
         <div class="table-wrap">
@@ -1502,137 +1928,201 @@
                 <th>Segmento</th>
                 <th class="num">n</th>
                 <th class="num">R² (R² Ajust.)</th>
-                <th class="num">F1: Ambiente (Beta / p)</th>
-                <th class="num">F2: Liderança (Beta / p)</th>
-                <th class="num">F3: Crescimento (Beta / p)</th>
-                <th class="num">F4: Equilíbrio (Beta / p)</th>
+                ${meta.factorMeta.map(fm => `<th class="num">${esc(fm.nome_curto)} (Beta / p)</th>`).join('')}
               </tr>
             </thead>
             <tbody>
-              ${Object.values(segC).map(m => {
-                const c = m.coeficientes;
-                return `
-                  <tr>
-                    <td><strong>${m.rotulo}</strong></td>
-                    <td class="num">${m.n}</td>
-                    <td class="num"><strong>${fmt(m.r2 * 100, 2)}%</strong> (${fmt(m.r2_ajustado * 100, 1)}%)</td>
-                    <td class="num">Beta = <strong>${fmt(c.F1_Ambiente?.beta, 3)}</strong> (p=${fmt(c.F1_Ambiente?.p, 3)})</td>
-                    <td class="num">Beta = <strong>${fmt(c.F2_Lideranca?.beta, 3)}</strong> (p=${fmt(c.F2_Lideranca?.p, 4)})</td>
-                    <td class="num">Beta = <strong>${fmt(c.F3_Crescimento?.beta, 3)}</strong> (p=${fmt(c.F3_Crescimento?.p, 3)})</td>
-                    <td class="num">Beta = <strong>${fmt(c.F4_Equilibrio?.beta, 3)}</strong> (p=${fmt(c.F4_Equilibrio?.p, 3)})</td>
-                  </tr>
-                `;
-              }).join('')}
+              ${Object.values(segC).map(m => `
+                <tr>
+                  <td><strong>${esc(m.rotulo)}</strong></td>
+                  <td class="num">${m.n}</td>
+                  <td class="num">${m.valido ? `<strong>${fmt(m.r2 * 100, 2)}%</strong> (${fmt(m.r2_ajustado * 100, 1)}%)` : 'n insuf.'}</td>
+                  ${meta.factorMeta.map(fm => {
+                    const c = m.coeficientes?.[fm.codigo];
+                    return `<td class="num">${c && c.beta !== null ? `β = <strong>${fmt(c.beta, 3)}</strong> (p=${fmtP(c.p)})` : '—'}</td>`;
+                  }).join('')}
+                </tr>
+              `).join('')}
             </tbody>
           </table>
         </div>
       </div>
 
+      ${segCatKeys.length ? `
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">🏷️ 5.2 Regressão Segmentada por ${esc(ei.primary_cat_col)}</div>
+              <div class="card-subtitle">Modelos OLS recalculados separadamente para cada categoria de ${esc(ei.primary_cat_col)}</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>${esc(ei.primary_cat_col)}</th>
+                  <th class="num">n</th>
+                  <th class="num">R² (R² Ajust.)</th>
+                  ${meta.factorMeta.map(fm => `<th class="num">${esc(fm.nome_curto)} (Beta / p)</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${segCatKeys.map(k => {
+                  const m = segCat[k];
+                  return `
+                    <tr>
+                      <td><strong>${esc(m.rotulo)}</strong></td>
+                      <td class="num">${m.n}</td>
+                      <td class="num">${m.valido ? `<strong>${fmt(m.r2 * 100, 2)}%</strong> (${fmt(m.r2_ajustado * 100, 1)}%)` : 'n insuf.'}</td>
+                      ${meta.factorMeta.map(fm => {
+                        const c = m.coeficientes?.[fm.codigo];
+                        return `<td class="num">${c && c.beta !== null ? `β = <strong>${fmt(c.beta, 3)}</strong> (p=${fmtP(c.p)})` : '—'}</td>`;
+                      }).join('')}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ` : ''}
+
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🖼️ 5.2 Galeria Completa dos 12 Gráficos Diagnósticos Embutidos no DOCX</div>
-            <div class="card-subtitle">Gerados em alta resolução pelo pipeline Python (200 DPI)</div>
+            <div class="card-title">📊 5.${segCatKeys.length ? '3' : '2'} Painel Gráfico Integrado (100% Dinâmico — Recalculado em Tempo Real)</div>
+            <div class="card-subtitle">Todos os 9 gráficos abaixo são gerados diretamente a partir da base carregada atualmente</div>
           </div>
         </div>
         <div class="grid-2">
-          ${figures.map(f => `
-            <div class="fig-card">
-              <img src="../analysis/figures/${f.file}" alt="${f.title}" loading="lazy" />
-              <div class="fig-caption">${f.title}</div>
-            </div>
-          `).join('')}
+          <div class="chart-card">
+            <div class="chart-title">1. Distribuição da Variável Alvo (${esc(meta.targetCol)})</div>
+            <div class="chart-subtitle">Histograma e média observada (N = ${meta.n})</div>
+            ${buildHistogramSVG(yValues, meta.targetCol)}
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">2. Scree Plot & Análise Paralela de Horn</div>
+            <div class="chart-subtitle">Autovalores observados vs. Kaiser (λ = 1) e P95 simulado</div>
+            ${buildScreeSVG(s.etapa2_fatorial.autovalores_tabela)}
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">3. Mapa de Calor das Cargas Fatoriais (Varimax)</div>
+            <div class="chart-subtitle">${meta.n_vars_likert} variáveis × ${meta.n_fatores} fatores rotacionados</div>
+            ${buildLoadingsHeatmapSVG(s.etapa2_fatorial.cargas_comunalidades, meta.factorMeta)}
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">4. Validação Multicritério de Clusters (WCSS & Silhueta)</div>
+            <div class="chart-subtitle">Comparativo automático de K = 2 a ${s.etapa3_cluster.metricas_escolha_k[s.etapa3_cluster.metricas_escolha_k.length - 1]?.k || 6}</div>
+            ${buildClusterMetricsSVG(s.etapa3_cluster.metricas_escolha_k, meta.n_clusters)}
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">5. Centróides dos Clusters nos ${meta.n_fatores} Fatores</div>
+            <div class="chart-subtitle">Assinatura fatorial padronizada (Z) de cada segmento</div>
+            ${buildCentroidsBarSVG(s.etapa3_cluster.perfis_k3, meta.factorMeta)}
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">6. ${esc(meta.targetCol)} por Cluster (Média ± DP)</div>
+            <div class="chart-subtitle">Comparação do desempenho médio entre os ${meta.n_clusters} segmentos</div>
+            ${buildClusterTargetBarSVG(s.etapa3_cluster.perfis_k3, meta.targetCol)}
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">7. Ranking de Impacto na Regressão (Betas Padronizados)</div>
+            <div class="chart-subtitle">R² = ${fmt(s.etapa4_regressao.r2 * 100, 2)}% | F = ${fmt(s.etapa4_regressao.f_anova, 2)}</div>
+            ${buildBetasBarSVG(s.etapa4_regressao.coeficientes)}
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">8. Diagnóstico OLS: ${esc(meta.targetCol)} Observado vs. Previsto (Ŷ)</div>
+            <div class="chart-subtitle">Pontos coloridos por cluster; linha tracejada indica ajuste perfeito (Y = Ŷ)</div>
+            ${buildScatterSVG(obsVsPred, 'Ŷ Previsto', `${meta.targetCol} Real`, { diagonal: true })}
+          </div>
+        </div>
+
+        <div class="chart-card" style="margin-top:16px;">
+          <div class="chart-title">9. Dispersão dos Resíduos Padronizados vs. Ŷ Previsto</div>
+          <div class="chart-subtitle">Faixa ±3 DP tracejada | Outliers |Z| &gt; 3 detectados: ${s.etapa4_regressao.pressupostos.outliers_residuo_maior_3dp.length}</div>
+          ${buildScatterSVG(residVsPred, 'Ŷ Previsto', 'Resíduo Padronizado (Z)', { zeroLine: true, forceZeroSymmetric: true })}
         </div>
       </div>
     `;
   }
 
   // =========================================================================
-  // VIEW 3: QUESTIONNAIRE (12 Q&A), TRIBUNAL DO MODELO & DATA EXPLORER
+  // VIEW 3: ENRICHED DATA EXPLORER ONLY
   // =========================================================================
-  function renderQaDataView() {
-    const qaList = [
-      { q: '1. Adequação para Análise Fatorial (KMO, Bartlett e Blocos V1–V4 vs V5–V8)', a: 'KMO = 0,7814 (bom/ótimo) e Bartlett χ²(105) = 1.190,09 (p < 0,0001), com todos os 15 MSAs da diagonal anti-imagem entre 0,616 e 0,858 (> 0,50). A matriz de correlação mostra que V1–V4 (r entre 0,56 e 0,66) e V5–V8 (r entre 0,60 e 0,71) formam blocos ortogonais distintos (correlações cruzadas próximas de zero, entre −0,09 e +0,13).' },
-      { q: '2. Número de Fatores Extraídos, Variância Explicada e Argumento de Juliana Braga', a: 'Foram extraídos 4 fatores (Kaiser λ > 1: 3,539; 2,937; 2,582; 2,174; e Análise Paralela de Horn), explicando 74,88% da variância total na ACP (65,55% na AFE-ML): F1 Ambiente (19,28%, α=0,867), F2 Liderança e Cultura (20,40%, α=0,893), F3 Crescimento (15,03%, α=0,827) e F4 Equilíbrio (20,17%, α=0,888). F2 captura exatamente a tese de Juliana Braga (cargas > 0,84 em segurança psicológica, reconhecimento, suporte e autonomia).' },
-      { q: '3. Fator com Maior Correlação com Y (Produtividade) e Posição de Caio Ventura', a: 'O Fator 2 — Liderança e Cultura possui a maior correlação com Y (r = 0,5315, p < 0,0001), seguido pelo Fator 4 — Equilíbrio (r = 0,4688). O Fator 1 — Ambiente fica apenas em 3º lugar (r = 0,3858). Isso refuta a tese central de Caio Ventura de que o espaço físico seria o determinante primário da produtividade.' },
-      { q: '4. Perfis dos 3 Clusters Identificados e Semelhança com o Squad de Priya Sharma', a: 'K = 3 clusters (50 colaboradores cada): Cluster 1 (Y = 161,80: ótimo ambiente +0,69, mas grave crise de liderança −0,78 e equilíbrio −0,52); Cluster 2 (Y = 163,84: boa liderança +0,44, mas ferramentas/ambiente precários −0,90 e sobrecarga −0,53); Cluster 3 (Y = 192,92: alto equilíbrio +1,05, forte liderança +0,34 e bom ambiente +0,21). O Cluster 3 espelha perfeitamente o estilo de liderança sustentável de Priya Sharma.' },
-      { q: '5. Associação dos Clusters com Modalidade e Senioridade (Teste Qui-Quadrado)', a: 'Não há associação significativa com Modalidade (χ² = 5,0203, gl = 4, p = 0,2852) nem com Senioridade (χ² = 5,3406, gl = 6, p = 0,5009). Isso refuta a tese de Caio: 40% do Cluster 3 (Alta Performance) trabalha 100% Remoto e 36% Híbrido, enquanto 40,9% dos trabalhadores Presenciais estão no Cluster 1 (baixa produtividade).' },
-      { q: '6. Significância da Regressão, R² e Comparação Ambiente vs. Liderança', a: 'O modelo é altamente significativo: F(4, 145) = 78,348 (p = 2,91 × 10⁻³⁵), com R² = 68,37% (R² ajustado = 67,50%). Todos os 4 fatores são significativos (p < 0,001). Liderança e Cultura (Beta = 0,5315, B = +13,44) e Equilíbrio (Beta = 0,4688, B = +11,85) são mais importantes que Ambiente de Trabalho (Beta = 0,3858, B = +9,75).' },
-      { q: '7. Maior Coeficiente Padronizado (Beta) e Decisão sobre o RTO', a: 'F2 Liderança e Cultura tem o maior Beta (0,5315). Se Felipe Drummond investisse em uma única dimensão, deveria ser em Liderança. Isso mostra que o RTO obrigatório atacaria a variável errada e destruiria a autonomia e flexibilidade dos times.' },
-      { q: '8. Atendimento aos Pressupostos da Regressão e Eliminação da Multicolinearidade', a: 'Todos atendidos: Normalidade dos resíduos (Shapiro-Wilk W = 0,9854, p = 0,1143; KS D = 0,054, p = 0,7542), Homocedasticidade (Breusch-Pagan LM = 1,453, p = 0,8349), Independência (Durbin-Watson = 2,3381) e Multicolinearidade zero (VIF = 1,0000 para todos os 4 fatores graças à rotação ortogonal Varimax).' },
-      { q: '9. Comparação de Y entre Clusters (ANOVA e Tukey HSD)', a: 'ANOVA F(2, 147) = 33,893 (p = 8,70 × 10⁻¹³). No teste de Tukey, o Cluster 3 (192,92) supera o Cluster 1 (161,80) em +31,12 pts (p < 0,0001) e o Cluster 2 (163,84) em +29,08 pts (p < 0,0001). Nota-se que o Cluster 2 tem boa liderança (+0,44), mas só atinge alta produtividade quando combinada com Equilíbrio e Ferramentas (como ocorre no Cluster 3).' },
-      { q: '10. Regressão Segmentada por Cluster e Razão Parcial de Caio Ventura', a: 'Sim, os coeficientes mudam por cluster! No Cluster 1 (R² = 48,85%), F1 Ambiente tem o maior Beta (0,4231, p = 0,0008), superando F2 (0,3712) — dando razão parcial a Caio de que ferramentas e espaço sustentam a entrega onde a gestão falha. Já no Cluster 3 (R² = 68,06%), F2 Liderança domina (Beta = 0,6246) e F3 Crescimento/Mentoria torna-se altamente significativo (Beta = 0,2421, p = 0,0070).' },
-      { q: '11. Retorno de +1 Desvio-Padrão no Fator Mais Influente (Escala Original e 0–100)', a: 'Aumentar F2 Liderança e Cultura em +1 DP eleva Y em +13,44 pontos na escala original 114–239 (IC 95%: [+11,10 ; +15,77]), o que corresponde a +10,75 pontos na amplitude normalizada 0–100 (ou +7,78% sobre a média da empresa).' },
-      { q: '12. Recomendação Final ao Board (45 Dias), Orçamento de R$ 4M e Impacto Projetado', a: 'Abandonar o RTO obrigatório, protegendo 40% do ARR (Squads Alpha e Beta). Alocar os R$ 4M de forma segmentada: R$ 1,80M no Cluster 1 (choque de liderança no padrão Priya Sharma e retenção dos 16 Staffs), R$ 1,40M no Cluster 2 (upgrade de ergonomia/ferramentas V1–V4 e rebalanceamento de carga) e R$ 0,80M no Cluster 3 (programa de mentoria V11 e trilha de carreira V10). Impacto projetado: elevar a produtividade média da TechNova de 172,85 para ~191,6 pontos (+18,8 pts).' }
-    ];
+  function renderDataExplorerView() {
+    const s = state.summary;
+    const meta = s.meta;
+    const K = s.etapa3_cluster.perfis_k3.length;
+    const catCols = meta.catCols;
+    const cat1 = catCols[0] || null;
+    const cat2 = catCols[1] || null;
+    const displayCats = catCols.slice(0, 3);
+
+    const f = state.explorerFilters;
+    const searchLower = (f.search || '').trim().toLowerCase();
 
     const filteredRows = state.rows.filter(r => {
-      if (state.filterCluster !== 'ALL' && String(r.Cluster_K3) !== state.filterCluster) return false;
-      if (state.filterModalidade !== 'ALL' && String(r.Modalidade) !== state.filterModalidade) return false;
-      if (state.filterSquad !== 'ALL' && String(r.Squad) !== state.filterSquad) return false;
+      if (f.cluster !== 'ALL' && String(r.Cluster_K) !== f.cluster) return false;
+      if (cat1 && f.cat1 !== 'ALL' && String(r[cat1] ?? 'N/A') !== f.cat1) return false;
+      if (cat2 && f.cat2 !== 'ALL' && String(r[cat2] ?? 'N/A') !== f.cat2) return false;
+      if (searchLower) {
+        const hay = [r.ID, ...displayCats.map(c => r[c]), r.Cluster_Nome].join(' ').toLowerCase();
+        if (!hay.includes(searchLower)) return false;
+      }
       return true;
     });
 
-    const squadsList = [...new Set(state.rows.map(r => r.Squad).filter(Boolean))].sort();
+    const cat1Vals = cat1 ? [...new Set(state.rows.map(r => String(r[cat1] ?? 'N/A')))].sort() : [];
+    const cat2Vals = cat2 ? [...new Set(state.rows.map(r => String(r[cat2] ?? 'N/A')))].sort() : [];
 
-    return `
+    document.getElementById('dataExplorerContent').innerHTML = `
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🎓 Parte VIII — Questionário Interpretativo Completo (12 Questões Fundamentadas)</div>
-            <div class="card-subtitle">Respostas analíticas integrando Estatística Descritiva, Fatorial, Cluster e Regressão</div>
+            <div class="card-title">🗄️ Explorador Interativo da Base Enriquecida (Exibindo ${filteredRows.length} de ${state.rows.length} registros)</div>
+            <div class="card-subtitle">Variáveis categóricas + ${meta.n_fatores} Escores Fatoriais + Mahalanobis D² + Cluster + ${esc(meta.targetCol)} Real, Previsto (Ŷ) e Resíduo Z</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <input type="text" class="control-input" placeholder="Buscar ID ou grupo..." value="${esc(f.search)}" oninput="window.AppUI.setExplorerFilter('search', this.value)" style="min-width:170px;" />
+            <select class="control-select" onchange="window.AppUI.setExplorerFilter('cluster', this.value)">
+              <option value="ALL">Todos os Clusters (K=${K})</option>
+              ${s.etapa3_cluster.perfis_k3.map(p => `
+                <option value="${p.cluster_id}" ${f.cluster === String(p.cluster_id) ? 'selected' : ''}>
+                  ${esc(p.rotulo_curto)}
+                </option>
+              `).join('')}
+            </select>
+            ${cat1 ? `
+              <select class="control-select" onchange="window.AppUI.setExplorerFilter('cat1', this.value)">
+                <option value="ALL">${esc(cat1)}: Todos</option>
+                ${cat1Vals.map(v => `<option value="${esc(v)}" ${f.cat1 === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}
+              </select>
+            ` : ''}
+            ${cat2 ? `
+              <select class="control-select" onchange="window.AppUI.setExplorerFilter('cat2', this.value)">
+                <option value="ALL">${esc(cat2)}: Todos</option>
+                ${cat2Vals.map(v => `<option value="${esc(v)}" ${f.cat2 === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}
+              </select>
+            ` : ''}
           </div>
         </div>
-        <div class="grid-2">
-          ${qaList.map(item => `
-            <div style="background:var(--surface-alt); border:1px solid var(--border); border-radius:10px; padding:14px;">
-              <div style="font-weight:800; font-size:13px; color:var(--primary-dark); margin-bottom:6px;">${item.q}</div>
-              <p style="font-size:12.3px; color:var(--text);">${item.a}</p>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">🗄️ Explorador Interativo da Base de Dados Enriquecida (N = ${filteredRows.length} de ${state.rows.length})</div>
-            <div class="card-subtitle">Contém as variáveis originais + Escores Fatoriais (F1..F4) + Mahalanobis D² + Cluster + Produtividade Prevista (Ŷ)</div>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <select style="padding:6px 10px; border-radius:6px; border:1px solid var(--border);" onchange="window.AppUI.setExplorerFilter('filterCluster', this.value)">
-              <option value="ALL">Todos os Clusters</option>
-              <option value="1" ${state.filterCluster === '1' ? 'selected' : ''}>Cluster 1 (Déficit Liderança)</option>
-              <option value="2" ${state.filterCluster === '2' ? 'selected' : ''}>Cluster 2 (Limitados Ambiente)</option>
-              <option value="3" ${state.filterCluster === '3' ? 'selected' : ''}>Cluster 3 (Alta Performance)</option>
-            </select>
-            <select style="padding:6px 10px; border-radius:6px; border:1px solid var(--border);" onchange="window.AppUI.setExplorerFilter('filterModalidade', this.value)">
-              <option value="ALL">Todas as Modalidades</option>
-              <option value="Presencial" ${state.filterModalidade === 'Presencial' ? 'selected' : ''}>Presencial</option>
-              <option value="Híbrido" ${state.filterModalidade === 'Híbrido' ? 'selected' : ''}>Híbrido</option>
-              <option value="Remoto" ${state.filterModalidade === 'Remoto' ? 'selected' : ''}>Remoto</option>
-            </select>
-            <select style="padding:6px 10px; border-radius:6px; border:1px solid var(--border);" onchange="window.AppUI.setExplorerFilter('filterSquad', this.value)">
-              <option value="ALL">Todos os Squads</option>
-              ${squadsList.map(sq => `<option value="${sq}" ${state.filterSquad === sq ? 'selected' : ''}>${sq}</option>`).join('')}
-            </select>
-          </div>
-        </div>
-        <div class="table-wrap" style="max-height:460px; overflow-y:auto;">
+        <div class="table-wrap" style="max-height:580px; overflow-y:auto;">
           <table>
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Squad</th>
-                <th>Senioridade</th>
-                <th>Modalidade</th>
-                <th class="num">F1 Amb.</th>
-                <th class="num">F2 Lid.</th>
-                <th class="num">F3 Cresc.</th>
-                <th class="num">F4 Equil.</th>
+                ${displayCats.map(c => `<th>${esc(c)}</th>`).join('')}
+                ${meta.factorMeta.map(fm => `<th class="num">${esc(fm.nome_curto.slice(0, 11))}</th>`).join('')}
                 <th class="num">Mahal. D²</th>
-                <th>Cluster</th>
-                <th class="num">Y Real</th>
+                <th class="center">Cluster</th>
+                <th class="num">${esc(meta.targetCol)} Real</th>
                 <th class="num">Ŷ Previsto</th>
                 <th class="num">Resíduo Z</th>
               </tr>
@@ -1640,19 +2130,14 @@
             <tbody>
               ${filteredRows.map(r => `
                 <tr>
-                  <td><strong>#${r.ID}</strong></td>
-                  <td>${r.Squad || '—'}</td>
-                  <td>${r.Senioridade || '—'}</td>
-                  <td>${r.Modalidade || '—'}</td>
-                  <td class="num">${fmt(r.F1_Ambiente, 3)}</td>
-                  <td class="num">${fmt(r.F2_Lideranca, 3)}</td>
-                  <td class="num">${fmt(r.F3_Crescimento, 3)}</td>
-                  <td class="num">${fmt(r.F4_Equilibrio, 3)}</td>
+                  <td><strong>#${esc(r.ID)}</strong></td>
+                  ${displayCats.map(c => `<td>${esc(r[c] ?? '—')}</td>`).join('')}
+                  ${meta.factorCodes.map(fc => `<td class="num">${fmt(r[fc], 3)}</td>`).join('')}
                   <td class="num">${fmt(r.Mahalanobis_D2, 2)}</td>
-                  <td><span class="badge ${r.Cluster_K3 === 3 ? 'badge-green' : r.Cluster_K3 === 2 ? 'badge-amber' : 'badge-red'}">C${r.Cluster_K3}</span></td>
-                  <td class="num"><strong>${r.Y}</strong></td>
-                  <td class="num">${fmt(r.Y_Predito, 1)}</td>
-                  <td class="num">${fmt(r.Residuo_Padronizado, 2)}</td>
+                  <td class="center"><span class="badge ${clusterBadgeClass(r.Cluster_K, K)}">C${r.Cluster_K}</span></td>
+                  <td class="num"><strong>${fmt(r[meta.targetCol], 2)}</strong></td>
+                  <td class="num">${fmt(r.Y_Predito, 2)}</td>
+                  <td class="num" style="color:${Math.abs(r.Residuo_Padronizado) > 3 ? 'var(--danger)' : 'inherit'};">${fmt(r.Residuo_Padronizado, 2)}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -1663,8 +2148,8 @@
   }
 
   function setExplorerFilter(key, val) {
-    state[key] = val;
-    renderQaDataView();
+    state.explorerFilters[key] = val;
+    renderDataExplorerView();
   }
 
   // =========================================================================
@@ -1678,32 +2163,54 @@
     document.getElementById('uploadModal').classList.remove('open');
   }
 
+  function splitCSVLine(line, sep) {
+    const out = [];
+    let cur = '', inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (ch === sep && !inQuotes) {
+        out.push(cur.trim());
+        cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    out.push(cur.trim());
+    return out;
+  }
+
   function parseCSVText(text) {
-    const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+    const clean = text.replace(/^\uFEFF/, '');
+    const lines = clean.split(/\r?\n/).filter(l => l.trim().length > 0);
     if (lines.length < 2) return [];
     const first = lines[0];
     const sep = first.includes(';') && !first.includes(',') ? ';' : (first.includes('\t') ? '\t' : ',');
-    const headers = first.split(sep).map(h => h.trim().replace(/^"|"$/g, ''));
+    const headers = splitCSVLine(first, sep).map(h => h.replace(/^"|"$/g, '').trim());
     return lines.slice(1).map((line, idx) => {
-      const parts = line.split(sep).map(v => v.trim().replace(/^"|"$/g, ''));
+      const parts = splitCSVLine(line, sep).map(v => v.replace(/^"|"$/g, '').trim());
       const obj = {};
       headers.forEach((h, i) => {
         const raw = parts[i] ?? '';
-        const normalizedNum = raw.replace(',', '.');
+        const normalizedNum = (sep === ';' && raw.includes(',')) ? raw.replace(/\./g, '').replace(',', '.') : raw.replace(',', '.');
         const num = Number(normalizedNum);
         obj[h] = (raw !== '' && !isNaN(num)) ? num : raw;
       });
-      if (obj.ID === undefined) obj.ID = idx + 1;
+      if (obj.ID === undefined && obj.id === undefined) obj.ID = idx + 1;
       return obj;
     });
   }
 
-  function handleFileSelect(event) {
-    const file = event.target.files?.[0];
+  function processUploadedFile(file) {
     if (!file) return;
     const ext = file.name.split('.').pop().toLowerCase();
-
     if (ext === 'xlsx' || ext === 'xls') {
+      if (!window.XLSX) {
+        alert('Biblioteca XLSX indisponível offline. Converta o arquivo para .CSV e tente novamente.');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = function (e) {
         const data = new Uint8Array(e.target.result);
@@ -1723,14 +2230,34 @@
     }
   }
 
+  function handleFileSelect(event) {
+    const file = event.target.files?.[0];
+    processUploadedFile(file);
+    event.target.value = '';
+  }
+
   function prepareColumnMapping(fileName, rows) {
     if (!rows || rows.length < 10) {
       alert('O arquivo precisa conter pelo menos 10 linhas de dados válidas.');
       return;
     }
     state.pendingUploadRows = rows;
+    state.pendingFileName = fileName;
     const cols = Object.keys(rows[0]);
-    const numericCols = cols.filter(c => c.toUpperCase() !== 'ID' && rows.every(r => typeof r[c] === 'number' || !isNaN(Number(r[c]))));
+    const numericCols = cols.filter(c => {
+      if (/^id$/i.test(c)) return false;
+      let valid = 0;
+      for (const r of rows) {
+        const v = r[c];
+        if (v !== '' && v !== null && v !== undefined && !isNaN(Number(v))) valid++;
+      }
+      return valid >= rows.length * 0.8;
+    });
+
+    if (numericCols.length < 3) {
+      alert('A base precisa conter pelo menos 3 colunas numéricas (1 variável alvo + 2 preditoras).');
+      return;
+    }
 
     document.getElementById('mappingArea').style.display = 'block';
     document.getElementById('uploadFileName').textContent = `✅ Base Carregada: ${fileName} (N = ${rows.length} registros, ${cols.length} colunas)`;
@@ -1738,14 +2265,15 @@
 
     const targetDefault = cols.includes('Y') ? 'Y' : numericCols[numericCols.length - 1];
     document.getElementById('selTargetCol').innerHTML = numericCols.map(c =>
-      `<option value="${c}" ${c === targetDefault ? 'selected' : ''}>${c}</option>`
+      `<option value="${esc(c)}" ${c === targetDefault ? 'selected' : ''}>${esc(c)}</option>`
     ).join('');
 
-    const featureDefault = numericCols.filter(c => c !== targetDefault && !['Cluster_K3','Y_Predito','Residuo_Padronizado','Mahalanobis_D2'].includes(c));
+    const ignoreDerived = new Set(['Cluster_K', 'Cluster_K3', 'Cluster_Ward3', 'Cluster_K4', 'Y_Predito', 'Y_Norm100', 'Residuo', 'Residuo_Padronizado', 'Mahalanobis_D2', 'Mahalanobis_p', 'Cooks_D']);
+    const featureDefault = numericCols.filter(c => c !== targetDefault && !ignoreDerived.has(c) && !/^F\d+_/i.test(c));
     document.getElementById('chkFeatureCols').innerHTML = numericCols.map(c => `
       <label style="display:inline-flex; align-items:center; gap:4px; background:#FFF; padding:4px 8px; border-radius:6px; border:1px solid var(--border); font-size:12px; cursor:pointer;">
-        <input type="checkbox" class="chk-feat" value="${c}" ${featureDefault.includes(c) ? 'checked' : ''} />
-        ${c}
+        <input type="checkbox" class="chk-feat" value="${esc(c)}" ${featureDefault.includes(c) ? 'checked' : ''} />
+        ${esc(c)}
       </label>
     `).join('');
   }
@@ -1759,51 +2287,41 @@
       .map(el => el.value)
       .filter(c => c !== targetCol);
 
-    if (featureCols.length < 4) {
-      alert('Selecione pelo menos 4 variáveis quantitativas para a Análise Fatorial.');
+    if (featureCols.length < 3) {
+      alert('Selecione pelo menos 3 variáveis quantitativas preditoras (além da variável alvo) para a Análise Fatorial.');
       return;
     }
 
-    const res = window.TechNovaStatsEngine.runAdaptivePipeline(rows, {
-      featureCols,
-      targetCol,
-      nClusters
-    });
-
-    state.datasetName = `Upload Adaptativo (N = ${rows.length}, ${featureCols.length} Vars)`;
-    state.isCustomUpload = true;
-    state.summary = res.summary;
-    state.rows = res.enrichedRows;
-    closeUploadModal();
-    renderTelemetry();
-    setMode(state.mode);
+    try {
+      const label = state.pendingFileName
+        ? `${state.pendingFileName} (N = ${rows.length})`
+        : `Upload Dinâmico (N = ${rows.length}, ${featureCols.length} Vars)`;
+      applyDataset(rows, label, { featureCols, targetCol, nClusters }, true);
+      closeUploadModal();
+    } catch (err) {
+      alert('Erro ao recalcular a base: ' + (err?.message || err));
+    }
   }
 
   function simulateNewUploadBatch() {
-    // Creates a realistic Q2 2026 post-intervention batch (N=150) where leadership & equipment improved
-    const simulated = window.TECHNOVA_RAW_ROWS.map((r, i) => {
-      const boost = (i % 3 === 0) ? 1 : 0;
-      const v5 = Math.min(10, r.V5 + boost);
-      const v7 = Math.min(10, r.V7 + boost);
-      const v8 = Math.min(10, r.V8 + boost);
-      const v14 = Math.min(10, r.V14 + boost);
-      const yNew = Math.round(r.Y + 4.5 * boost + ((i % 5) - 2));
+    const simulated = state.rawRows.map((r, i) => {
+      const boost = (i % 3 === 0) ? 1 : ((i % 5 === 0) ? -1 : 0);
+      const clamp10 = (v) => Math.max(1, Math.min(10, v));
       return {
         ...r,
-        V5: v5, V7: v7, V8: v8, V14: v14,
-        Y: yNew
+        V2: clamp10(r.V2 + boost),
+        V5: clamp10(r.V5 + boost),
+        V7: clamp10(r.V7 + boost),
+        V8: clamp10(r.V8 + boost),
+        V14: clamp10(r.V14 + boost),
+        Y: Math.round(r.Y + 6.0 * boost + ((i % 7) - 3))
       };
     });
-    prepareColumnMapping('TechNova_Ciclo_Q2_2026_Simulado.csv', simulated);
+    prepareColumnMapping('Ciclo_Simulado_Novo.csv', simulated);
   }
 
   function restoreDefaultDataset() {
-    state.datasetName = 'Base Oficial TechNova (N = 150)';
-    state.isCustomUpload = false;
-    state.summary = window.TECHNOVA_DEFAULT_SUMMARY;
-    state.rows = window.TECHNOVA_ENRICHED_ROWS;
-    renderTelemetry();
-    setMode(state.mode);
+    applyDataset(state.rawRows, `Base Padrão (N = ${state.rawRows.length})`, { nClusters: 3 }, false);
   }
 
   function exportEnrichedCSV() {
@@ -1813,31 +2331,49 @@
       cols.join(','),
       ...state.rows.map(r => cols.map(c => {
         const v = r[c] ?? '';
-        return typeof v === 'string' && v.includes(',') ? `"${v}"` : v;
+        const s = String(v);
+        return (s.includes(',') || s.includes('"')) ? `"${s.replace(/"/g, '""')}"` : s;
       }).join(','))
     ];
     const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'technova_base_enriquecida_fatores_clusters.csv';
+    a.download = 'base_enriquecida_fatores_clusters.csv';
     a.click();
     URL.revokeObjectURL(url);
   }
 
   function downloadTemplateCSV() {
-    const cols = Object.keys(window.TECHNOVA_RAW_ROWS[0]);
+    if (!state.rawRows || !state.rawRows.length) return;
+    const cols = Object.keys(state.rawRows[0]);
     const csvLines = [
       cols.join(','),
-      ...window.TECHNOVA_RAW_ROWS.map(r => cols.map(c => r[c]).join(','))
+      ...state.rawRows.map(r => cols.map(c => r[c]).join(','))
     ];
     const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'template_technova_150.csv';
+    a.download = 'template_base_dados.csv';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function bindDropZone() {
+    const dz = document.getElementById('dropZone');
+    if (!dz) return;
+    dz.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dz.classList.add('dragover');
+    });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) processUploadedFile(file);
+    });
   }
 
   // Expose public UI API
@@ -1847,6 +2383,10 @@
     selectStage,
     applySimPreset,
     updateSimSlider,
+    setCaioCatCol,
+    setCaioFactor,
+    setLucasGroupCol,
+    setLucasFilterVal,
     loadCollaboratorIntoPriya,
     updatePriyaVScore,
     setExplorerFilter,
@@ -1860,9 +2400,9 @@
     downloadTemplateCSV
   };
 
-  // Initialize on DOM load
+  // Initialize cleanly through the automated statistical engine
   window.addEventListener('DOMContentLoaded', () => {
-    renderTelemetry();
-    renderPersonasView();
+    bindDropZone();
+    applyDataset(state.rawRows, `Base Padrão (N = ${state.rawRows.length})`, { nClusters: 3 }, false);
   });
 })();
