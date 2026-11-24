@@ -1,0 +1,3449 @@
+{
+  "meta": {
+    "n": 150,
+    "n_vars_likert": 15
+  },
+  "etapa1_descritiva": {
+    "auditoria": {
+      "n_linhas": 150,
+      "missing_total": 0,
+      "duplicados_id": 0,
+      "escala_likert_min": 1,
+      "escala_likert_max": 10,
+      "y_min_observado": 114.0,
+      "y_max_observado": 239.0,
+      "y_media_observada": 172.85,
+      "y_dp_observado": 25.28,
+      "nota_auditoria_y": "O dicionário nominal menciona escala 0-100 para Y, mas os 150 registros reais variam de 114 a 239 (média = 172.85, DP = 25.28). Mantém-se a escala original empírica para preservar a variância exata nos modelos, reportando também a equivalência normalizada (0-100)."
+    },
+    "tabela_descritiva": [
+      {
+        "variavel": "V1",
+        "descricao": "Qualidade do espaço de trabalho",
+        "dimensao_teorica": "Ambiente",
+        "media": 6.633,
+        "mediana": 7.0,
+        "moda": 8.0,
+        "dp": 2.067,
+        "variancia": 4.274,
+        "cv_pct": 31.17,
+        "min": 2.0,
+        "max": 10.0,
+        "assimetria": -0.167,
+        "curtose": -0.6,
+        "shapiro_w": 0.9565,
+        "shapiro_p": 0.00011741801227380282,
+        "ks_d": 0.1257,
+        "ks_p": 0.015892192671666
+      },
+      {
+        "variavel": "V2",
+        "descricao": "Disponibilidade/qualidade de ferramentas",
+        "dimensao_teorica": "Ambiente",
+        "media": 6.353,
+        "mediana": 6.0,
+        "moda": 6.0,
+        "dp": 2.196,
+        "variancia": 4.821,
+        "cv_pct": 34.56,
+        "min": 2.0,
+        "max": 10.0,
+        "assimetria": 0.023,
+        "curtose": -0.942,
+        "shapiro_w": 0.9542,
+        "shapiro_p": 7.418600166074981e-05,
+        "ks_d": 0.1112,
+        "ks_p": 0.045309445181857755
+      },
+      {
+        "variavel": "V3",
+        "descricao": "Gestão de ruído e interrupções",
+        "dimensao_teorica": "Ambiente",
+        "media": 6.44,
+        "mediana": 6.0,
+        "moda": 6.0,
+        "dp": 2.122,
+        "variancia": 4.503,
+        "cv_pct": 32.95,
+        "min": 2.0,
+        "max": 10.0,
+        "assimetria": -0.212,
+        "curtose": -0.524,
+        "shapiro_w": 0.9576,
+        "shapiro_p": 0.0001479083854919419,
+        "ks_d": 0.1179,
+        "ks_p": 0.028427263825882232
+      },
+      {
+        "variavel": "V4",
+        "descricao": "Ergonomia do posto de trabalho",
+        "dimensao_teorica": "Ambiente",
+        "media": 6.88,
+        "mediana": 7.0,
+        "moda": 8.0,
+        "dp": 2.095,
+        "variancia": 4.388,
+        "cv_pct": 30.45,
+        "min": 3.0,
+        "max": 10.0,
+        "assimetria": -0.256,
+        "curtose": -0.919,
+        "shapiro_w": 0.9396,
+        "shapiro_p": 4.881879095389857e-06,
+        "ks_d": 0.1436,
+        "ks_p": 0.0036793757990692204
+      },
+      {
+        "variavel": "V5",
+        "descricao": "Suporte e acessibilidade do gestor",
+        "dimensao_teorica": "Liderança",
+        "media": 5.9,
+        "mediana": 6.0,
+        "moda": 5.0,
+        "dp": 2.503,
+        "variancia": 6.265,
+        "cv_pct": 42.42,
+        "min": 1.0,
+        "max": 10.0,
+        "assimetria": 0.003,
+        "curtose": -0.881,
+        "shapiro_w": 0.9576,
+        "shapiro_p": 0.00014839156692891722,
+        "ks_d": 0.0937,
+        "ks_p": 0.1343125967155664
+      },
+      {
+        "variavel": "V6",
+        "descricao": "Grau de autonomia técnica",
+        "dimensao_teorica": "Liderança",
+        "media": 5.973,
+        "mediana": 6.0,
+        "moda": 5.0,
+        "dp": 2.273,
+        "variancia": 5.167,
+        "cv_pct": 38.05,
+        "min": 1.0,
+        "max": 10.0,
+        "assimetria": -0.008,
+        "curtose": -0.795,
+        "shapiro_w": 0.964,
+        "shapiro_p": 0.0005807959654289769,
+        "ks_d": 0.1257,
+        "ks_p": 0.01585499979898571
+      },
+      {
+        "variavel": "V7",
+        "descricao": "Reconhecimento por entregas",
+        "dimensao_teorica": "Liderança",
+        "media": 6.053,
+        "mediana": 6.0,
+        "moda": 5.0,
+        "dp": 2.317,
+        "variancia": 5.366,
+        "cv_pct": 38.27,
+        "min": 1.0,
+        "max": 10.0,
+        "assimetria": 0.026,
+        "curtose": -0.753,
+        "shapiro_w": 0.9585,
+        "shapiro_p": 0.00017886847022822135,
+        "ks_d": 0.1159,
+        "ks_p": 0.032815819615097386
+      },
+      {
+        "variavel": "V8",
+        "descricao": "Segurança psicológica",
+        "dimensao_teorica": "Liderança",
+        "media": 6.453,
+        "mediana": 7.0,
+        "moda": 7.0,
+        "dp": 2.141,
+        "variancia": 4.585,
+        "cv_pct": 33.18,
+        "min": 2.0,
+        "max": 10.0,
+        "assimetria": -0.128,
+        "curtose": -0.909,
+        "shapiro_w": 0.9552,
+        "shapiro_p": 9.007124245528686e-05,
+        "ks_d": 0.1208,
+        "ks_p": 0.02305512237314722
+      },
+      {
+        "variavel": "V9",
+        "descricao": "Oportunidades de treinamento",
+        "dimensao_teorica": "Crescimento",
+        "media": 5.967,
+        "mediana": 6.0,
+        "moda": 6.0,
+        "dp": 2.077,
+        "variancia": 4.314,
+        "cv_pct": 34.81,
+        "min": 2.0,
+        "max": 10.0,
+        "assimetria": 0.009,
+        "curtose": -0.803,
+        "shapiro_w": 0.9591,
+        "shapiro_p": 0.0002035297838845322,
+        "ks_d": 0.1215,
+        "ks_p": 0.021866295462190776
+      },
+      {
+        "variavel": "V10",
+        "descricao": "Clareza do plano de carreira",
+        "dimensao_teorica": "Crescimento",
+        "media": 5.993,
+        "mediana": 6.0,
+        "moda": 4.0,
+        "dp": 2.135,
+        "variancia": 4.557,
+        "cv_pct": 35.62,
+        "min": 2.0,
+        "max": 10.0,
+        "assimetria": 0.177,
+        "curtose": -0.901,
+        "shapiro_w": 0.9524,
+        "shapiro_p": 5.2221089852394446e-05,
+        "ks_d": 0.1392,
+        "ks_p": 0.005377627049383433
+      },
+      {
+        "variavel": "V11",
+        "descricao": "Qualidade/disponibilidade de mentoria",
+        "dimensao_teorica": "Crescimento",
+        "media": 5.533,
+        "mediana": 6.0,
+        "moda": 6.0,
+        "dp": 1.888,
+        "variancia": 3.566,
+        "cv_pct": 34.13,
+        "min": 2.0,
+        "max": 9.0,
+        "assimetria": -0.219,
+        "curtose": -0.649,
+        "shapiro_w": 0.9477,
+        "shapiro_p": 2.1293621401541542e-05,
+        "ks_d": 0.1643,
+        "ks_p": 0.0005267605047683631
+      },
+      {
+        "variavel": "V12",
+        "descricao": "Justiça na carga de trabalho",
+        "dimensao_teorica": "Equilíbrio",
+        "media": 6.173,
+        "mediana": 6.0,
+        "moda": 6.0,
+        "dp": 2.354,
+        "variancia": 5.54,
+        "cv_pct": 38.13,
+        "min": 1.0,
+        "max": 10.0,
+        "assimetria": -0.12,
+        "curtose": -0.524,
+        "shapiro_w": 0.9575,
+        "shapiro_p": 0.00014521977825961738,
+        "ks_d": 0.096,
+        "ks_p": 0.11781513528269993
+      },
+      {
+        "variavel": "V13",
+        "descricao": "Flexibilidade de horários",
+        "dimensao_teorica": "Equilíbrio",
+        "media": 6.313,
+        "mediana": 6.0,
+        "moda": 6.0,
+        "dp": 2.259,
+        "variancia": 5.103,
+        "cv_pct": 35.78,
+        "min": 1.0,
+        "max": 10.0,
+        "assimetria": -0.113,
+        "curtose": -0.636,
+        "shapiro_w": 0.96,
+        "shapiro_p": 0.0002465473414610987,
+        "ks_d": 0.1218,
+        "ks_p": 0.021297800168582303
+      },
+      {
+        "variavel": "V14",
+        "descricao": "Prevenção efetiva ao burnout",
+        "dimensao_teorica": "Equilíbrio",
+        "media": 6.153,
+        "mediana": 6.0,
+        "moda": 5.0,
+        "dp": 2.207,
+        "variancia": 4.869,
+        "cv_pct": 35.86,
+        "min": 1.0,
+        "max": 10.0,
+        "assimetria": 0.065,
+        "curtose": -0.847,
+        "shapiro_w": 0.9591,
+        "shapiro_p": 0.00020051425895546203,
+        "ks_d": 0.1327,
+        "ks_p": 0.009146743889220576
+      },
+      {
+        "variavel": "V15",
+        "descricao": "Satisfação com benefícios",
+        "dimensao_teorica": "Equilíbrio",
+        "media": 6.773,
+        "mediana": 7.0,
+        "moda": 6.0,
+        "dp": 2.07,
+        "variancia": 4.284,
+        "cv_pct": 30.56,
+        "min": 2.0,
+        "max": 10.0,
+        "assimetria": -0.18,
+        "curtose": -0.769,
+        "shapiro_w": 0.9544,
+        "shapiro_p": 7.690710171513661e-05,
+        "ks_d": 0.1166,
+        "ks_p": 0.031054178629990603
+      },
+      {
+        "variavel": "Y",
+        "descricao": "Índice de Produtividade (Y)",
+        "dimensao_teorica": "Variável Dependente",
+        "media": 172.853,
+        "mediana": 169.5,
+        "moda": 170.0,
+        "dp": 25.285,
+        "variancia": 639.321,
+        "cv_pct": 14.63,
+        "min": 114.0,
+        "max": 239.0,
+        "assimetria": 0.432,
+        "curtose": -0.145,
+        "shapiro_w": 0.98,
+        "shapiro_p": 0.027760835576177856,
+        "ks_d": 0.0892,
+        "ks_p": 0.1728088322018353
+      }
+    ],
+    "categoricas": {
+      "Modalidade": {
+        "table": [
+          {
+            "Modalidade": "Híbrido",
+            "freq": 55,
+            "y_media": 173.15,
+            "y_dp": 23.91,
+            "y_mediana": 169.0,
+            "pct": 36.67
+          },
+          {
+            "Modalidade": "Presencial",
+            "freq": 44,
+            "y_media": 172.36,
+            "y_dp": 27.55,
+            "y_mediana": 166.5,
+            "pct": 29.33
+          },
+          {
+            "Modalidade": "Remoto",
+            "freq": 51,
+            "y_media": 172.96,
+            "y_dp": 25.19,
+            "y_mediana": 170.0,
+            "pct": 34.0
+          }
+        ],
+        "anova_y_f": 0.0122,
+        "anova_y_p": 0.9878564053652198
+      },
+      "Senioridade": {
+        "table": [
+          {
+            "Senioridade": "Júnior",
+            "freq": 38,
+            "y_media": 172.39,
+            "y_dp": 19.98,
+            "y_mediana": 170.5,
+            "pct": 25.33
+          },
+          {
+            "Senioridade": "Pleno",
+            "freq": 33,
+            "y_media": 172.94,
+            "y_dp": 28.73,
+            "y_mediana": 167.0,
+            "pct": 22.0
+          },
+          {
+            "Senioridade": "Staff",
+            "freq": 39,
+            "y_media": 174.51,
+            "y_dp": 24.87,
+            "y_mediana": 171.0,
+            "pct": 26.0
+          },
+          {
+            "Senioridade": "Sênior",
+            "freq": 40,
+            "y_media": 171.6,
+            "y_dp": 27.92,
+            "y_mediana": 165.5,
+            "pct": 26.67
+          }
+        ],
+        "anova_y_f": 0.0914,
+        "anova_y_p": 0.9647089154732754
+      },
+      "Squad": {
+        "table": [
+          {
+            "Squad": "Squad Alpha",
+            "freq": 12,
+            "y_media": 183.75,
+            "y_dp": 28.94,
+            "y_mediana": 176.5,
+            "pct": 8.0
+          },
+          {
+            "Squad": "Squad Beta",
+            "freq": 18,
+            "y_media": 171.61,
+            "y_dp": 34.11,
+            "y_mediana": 160.5,
+            "pct": 12.0
+          },
+          {
+            "Squad": "Squad Delta",
+            "freq": 13,
+            "y_media": 163.54,
+            "y_dp": 15.58,
+            "y_mediana": 162.0,
+            "pct": 8.67
+          },
+          {
+            "Squad": "Squad Epsilon",
+            "freq": 13,
+            "y_media": 179.38,
+            "y_dp": 21.18,
+            "y_mediana": 173.0,
+            "pct": 8.67
+          },
+          {
+            "Squad": "Squad Eta",
+            "freq": 13,
+            "y_media": 179.92,
+            "y_dp": 23.78,
+            "y_mediana": 177.0,
+            "pct": 8.67
+          },
+          {
+            "Squad": "Squad Gamma",
+            "freq": 15,
+            "y_media": 166.73,
+            "y_dp": 25.3,
+            "y_mediana": 165.0,
+            "pct": 10.0
+          },
+          {
+            "Squad": "Squad Iota",
+            "freq": 24,
+            "y_media": 172.08,
+            "y_dp": 26.09,
+            "y_mediana": 174.5,
+            "pct": 16.0
+          },
+          {
+            "Squad": "Squad Kappa",
+            "freq": 17,
+            "y_media": 170.29,
+            "y_dp": 23.21,
+            "y_mediana": 167.0,
+            "pct": 11.33
+          },
+          {
+            "Squad": "Squad Theta",
+            "freq": 8,
+            "y_media": 172.0,
+            "y_dp": 20.56,
+            "y_mediana": 170.5,
+            "pct": 5.33
+          },
+          {
+            "Squad": "Squad Zeta",
+            "freq": 17,
+            "y_media": 172.65,
+            "y_dp": 25.63,
+            "y_mediana": 166.0,
+            "pct": 11.33
+          }
+        ],
+        "anova_y_f": 0.7675,
+        "anova_y_p": 0.6465895499827015
+      }
+    },
+    "correlacoes_com_y": [
+      {
+        "variavel": "V8",
+        "descricao": "Segurança psicológica",
+        "dimensao": "Liderança",
+        "r": 0.58,
+        "p_valor": 7.376159741196995e-15
+      },
+      {
+        "variavel": "V7",
+        "descricao": "Reconhecimento por entregas",
+        "dimensao": "Liderança",
+        "r": 0.4864,
+        "p_valor": 2.776741619242548e-10
+      },
+      {
+        "variavel": "V14",
+        "descricao": "Prevenção efetiva ao burnout",
+        "dimensao": "Equilíbrio",
+        "r": 0.4735,
+        "p_valor": 9.377123512634222e-10
+      },
+      {
+        "variavel": "V15",
+        "descricao": "Satisfação com benefícios",
+        "dimensao": "Equilíbrio",
+        "r": 0.4469,
+        "p_valor": 9.855376512228342e-09
+      },
+      {
+        "variavel": "V5",
+        "descricao": "Suporte e acessibilidade do gestor",
+        "dimensao": "Liderança",
+        "r": 0.4365,
+        "p_valor": 2.359036177987132e-08
+      },
+      {
+        "variavel": "V13",
+        "descricao": "Flexibilidade de horários",
+        "dimensao": "Equilíbrio",
+        "r": 0.4345,
+        "p_valor": 2.76255670005062e-08
+      },
+      {
+        "variavel": "V6",
+        "descricao": "Grau de autonomia técnica",
+        "dimensao": "Liderança",
+        "r": 0.4306,
+        "p_valor": 3.802092769424668e-08
+      },
+      {
+        "variavel": "V12",
+        "descricao": "Justiça na carga de trabalho",
+        "dimensao": "Equilíbrio",
+        "r": 0.4013,
+        "p_valor": 3.5862444342097817e-07
+      },
+      {
+        "variavel": "V1",
+        "descricao": "Qualidade do espaço de trabalho",
+        "dimensao": "Ambiente",
+        "r": 0.3977,
+        "p_valor": 4.6514299628529945e-07
+      },
+      {
+        "variavel": "V4",
+        "descricao": "Ergonomia do posto de trabalho",
+        "dimensao": "Ambiente",
+        "r": 0.3821,
+        "p_valor": 1.4024819205314043e-06
+      },
+      {
+        "variavel": "V2",
+        "descricao": "Disponibilidade/qualidade de ferramentas",
+        "dimensao": "Ambiente",
+        "r": 0.3793,
+        "p_valor": 1.6912963687879723e-06
+      },
+      {
+        "variavel": "V3",
+        "descricao": "Gestão de ruído e interrupções",
+        "dimensao": "Ambiente",
+        "r": 0.264,
+        "p_valor": 0.001096463622108858
+      },
+      {
+        "variavel": "V10",
+        "descricao": "Clareza do plano de carreira",
+        "dimensao": "Crescimento",
+        "r": 0.1584,
+        "p_valor": 0.05287836803804622
+      },
+      {
+        "variavel": "V11",
+        "descricao": "Qualidade/disponibilidade de mentoria",
+        "dimensao": "Crescimento",
+        "r": 0.1245,
+        "p_valor": 0.12902560654525624
+      },
+      {
+        "variavel": "V9",
+        "descricao": "Oportunidades de treinamento",
+        "dimensao": "Crescimento",
+        "r": 0.1062,
+        "p_valor": 0.19573402764294062
+      }
+    ],
+    "top_pares_likert": [
+      {
+        "par": "V13 - V15",
+        "v1": "V13",
+        "v2": "V15",
+        "r": 0.7574
+      },
+      {
+        "par": "V6 - V8",
+        "v1": "V6",
+        "v2": "V8",
+        "r": 0.7099
+      },
+      {
+        "par": "V5 - V8",
+        "v1": "V5",
+        "v2": "V8",
+        "r": 0.7072
+      },
+      {
+        "par": "V12 - V15",
+        "v1": "V12",
+        "v2": "V15",
+        "r": 0.7024
+      },
+      {
+        "par": "V7 - V8",
+        "v1": "V7",
+        "v2": "V8",
+        "r": 0.7014
+      },
+      {
+        "par": "V9 - V11",
+        "v1": "V9",
+        "v2": "V11",
+        "r": 0.701
+      },
+      {
+        "par": "V5 - V7",
+        "v1": "V5",
+        "v2": "V7",
+        "r": 0.6977
+      },
+      {
+        "par": "V12 - V13",
+        "v1": "V12",
+        "v2": "V13",
+        "r": 0.6638
+      },
+      {
+        "par": "V2 - V4",
+        "v1": "V2",
+        "v2": "V4",
+        "r": 0.663
+      },
+      {
+        "par": "V6 - V7",
+        "v1": "V6",
+        "v2": "V7",
+        "r": 0.6618
+      },
+      {
+        "par": "V3 - V4",
+        "v1": "V3",
+        "v2": "V4",
+        "r": 0.6612
+      },
+      {
+        "par": "V13 - V14",
+        "v1": "V13",
+        "v2": "V14",
+        "r": 0.6595
+      },
+      {
+        "par": "V1 - V4",
+        "v1": "V1",
+        "v2": "V4",
+        "r": 0.6577
+      },
+      {
+        "par": "V14 - V15",
+        "v1": "V14",
+        "v2": "V15",
+        "r": 0.6528
+      },
+      {
+        "par": "V5 - V6",
+        "v1": "V5",
+        "v2": "V6",
+        "r": 0.5988
+      },
+      {
+        "par": "V1 - V3",
+        "v1": "V1",
+        "v2": "V3",
+        "r": 0.5923
+      },
+      {
+        "par": "V1 - V2",
+        "v1": "V1",
+        "v2": "V2",
+        "r": 0.5876
+      },
+      {
+        "par": "V9 - V10",
+        "v1": "V9",
+        "v2": "V10",
+        "r": 0.5827
+      },
+      {
+        "par": "V10 - V11",
+        "v1": "V10",
+        "v2": "V11",
+        "r": 0.5719
+      },
+      {
+        "par": "V12 - V14",
+        "v1": "V12",
+        "v2": "V14",
+        "r": 0.5712
+      },
+      {
+        "par": "V2 - V3",
+        "v1": "V2",
+        "v2": "V3",
+        "r": 0.5613
+      },
+      {
+        "par": "V8 - V14",
+        "v1": "V8",
+        "v2": "V14",
+        "r": 0.1897
+      },
+      {
+        "par": "V1 - V12",
+        "v1": "V1",
+        "v2": "V12",
+        "r": 0.1662
+      },
+      {
+        "par": "V4 - V15",
+        "v1": "V4",
+        "v2": "V15",
+        "r": 0.1516
+      },
+      {
+        "par": "V9 - V12",
+        "v1": "V9",
+        "v2": "V12",
+        "r": -0.1512
+      }
+    ],
+    "matriz_correlacao": {
+      "V1": {
+        "V1": 1.0,
+        "V2": 0.5876,
+        "V3": 0.5923,
+        "V4": 0.6577,
+        "V5": -0.011,
+        "V6": 0.0707,
+        "V7": -0.0351,
+        "V8": 0.0984,
+        "V9": -0.0607,
+        "V10": -0.0234,
+        "V11": 0.0384,
+        "V12": 0.1662,
+        "V13": 0.0909,
+        "V14": 0.1389,
+        "V15": 0.142,
+        "Y": 0.3977
+      },
+      "V2": {
+        "V1": 0.5876,
+        "V2": 1.0,
+        "V3": 0.5613,
+        "V4": 0.663,
+        "V5": -0.0094,
+        "V6": 0.0812,
+        "V7": -0.0024,
+        "V8": 0.1342,
+        "V9": -0.043,
+        "V10": 0.0363,
+        "V11": -0.0134,
+        "V12": 0.1114,
+        "V13": 0.0032,
+        "V14": 0.1384,
+        "V15": 0.0355,
+        "Y": 0.3793
+      },
+      "V3": {
+        "V1": 0.5923,
+        "V2": 0.5613,
+        "V3": 1.0,
+        "V4": 0.6612,
+        "V5": -0.0649,
+        "V6": -0.0226,
+        "V7": -0.0908,
+        "V8": 0.0622,
+        "V9": -0.0484,
+        "V10": -0.0171,
+        "V11": 0.0583,
+        "V12": 0.0384,
+        "V13": 0.0565,
+        "V14": 0.1131,
+        "V15": 0.0733,
+        "Y": 0.264
+      },
+      "V4": {
+        "V1": 0.6577,
+        "V2": 0.663,
+        "V3": 0.6612,
+        "V4": 1.0,
+        "V5": -0.0202,
+        "V6": 0.0726,
+        "V7": -0.007,
+        "V8": 0.1065,
+        "V9": -0.0518,
+        "V10": -0.0302,
+        "V11": -0.0465,
+        "V12": 0.1199,
+        "V13": 0.008,
+        "V14": 0.1187,
+        "V15": 0.1516,
+        "Y": 0.3821
+      },
+      "V5": {
+        "V1": -0.011,
+        "V2": -0.0094,
+        "V3": -0.0649,
+        "V4": -0.0202,
+        "V5": 1.0,
+        "V6": 0.5988,
+        "V7": 0.6977,
+        "V8": 0.7072,
+        "V9": 0.0045,
+        "V10": 0.1092,
+        "V11": -0.0043,
+        "V12": -0.0836,
+        "V13": 0.0305,
+        "V14": 0.0623,
+        "V15": -0.0808,
+        "Y": 0.4365
+      },
+      "V6": {
+        "V1": 0.0707,
+        "V2": 0.0812,
+        "V3": -0.0226,
+        "V4": 0.0726,
+        "V5": 0.5988,
+        "V6": 1.0,
+        "V7": 0.6618,
+        "V8": 0.7099,
+        "V9": -0.0698,
+        "V10": -0.0692,
+        "V11": -0.0201,
+        "V12": 0.0749,
+        "V13": 0.1245,
+        "V14": 0.1333,
+        "V15": 0.0401,
+        "Y": 0.4306
+      },
+      "V7": {
+        "V1": -0.0351,
+        "V2": -0.0024,
+        "V3": -0.0908,
+        "V4": -0.007,
+        "V5": 0.6977,
+        "V6": 0.6618,
+        "V7": 1.0,
+        "V8": 0.7014,
+        "V9": -0.0122,
+        "V10": 0.034,
+        "V11": -0.0219,
+        "V12": 0.0266,
+        "V13": 0.0917,
+        "V14": 0.131,
+        "V15": 0.0501,
+        "Y": 0.4864
+      },
+      "V8": {
+        "V1": 0.0984,
+        "V2": 0.1342,
+        "V3": 0.0622,
+        "V4": 0.1065,
+        "V5": 0.7072,
+        "V6": 0.7099,
+        "V7": 0.7014,
+        "V8": 1.0,
+        "V9": -0.0403,
+        "V10": 0.0153,
+        "V11": -0.0071,
+        "V12": 0.0709,
+        "V13": 0.1175,
+        "V14": 0.1897,
+        "V15": 0.0582,
+        "Y": 0.58
+      },
+      "V9": {
+        "V1": -0.0607,
+        "V2": -0.043,
+        "V3": -0.0484,
+        "V4": -0.0518,
+        "V5": 0.0045,
+        "V6": -0.0698,
+        "V7": -0.0122,
+        "V8": -0.0403,
+        "V9": 1.0,
+        "V10": 0.5827,
+        "V11": 0.701,
+        "V12": -0.1512,
+        "V13": -0.0807,
+        "V14": -0.0706,
+        "V15": -0.0892,
+        "Y": 0.1062
+      },
+      "V10": {
+        "V1": -0.0234,
+        "V2": 0.0363,
+        "V3": -0.0171,
+        "V4": -0.0302,
+        "V5": 0.1092,
+        "V6": -0.0692,
+        "V7": 0.034,
+        "V8": 0.0153,
+        "V9": 0.5827,
+        "V10": 1.0,
+        "V11": 0.5719,
+        "V12": -0.1146,
+        "V13": -0.0288,
+        "V14": -0.0511,
+        "V15": -0.0854,
+        "Y": 0.1584
+      },
+      "V11": {
+        "V1": 0.0384,
+        "V2": -0.0134,
+        "V3": 0.0583,
+        "V4": -0.0465,
+        "V5": -0.0043,
+        "V6": -0.0201,
+        "V7": -0.0219,
+        "V8": -0.0071,
+        "V9": 0.701,
+        "V10": 0.5719,
+        "V11": 1.0,
+        "V12": -0.101,
+        "V13": 0.0282,
+        "V14": -0.0745,
+        "V15": -0.0307,
+        "Y": 0.1245
+      },
+      "V12": {
+        "V1": 0.1662,
+        "V2": 0.1114,
+        "V3": 0.0384,
+        "V4": 0.1199,
+        "V5": -0.0836,
+        "V6": 0.0749,
+        "V7": 0.0266,
+        "V8": 0.0709,
+        "V9": -0.1512,
+        "V10": -0.1146,
+        "V11": -0.101,
+        "V12": 1.0,
+        "V13": 0.6638,
+        "V14": 0.5712,
+        "V15": 0.7024,
+        "Y": 0.4013
+      },
+      "V13": {
+        "V1": 0.0909,
+        "V2": 0.0032,
+        "V3": 0.0565,
+        "V4": 0.008,
+        "V5": 0.0305,
+        "V6": 0.1245,
+        "V7": 0.0917,
+        "V8": 0.1175,
+        "V9": -0.0807,
+        "V10": -0.0288,
+        "V11": 0.0282,
+        "V12": 0.6638,
+        "V13": 1.0,
+        "V14": 0.6595,
+        "V15": 0.7574,
+        "Y": 0.4345
+      },
+      "V14": {
+        "V1": 0.1389,
+        "V2": 0.1384,
+        "V3": 0.1131,
+        "V4": 0.1187,
+        "V5": 0.0623,
+        "V6": 0.1333,
+        "V7": 0.131,
+        "V8": 0.1897,
+        "V9": -0.0706,
+        "V10": -0.0511,
+        "V11": -0.0745,
+        "V12": 0.5712,
+        "V13": 0.6595,
+        "V14": 1.0,
+        "V15": 0.6528,
+        "Y": 0.4735
+      },
+      "V15": {
+        "V1": 0.142,
+        "V2": 0.0355,
+        "V3": 0.0733,
+        "V4": 0.1516,
+        "V5": -0.0808,
+        "V6": 0.0401,
+        "V7": 0.0501,
+        "V8": 0.0582,
+        "V9": -0.0892,
+        "V10": -0.0854,
+        "V11": -0.0307,
+        "V12": 0.7024,
+        "V13": 0.7574,
+        "V14": 0.6528,
+        "V15": 1.0,
+        "Y": 0.4469
+      },
+      "Y": {
+        "V1": 0.3977,
+        "V2": 0.3793,
+        "V3": 0.264,
+        "V4": 0.3821,
+        "V5": 0.4365,
+        "V6": 0.4306,
+        "V7": 0.4864,
+        "V8": 0.58,
+        "V9": 0.1062,
+        "V10": 0.1584,
+        "V11": 0.1245,
+        "V12": 0.4013,
+        "V13": 0.4345,
+        "V14": 0.4735,
+        "V15": 0.4469,
+        "Y": 1.0
+      }
+    }
+  },
+  "etapa2_fatorial": {
+    "kmo_global": 0.7814,
+    "bartlett_chi2": 1190.09,
+    "bartlett_df": 105,
+    "bartlett_p": 2.8602403821285432e-183,
+    "det_matriz_correlacao": 0.00024540224164820495,
+    "msa_individual": {
+      "V1": 0.8452,
+      "V2": 0.8068,
+      "V3": 0.7795,
+      "V4": 0.7309,
+      "V5": 0.7983,
+      "V6": 0.8207,
+      "V7": 0.8371,
+      "V8": 0.807,
+      "V9": 0.6629,
+      "V10": 0.7451,
+      "V11": 0.6158,
+      "V12": 0.852,
+      "V13": 0.7656,
+      "V14": 0.858,
+      "V15": 0.7551
+    },
+    "matriz_anti_imagem_corr": {
+      "V1": {
+        "V1": 0.8452,
+        "V2": -0.2154,
+        "V3": -0.2127,
+        "V4": -0.3118,
+        "V5": -0.0506,
+        "V6": -0.035,
+        "V7": 0.0636,
+        "V8": 0.005,
+        "V9": 0.0697,
+        "V10": 0.0394,
+        "V11": -0.1168,
+        "V12": -0.086,
+        "V13": -0.0136,
+        "V14": 0.0164,
+        "V15": 0.0007
+      },
+      "V2": {
+        "V1": -0.2154,
+        "V2": 0.8068,
+        "V3": -0.1492,
+        "V4": -0.3583,
+        "V5": 0.0812,
+        "V6": -0.0232,
+        "V7": 0.0064,
+        "V8": -0.077,
+        "V9": 0.025,
+        "V10": -0.1124,
+        "V11": 0.0346,
+        "V12": -0.0984,
+        "V13": 0.0252,
+        "V14": -0.1248,
+        "V15": 0.1661
+      },
+      "V3": {
+        "V1": -0.2127,
+        "V2": -0.1492,
+        "V3": 0.7795,
+        "V4": -0.3894,
+        "V5": 0.0353,
+        "V6": 0.1111,
+        "V7": 0.0593,
+        "V8": -0.0966,
+        "V9": 0.0964,
+        "V10": 0.06,
+        "V11": -0.1461,
+        "V12": 0.1368,
+        "V13": -0.1308,
+        "V14": -0.0579,
+        "V15": 0.0777
+      },
+      "V4": {
+        "V1": -0.3118,
+        "V2": -0.3583,
+        "V3": -0.3894,
+        "V4": 0.7309,
+        "V5": -0.0021,
+        "V6": -0.0712,
+        "V7": -0.0132,
+        "V8": 0.0191,
+        "V9": -0.0927,
+        "V10": -0.0166,
+        "V11": 0.1385,
+        "V12": -0.0024,
+        "V13": 0.1907,
+        "V14": 0.0582,
+        "V15": -0.2426
+      },
+      "V5": {
+        "V1": -0.0506,
+        "V2": 0.0812,
+        "V3": 0.0353,
+        "V4": -0.0021,
+        "V5": 0.7983,
+        "V6": -0.0936,
+        "V7": -0.344,
+        "V8": -0.3779,
+        "V9": 0.0128,
+        "V10": -0.161,
+        "V11": 0.0805,
+        "V12": 0.1105,
+        "V13": -0.0967,
+        "V14": -0.015,
+        "V15": 0.1199
+      },
+      "V6": {
+        "V1": -0.035,
+        "V2": -0.0232,
+        "V3": 0.1111,
+        "V4": -0.0712,
+        "V5": -0.0936,
+        "V6": 0.8207,
+        "V7": -0.2776,
+        "V8": -0.3759,
+        "V9": 0.0326,
+        "V10": 0.1553,
+        "V11": -0.0932,
+        "V12": -0.0361,
+        "V13": -0.095,
+        "V14": 0.0231,
+        "V15": 0.0891
+      },
+      "V7": {
+        "V1": 0.0636,
+        "V2": 0.0064,
+        "V3": 0.0593,
+        "V4": -0.0132,
+        "V5": -0.344,
+        "V6": -0.2776,
+        "V7": 0.8371,
+        "V8": -0.2568,
+        "V9": -0.0282,
+        "V10": -0.0227,
+        "V11": 0.0352,
+        "V12": 0.0221,
+        "V13": 0.042,
+        "V14": -0.0056,
+        "V15": -0.098
+      },
+      "V8": {
+        "V1": 0.005,
+        "V2": -0.077,
+        "V3": -0.0966,
+        "V4": 0.0191,
+        "V5": -0.3779,
+        "V6": -0.3759,
+        "V7": -0.2568,
+        "V8": 0.807,
+        "V9": 0.0224,
+        "V10": 0.0108,
+        "V11": -0.0367,
+        "V12": -0.0464,
+        "V13": 0.0551,
+        "V14": -0.0969,
+        "V15": -0.015
+      },
+      "V9": {
+        "V1": 0.0697,
+        "V2": 0.025,
+        "V3": 0.0964,
+        "V4": -0.0927,
+        "V5": 0.0128,
+        "V6": 0.0326,
+        "V7": -0.0282,
+        "V8": 0.0224,
+        "V9": 0.6629,
+        "V10": -0.2848,
+        "V11": -0.5691,
+        "V12": 0.037,
+        "V13": 0.0993,
+        "V14": -0.1031,
+        "V15": -0.0004
+      },
+      "V10": {
+        "V1": 0.0394,
+        "V2": -0.1124,
+        "V3": 0.06,
+        "V4": -0.0166,
+        "V5": -0.161,
+        "V6": 0.1553,
+        "V7": -0.0227,
+        "V8": 0.0108,
+        "V9": -0.2848,
+        "V10": 0.7451,
+        "V11": -0.299,
+        "V12": 0.0026,
+        "V13": -0.0421,
+        "V14": -0.0104,
+        "V15": 0.0491
+      },
+      "V11": {
+        "V1": -0.1168,
+        "V2": 0.0346,
+        "V3": -0.1461,
+        "V4": 0.1385,
+        "V5": 0.0805,
+        "V6": -0.0932,
+        "V7": 0.0352,
+        "V8": -0.0367,
+        "V9": -0.5691,
+        "V10": -0.299,
+        "V11": 0.6158,
+        "V12": 0.0566,
+        "V13": -0.1261,
+        "V14": 0.1402,
+        "V15": -0.0384
+      },
+      "V12": {
+        "V1": -0.086,
+        "V2": -0.0984,
+        "V3": 0.1368,
+        "V4": -0.0024,
+        "V5": 0.1105,
+        "V6": -0.0361,
+        "V7": 0.0221,
+        "V8": -0.0464,
+        "V9": 0.037,
+        "V10": 0.0026,
+        "V11": 0.0566,
+        "V12": 0.852,
+        "V13": -0.2565,
+        "V14": -0.1055,
+        "V15": -0.326
+      },
+      "V13": {
+        "V1": -0.0136,
+        "V2": 0.0252,
+        "V3": -0.1308,
+        "V4": 0.1907,
+        "V5": -0.0967,
+        "V6": -0.095,
+        "V7": 0.042,
+        "V8": 0.0551,
+        "V9": 0.0993,
+        "V10": -0.0421,
+        "V11": -0.1261,
+        "V12": -0.2565,
+        "V13": 0.7656,
+        "V14": -0.2856,
+        "V15": -0.4575
+      },
+      "V14": {
+        "V1": 0.0164,
+        "V2": -0.1248,
+        "V3": -0.0579,
+        "V4": 0.0582,
+        "V5": -0.015,
+        "V6": 0.0231,
+        "V7": -0.0056,
+        "V8": -0.0969,
+        "V9": -0.1031,
+        "V10": -0.0104,
+        "V11": 0.1402,
+        "V12": -0.1055,
+        "V13": -0.2856,
+        "V14": 0.858,
+        "V15": -0.257
+      },
+      "V15": {
+        "V1": 0.0007,
+        "V2": 0.1661,
+        "V3": 0.0777,
+        "V4": -0.2426,
+        "V5": 0.1199,
+        "V6": 0.0891,
+        "V7": -0.098,
+        "V8": -0.015,
+        "V9": -0.0004,
+        "V10": 0.0491,
+        "V11": -0.0384,
+        "V12": -0.326,
+        "V13": -0.4575,
+        "V14": -0.257,
+        "V15": 0.7551
+      }
+    },
+    "autovalores_tabela": [
+      {
+        "componente": 1,
+        "autovalor": 3.5392,
+        "var_pct": 23.59,
+        "var_acum_pct": 23.59,
+        "pa_p95": 1.7132,
+        "retido_kaiser": true,
+        "retido_pa": true
+      },
+      {
+        "componente": 2,
+        "autovalor": 2.9372,
+        "var_pct": 19.58,
+        "var_acum_pct": 43.18,
+        "pa_p95": 1.5387,
+        "retido_kaiser": true,
+        "retido_pa": true
+      },
+      {
+        "componente": 3,
+        "autovalor": 2.5821,
+        "var_pct": 17.21,
+        "var_acum_pct": 60.39,
+        "pa_p95": 1.4211,
+        "retido_kaiser": true,
+        "retido_pa": true
+      },
+      {
+        "componente": 4,
+        "autovalor": 2.174,
+        "var_pct": 14.49,
+        "var_acum_pct": 74.88,
+        "pa_p95": 1.3288,
+        "retido_kaiser": true,
+        "retido_pa": true
+      },
+      {
+        "componente": 5,
+        "autovalor": 0.5442,
+        "var_pct": 3.63,
+        "var_acum_pct": 78.51,
+        "pa_p95": 1.2396,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 6,
+        "autovalor": 0.4943,
+        "var_pct": 3.3,
+        "var_acum_pct": 81.81,
+        "pa_p95": 1.1611,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 7,
+        "autovalor": 0.4418,
+        "var_pct": 2.95,
+        "var_acum_pct": 84.75,
+        "pa_p95": 1.0848,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 8,
+        "autovalor": 0.3852,
+        "var_pct": 2.57,
+        "var_acum_pct": 87.32,
+        "pa_p95": 1.0267,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 9,
+        "autovalor": 0.3721,
+        "var_pct": 2.48,
+        "var_acum_pct": 89.8,
+        "pa_p95": 0.9582,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 10,
+        "autovalor": 0.3132,
+        "var_pct": 2.09,
+        "var_acum_pct": 91.89,
+        "pa_p95": 0.9049,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 11,
+        "autovalor": 0.2962,
+        "var_pct": 1.97,
+        "var_acum_pct": 93.86,
+        "pa_p95": 0.8424,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 12,
+        "autovalor": 0.2744,
+        "var_pct": 1.83,
+        "var_acum_pct": 95.69,
+        "pa_p95": 0.7839,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 13,
+        "autovalor": 0.2477,
+        "var_pct": 1.65,
+        "var_acum_pct": 97.34,
+        "pa_p95": 0.7178,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 14,
+        "autovalor": 0.2222,
+        "var_pct": 1.48,
+        "var_acum_pct": 98.82,
+        "pa_p95": 0.661,
+        "retido_kaiser": false,
+        "retido_pa": false
+      },
+      {
+        "componente": 15,
+        "autovalor": 0.1763,
+        "var_pct": 1.18,
+        "var_acum_pct": 100.0,
+        "pa_p95": 0.594,
+        "retido_kaiser": false,
+        "retido_pa": false
+      }
+    ],
+    "variancia_total_explicada_acp_pct": 74.88,
+    "variancia_comum_afe_ml_pct": 65.55,
+    "fatores_resumo": [
+      {
+        "codigo": "F1_Ambiente",
+        "nome": "Fator 1 — Ambiente de Trabalho",
+        "ss_loadings_rot": 2.8919,
+        "var_rot_pct": 19.28,
+        "alfa_cronbach": 0.867,
+        "media_itens_original": 6.577,
+        "dp_itens_original": 2.125
+      },
+      {
+        "codigo": "F2_Lideranca",
+        "nome": "Fator 2 — Liderança e Cultura",
+        "ss_loadings_rot": 3.0607,
+        "var_rot_pct": 20.4,
+        "alfa_cronbach": 0.8927,
+        "media_itens_original": 6.095,
+        "dp_itens_original": 2.316
+      },
+      {
+        "codigo": "F3_Crescimento",
+        "nome": "Fator 3 — Crescimento e Aprendizado",
+        "ss_loadings_rot": 2.254,
+        "var_rot_pct": 15.03,
+        "alfa_cronbach": 0.8269,
+        "media_itens_original": 5.831,
+        "dp_itens_original": 2.043
+      },
+      {
+        "codigo": "F4_Equilibrio",
+        "nome": "Fator 4 — Equilíbrio Vida-Trabalho",
+        "ss_loadings_rot": 3.026,
+        "var_rot_pct": 20.17,
+        "alfa_cronbach": 0.8879,
+        "media_itens_original": 6.353,
+        "dp_itens_original": 2.233
+      }
+    ],
+    "cargas_comunalidades": [
+      {
+        "variavel": "V1",
+        "descricao": "Qualidade do espaço de trabalho",
+        "F1_Ambiente": 0.8305,
+        "F2_Lideranca": 0.0175,
+        "F3_Crescimento": -0.0025,
+        "F4_Equilibrio": 0.1097,
+        "comunalidade_acp": 0.7021,
+        "unicidade_acp": 0.2979,
+        "msa_anti_imagem": 0.8452,
+        "carga_afe_ml_principal": 0.7605,
+        "comunalidade_afe_ml": 0.5906,
+        "fator_dominante": "F1_Ambiente"
+      },
+      {
+        "variavel": "V2",
+        "descricao": "Disponibilidade/qualidade de ferramentas",
+        "F1_Ambiente": 0.8307,
+        "F2_Lideranca": 0.0537,
+        "F3_Crescimento": -0.0,
+        "F4_Equilibrio": 0.022,
+        "comunalidade_acp": 0.6935,
+        "unicidade_acp": 0.3065,
+        "msa_anti_imagem": 0.8068,
+        "carga_afe_ml_principal": 0.76,
+        "comunalidade_afe_ml": 0.5807,
+        "fator_dominante": "F1_Ambiente"
+      },
+      {
+        "variavel": "V3",
+        "descricao": "Gestão de ruído e interrupções",
+        "F1_Ambiente": 0.831,
+        "F2_Lideranca": -0.0537,
+        "F3_Crescimento": 0.0146,
+        "F4_Equilibrio": 0.0294,
+        "comunalidade_acp": 0.6945,
+        "unicidade_acp": 0.3055,
+        "msa_anti_imagem": 0.7795,
+        "carga_afe_ml_principal": 0.7582,
+        "comunalidade_afe_ml": 0.5785,
+        "fator_dominante": "F1_Ambiente"
+      },
+      {
+        "variavel": "V4",
+        "descricao": "Ergonomia do posto de trabalho",
+        "F1_Ambiente": 0.8818,
+        "F2_Lideranca": 0.0277,
+        "F3_Crescimento": -0.0434,
+        "F4_Equilibrio": 0.0551,
+        "comunalidade_acp": 0.7832,
+        "unicidade_acp": 0.2168,
+        "msa_anti_imagem": 0.7309,
+        "carga_afe_ml_principal": 0.8575,
+        "comunalidade_afe_ml": 0.7413,
+        "fator_dominante": "F1_Ambiente"
+      },
+      {
+        "variavel": "V5",
+        "descricao": "Suporte e acessibilidade do gestor",
+        "F1_Ambiente": -0.0449,
+        "F2_Lideranca": 0.8681,
+        "F3_Crescimento": 0.0509,
+        "F4_Equilibrio": -0.0627,
+        "comunalidade_acp": 0.7622,
+        "unicidade_acp": 0.2378,
+        "msa_anti_imagem": 0.7983,
+        "carga_afe_ml_principal": 0.8182,
+        "comunalidade_afe_ml": 0.676,
+        "fator_dominante": "F2_Lideranca"
+      },
+      {
+        "variavel": "V6",
+        "descricao": "Grau de autonomia técnica",
+        "F1_Ambiente": 0.0487,
+        "F2_Lideranca": 0.8442,
+        "F3_Crescimento": -0.0635,
+        "F4_Equilibrio": 0.073,
+        "comunalidade_acp": 0.7244,
+        "unicidade_acp": 0.2756,
+        "msa_anti_imagem": 0.8207,
+        "carga_afe_ml_principal": 0.7812,
+        "comunalidade_afe_ml": 0.6199,
+        "fator_dominante": "F2_Lideranca"
+      },
+      {
+        "variavel": "V7",
+        "descricao": "Reconhecimento por entregas",
+        "F1_Ambiente": -0.0636,
+        "F2_Lideranca": 0.8773,
+        "F3_Crescimento": 0.0068,
+        "F4_Equilibrio": 0.0555,
+        "comunalidade_acp": 0.7769,
+        "unicidade_acp": 0.2231,
+        "msa_anti_imagem": 0.8371,
+        "carga_afe_ml_principal": 0.8263,
+        "comunalidade_afe_ml": 0.689,
+        "fator_dominante": "F2_Lideranca"
+      },
+      {
+        "variavel": "V8",
+        "descricao": "Segurança psicológica",
+        "F1_Ambiente": 0.1107,
+        "F2_Lideranca": 0.891,
+        "F3_Crescimento": -0.0032,
+        "F4_Equilibrio": 0.0836,
+        "comunalidade_acp": 0.8131,
+        "unicidade_acp": 0.1869,
+        "msa_anti_imagem": 0.807,
+        "carga_afe_ml_principal": 0.8655,
+        "comunalidade_afe_ml": 0.7657,
+        "fator_dominante": "F2_Lideranca"
+      },
+      {
+        "variavel": "V9",
+        "descricao": "Oportunidades de treinamento",
+        "F1_Ambiente": -0.049,
+        "F2_Lideranca": -0.0307,
+        "F3_Crescimento": 0.8794,
+        "F4_Equilibrio": -0.0724,
+        "comunalidade_acp": 0.782,
+        "unicidade_acp": 0.218,
+        "msa_anti_imagem": 0.6629,
+        "carga_afe_ml_principal": 0.8291,
+        "comunalidade_afe_ml": 0.6959,
+        "fator_dominante": "F3_Crescimento"
+      },
+      {
+        "variavel": "V10",
+        "descricao": "Clareza do plano de carreira",
+        "F1_Ambiente": 0.0008,
+        "F2_Lideranca": 0.038,
+        "F3_Crescimento": 0.8237,
+        "F4_Equilibrio": -0.0512,
+        "comunalidade_acp": 0.6825,
+        "unicidade_acp": 0.3175,
+        "msa_anti_imagem": 0.7451,
+        "carga_afe_ml_principal": 0.6887,
+        "comunalidade_afe_ml": 0.4792,
+        "fator_dominante": "F3_Crescimento"
+      },
+      {
+        "variavel": "V11",
+        "descricao": "Qualidade/disponibilidade de mentoria",
+        "F1_Ambiente": 0.0227,
+        "F2_Lideranca": -0.0186,
+        "F3_Crescimento": 0.8822,
+        "F4_Equilibrio": -0.0059,
+        "comunalidade_acp": 0.7791,
+        "unicidade_acp": 0.2209,
+        "msa_anti_imagem": 0.6158,
+        "carga_afe_ml_principal": 0.8365,
+        "comunalidade_afe_ml": 0.7,
+        "fator_dominante": "F3_Crescimento"
+      },
+      {
+        "variavel": "V12",
+        "descricao": "Justiça na carga de trabalho",
+        "F1_Ambiente": 0.0774,
+        "F2_Lideranca": -0.0185,
+        "F3_Crescimento": -0.1125,
+        "F4_Equilibrio": 0.8406,
+        "comunalidade_acp": 0.7256,
+        "unicidade_acp": 0.2744,
+        "msa_anti_imagem": 0.852,
+        "carga_afe_ml_principal": 0.7741,
+        "comunalidade_afe_ml": 0.6185,
+        "fator_dominante": "F4_Equilibrio"
+      },
+      {
+        "variavel": "V13",
+        "descricao": "Flexibilidade de horários",
+        "F1_Ambiente": -0.0186,
+        "F2_Lideranca": 0.0675,
+        "F3_Crescimento": 0.0225,
+        "F4_Equilibrio": 0.8954,
+        "comunalidade_acp": 0.8071,
+        "unicidade_acp": 0.1929,
+        "msa_anti_imagem": 0.7656,
+        "carga_afe_ml_principal": 0.8633,
+        "comunalidade_afe_ml": 0.751,
+        "fator_dominante": "F4_Equilibrio"
+      },
+      {
+        "variavel": "V14",
+        "descricao": "Prevenção efetiva ao burnout",
+        "F1_Ambiente": 0.102,
+        "F2_Lideranca": 0.125,
+        "F3_Crescimento": -0.0299,
+        "F4_Equilibrio": 0.8125,
+        "comunalidade_acp": 0.6871,
+        "unicidade_acp": 0.3129,
+        "msa_anti_imagem": 0.858,
+        "carga_afe_ml_principal": 0.7335,
+        "comunalidade_afe_ml": 0.5658,
+        "fator_dominante": "F4_Equilibrio"
+      },
+      {
+        "variavel": "V15",
+        "descricao": "Satisfação com benefícios",
+        "F1_Ambiente": 0.0608,
+        "F2_Lideranca": -0.0262,
+        "F3_Crescimento": -0.0328,
+        "F4_Equilibrio": 0.9022,
+        "comunalidade_acp": 0.8194,
+        "unicidade_acp": 0.1806,
+        "msa_anti_imagem": 0.7551,
+        "carga_afe_ml_principal": 0.8793,
+        "comunalidade_afe_ml": 0.7798,
+        "fator_dominante": "F4_Equilibrio"
+      }
+    ]
+  },
+  "etapa3_cluster": {
+    "outliers_mahalanobis_p001": [],
+    "outliers_mahalanobis_p01": [],
+    "mahalanobis_max_d2": 9.1304,
+    "agrupamento_ward_ultimas_10_etapas": [
+      {
+        "etapa": 140,
+        "numero_clusters_antes_salto": 10,
+        "cluster_1": 282,
+        "cluster_2": 287,
+        "distancia_fusao_ward": 5.6498,
+        "coeficiente_aglomeracao_wss": 206.2043,
+        "salto_absoluto_proximo": 17.8368,
+        "salto_relativo_pct": 8.65
+      },
+      {
+        "etapa": 141,
+        "numero_clusters_antes_salto": 9,
+        "cluster_1": 278,
+        "cluster_2": 283,
+        "distancia_fusao_ward": 5.9727,
+        "coeficiente_aglomeracao_wss": 224.0411,
+        "salto_absoluto_proximo": 21.2634,
+        "salto_relativo_pct": 9.49
+      },
+      {
+        "etapa": 142,
+        "numero_clusters_antes_salto": 8,
+        "cluster_1": 268,
+        "cluster_2": 289,
+        "distancia_fusao_ward": 6.5213,
+        "coeficiente_aglomeracao_wss": 245.3044,
+        "salto_absoluto_proximo": 23.1131,
+        "salto_relativo_pct": 9.42
+      },
+      {
+        "etapa": 143,
+        "numero_clusters_antes_salto": 7,
+        "cluster_1": 280,
+        "cluster_2": 290,
+        "distancia_fusao_ward": 6.799,
+        "coeficiente_aglomeracao_wss": 268.4175,
+        "salto_absoluto_proximo": 26.6708,
+        "salto_relativo_pct": 9.94
+      },
+      {
+        "etapa": 144,
+        "numero_clusters_antes_salto": 6,
+        "cluster_1": 281,
+        "cluster_2": 286,
+        "distancia_fusao_ward": 7.3035,
+        "coeficiente_aglomeracao_wss": 295.0883,
+        "salto_absoluto_proximo": 33.5136,
+        "salto_relativo_pct": 11.36
+      },
+      {
+        "etapa": 145,
+        "numero_clusters_antes_salto": 5,
+        "cluster_1": 285,
+        "cluster_2": 291,
+        "distancia_fusao_ward": 8.187,
+        "coeficiente_aglomeracao_wss": 328.6019,
+        "salto_absoluto_proximo": 47.7353,
+        "salto_relativo_pct": 14.53
+      },
+      {
+        "etapa": 146,
+        "numero_clusters_antes_salto": 4,
+        "cluster_1": 288,
+        "cluster_2": 295,
+        "distancia_fusao_ward": 9.7709,
+        "coeficiente_aglomeracao_wss": 376.3372,
+        "salto_absoluto_proximo": 55.6514,
+        "salto_relativo_pct": 14.79
+      },
+      {
+        "etapa": 147,
+        "numero_clusters_antes_salto": 3,
+        "cluster_1": 292,
+        "cluster_2": 294,
+        "distancia_fusao_ward": 10.55,
+        "coeficiente_aglomeracao_wss": 431.9886,
+        "salto_absoluto_proximo": 77.3871,
+        "salto_relativo_pct": 17.91
+      },
+      {
+        "etapa": 148,
+        "numero_clusters_antes_salto": 2,
+        "cluster_1": 296,
+        "cluster_2": 297,
+        "distancia_fusao_ward": 12.4408,
+        "coeficiente_aglomeracao_wss": 509.3757,
+        "salto_absoluto_proximo": 86.6243,
+        "salto_relativo_pct": 17.01
+      },
+      {
+        "etapa": 149,
+        "numero_clusters_antes_salto": 1,
+        "cluster_1": 293,
+        "cluster_2": 298,
+        "distancia_fusao_ward": 13.1624,
+        "coeficiente_aglomeracao_wss": 596.0,
+        "salto_absoluto_proximo": 0.0,
+        "salto_relativo_pct": 0.0
+      }
+    ],
+    "metricas_escolha_k": [
+      {
+        "k": 2,
+        "wcss_inercia": 483.276,
+        "silhueta": 0.1821,
+        "calinski_harabasz": 34.521,
+        "davies_bouldin": 1.9822,
+        "gap_statistic": 0.333,
+        "gap_sk": 0.0368,
+        "tamanhos": [
+          81,
+          69
+        ]
+      },
+      {
+        "k": 3,
+        "wcss_inercia": 398.677,
+        "silhueta": 0.2013,
+        "calinski_harabasz": 36.378,
+        "davies_bouldin": 1.6138,
+        "gap_statistic": 0.342,
+        "gap_sk": 0.042,
+        "tamanhos": [
+          50,
+          50,
+          50
+        ]
+      },
+      {
+        "k": 4,
+        "wcss_inercia": 333.585,
+        "silhueta": 0.2169,
+        "calinski_harabasz": 38.284,
+        "davies_bouldin": 1.3522,
+        "gap_statistic": 0.3519,
+        "gap_sk": 0.0475,
+        "tamanhos": [
+          44,
+          37,
+          30,
+          39
+        ]
+      },
+      {
+        "k": 5,
+        "wcss_inercia": 287.827,
+        "silhueta": 0.2214,
+        "calinski_harabasz": 38.812,
+        "davies_bouldin": 1.2047,
+        "gap_statistic": 0.3568,
+        "gap_sk": 0.0443,
+        "tamanhos": [
+          35,
+          38,
+          28,
+          23,
+          26
+        ]
+      },
+      {
+        "k": 6,
+        "wcss_inercia": 261.402,
+        "silhueta": 0.2118,
+        "calinski_harabasz": 36.864,
+        "davies_bouldin": 1.2563,
+        "gap_statistic": 0.3387,
+        "gap_sk": 0.0466,
+        "tamanhos": [
+          22,
+          19,
+          22,
+          25,
+          24,
+          38
+        ]
+      }
+    ],
+    "perfis_k3": [
+      {
+        "cluster_id": 1,
+        "n": 50,
+        "pct": 33.33,
+        "y_media": 161.8,
+        "y_dp": 20.06,
+        "y_norm100_media": 38.24,
+        "centroides_fatores": {
+          "F1_Ambiente": 0.6903,
+          "F2_Lideranca": -0.7752,
+          "F3_Crescimento": -0.1589,
+          "F4_Equilibrio": -0.522
+        },
+        "medias_originais": {
+          "V1": 7.58,
+          "V2": 7.58,
+          "V3": 7.64,
+          "V4": 8.16,
+          "V5": 4.1,
+          "V6": 4.56,
+          "V7": 4.42,
+          "V8": 4.96,
+          "V9": 5.72,
+          "V10": 5.72,
+          "V11": 5.34,
+          "V12": 5.3,
+          "V13": 5.18,
+          "V14": 5.12,
+          "V15": 5.94
+        },
+        "medias_blocos_likert": {
+          "Ambiente_V1_V4": 7.74,
+          "Lideranca_V5_V8": 4.51,
+          "Crescimento_V9_V11": 5.59,
+          "Equilibrio_V12_V15": 5.38
+        },
+        "rotulo": "Cluster 1 — Boa Infraestrutura, mas Crise de Liderança e Sobrecarga (Baixa Produtividade)",
+        "rotulo_curto": "C1: Déficit de Liderança & Burnout"
+      },
+      {
+        "cluster_id": 2,
+        "n": 50,
+        "pct": 33.33,
+        "y_media": 163.84,
+        "y_dp": 19.12,
+        "y_norm100_media": 39.87,
+        "centroides_fatores": {
+          "F1_Ambiente": -0.896,
+          "F2_Lideranca": 0.4381,
+          "F3_Crescimento": 0.162,
+          "F4_Equilibrio": -0.5322
+        },
+        "medias_originais": {
+          "V1": 5.02,
+          "V2": 4.62,
+          "V3": 4.94,
+          "V4": 5.06,
+          "V5": 6.94,
+          "V6": 6.48,
+          "V7": 7.02,
+          "V8": 7.2,
+          "V9": 6.4,
+          "V10": 6.34,
+          "V11": 5.8,
+          "V12": 5.08,
+          "V13": 5.16,
+          "V14": 5.22,
+          "V15": 5.54
+        },
+        "medias_blocos_likert": {
+          "Ambiente_V1_V4": 4.91,
+          "Lideranca_V5_V8": 6.91,
+          "Crescimento_V9_V11": 6.18,
+          "Equilibrio_V12_V15": 5.25
+        },
+        "rotulo": "Cluster 2 — Liderança Positiva, mas Limitados por Ambiente/Ferramentas Precários e Sobrecarga",
+        "rotulo_curto": "C2: Limitados por Ambiente & Carga"
+      },
+      {
+        "cluster_id": 3,
+        "n": 50,
+        "pct": 33.33,
+        "y_media": 192.92,
+        "y_dp": 23.62,
+        "y_norm100_media": 63.14,
+        "centroides_fatores": {
+          "F1_Ambiente": 0.2057,
+          "F2_Lideranca": 0.337,
+          "F3_Crescimento": -0.0032,
+          "F4_Equilibrio": 1.0542
+        },
+        "medias_originais": {
+          "V1": 7.3,
+          "V2": 6.86,
+          "V3": 6.74,
+          "V4": 7.42,
+          "V5": 6.66,
+          "V6": 6.88,
+          "V7": 6.72,
+          "V8": 7.2,
+          "V9": 5.78,
+          "V10": 5.92,
+          "V11": 5.46,
+          "V12": 8.14,
+          "V13": 8.6,
+          "V14": 8.12,
+          "V15": 8.84
+        },
+        "medias_blocos_likert": {
+          "Ambiente_V1_V4": 7.08,
+          "Lideranca_V5_V8": 6.87,
+          "Crescimento_V9_V11": 5.72,
+          "Equilibrio_V12_V15": 8.43
+        },
+        "rotulo": "Cluster 3 — Alta Performance Integral: Equilíbrio, Liderança Forte e Autonomia (Benchmark)",
+        "rotulo_curto": "C3: Engajados de Alta Performance"
+      }
+    ],
+    "anova_tukey_clusters": [
+      {
+        "variavel": "F1_Ambiente",
+        "f_stat": 58.5652,
+        "p_valor": 1.9686243087170709e-19,
+        "media_c1": 0.69,
+        "media_c2": -0.896,
+        "media_c3": 0.206,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -1.5862,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": -0.4846,
+            "p_adj": 0.0044,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 1.1016,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "F2_Lideranca",
+        "f_stat": 32.1299,
+        "p_valor": 2.6533682727760056e-12,
+        "media_c1": -0.775,
+        "media_c2": 0.438,
+        "media_c3": 0.337,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 1.2133,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 1.1122,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": -0.1011,
+            "p_adj": 0.8192,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "F3_Crescimento",
+        "f_stat": 1.2927,
+        "p_valor": 0.2776396097520057,
+        "media_c1": -0.159,
+        "media_c2": 0.162,
+        "media_c3": -0.003,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 0.3209,
+            "p_adj": 0.2456,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 0.1557,
+            "p_adj": 0.7159,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": -0.1652,
+            "p_adj": 0.6864,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "F4_Equilibrio",
+        "f_stat": 93.3188,
+        "p_valor": 6.872501229090114e-27,
+        "media_c1": -0.522,
+        "media_c2": -0.532,
+        "media_c3": 1.054,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -0.0101,
+            "p_adj": 0.9968,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 1.5762,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 1.5863,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "V1",
+        "f_stat": 32.9624,
+        "p_valor": 1.4900500877669048e-12,
+        "media_c1": 7.58,
+        "media_c2": 5.02,
+        "media_c3": 7.3,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -2.56,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": -0.28,
+            "p_adj": 0.6977,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 2.28,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "V2",
+        "f_stat": 36.4902,
+        "p_valor": 1.3570778929196052e-13,
+        "media_c1": 7.58,
+        "media_c2": 4.62,
+        "media_c3": 6.86,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -2.96,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": -0.72,
+            "p_adj": 0.1177,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 2.24,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "V3",
+        "f_stat": 28.8229,
+        "p_valor": 2.7485641575179723e-11,
+        "media_c1": 7.64,
+        "media_c2": 4.94,
+        "media_c3": 6.74,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -2.7,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": -0.9,
+            "p_adj": 0.0372,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 1.8,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "V4",
+        "f_stat": 49.1826,
+        "p_valor": 4.431626027400783e-17,
+        "media_c1": 8.16,
+        "media_c2": 5.06,
+        "media_c3": 7.42,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -3.1,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": -0.74,
+            "p_adj": 0.0638,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 2.36,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "V5",
+        "f_stat": 26.1489,
+        "p_valor": 1.9248269443276803e-10,
+        "media_c1": 4.1,
+        "media_c2": 6.94,
+        "media_c3": 6.66,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 2.84,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 2.56,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": -0.28,
+            "p_adj": 0.7944,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "V6",
+        "f_stat": 18.3503,
+        "p_valor": 7.685666346152176e-08,
+        "media_c1": 4.56,
+        "media_c2": 6.48,
+        "media_c3": 6.88,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 1.92,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 2.32,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 0.4,
+            "p_adj": 0.5926,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "V7",
+        "f_stat": 24.9004,
+        "p_valor": 4.862482153937312e-10,
+        "media_c1": 4.42,
+        "media_c2": 7.02,
+        "media_c3": 6.72,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 2.6,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 2.3,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": -0.3,
+            "p_adj": 0.7376,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "V8",
+        "f_stat": 23.8276,
+        "p_valor": 1.0883840291630037e-09,
+        "media_c1": 4.96,
+        "media_c2": 7.2,
+        "media_c3": 7.2,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 2.24,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 2.24,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 0.0,
+            "p_adj": 1.0,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "V9",
+        "f_stat": 1.6571,
+        "p_valor": 0.1942369363126005,
+        "media_c1": 5.72,
+        "media_c2": 6.4,
+        "media_c3": 5.78,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 0.68,
+            "p_adj": 0.2305,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 0.06,
+            "p_adj": 0.9885,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": -0.62,
+            "p_adj": 0.2944,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "V10",
+        "f_stat": 1.1002,
+        "p_valor": 0.3355446839246028,
+        "media_c1": 5.72,
+        "media_c2": 6.34,
+        "media_c3": 5.92,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 0.62,
+            "p_adj": 0.3166,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 0.2,
+            "p_adj": 0.886,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": -0.42,
+            "p_adj": 0.5879,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "V11",
+        "f_stat": 0.7961,
+        "p_valor": 0.4530214907677039,
+        "media_c1": 5.34,
+        "media_c2": 5.8,
+        "media_c3": 5.46,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 0.46,
+            "p_adj": 0.4455,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 0.12,
+            "p_adj": 0.946,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": -0.34,
+            "p_adj": 0.6418,
+            "rejeita_h0": false
+          }
+        ]
+      },
+      {
+        "variavel": "V12",
+        "f_stat": 40.0787,
+        "p_valor": 1.2817048767635302e-14,
+        "media_c1": 5.3,
+        "media_c2": 5.08,
+        "media_c3": 8.14,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -0.22,
+            "p_adj": 0.8326,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 2.84,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 3.06,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "V13",
+        "f_stat": 78.3068,
+        "p_valor": 7.03412986183661e-24,
+        "media_c1": 5.18,
+        "media_c2": 5.16,
+        "media_c3": 8.6,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -0.02,
+            "p_adj": 0.9978,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 3.42,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 3.44,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "V14",
+        "f_stat": 49.0405,
+        "p_valor": 4.825643296006579e-17,
+        "media_c1": 5.12,
+        "media_c2": 5.22,
+        "media_c3": 8.12,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 0.1,
+            "p_adj": 0.9545,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 3.0,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 2.9,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "V15",
+        "f_stat": 75.9285,
+        "p_valor": 2.2452767470615882e-23,
+        "media_c1": 5.94,
+        "media_c2": 5.54,
+        "media_c3": 8.84,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": -0.4,
+            "p_adj": 0.3601,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 2.9,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 3.3,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      },
+      {
+        "variavel": "Y",
+        "f_stat": 34.2913,
+        "p_valor": 5.987064245011768e-13,
+        "media_c1": 161.8,
+        "media_c2": 163.84,
+        "media_c3": 192.92,
+        "tukey_hsd": [
+          {
+            "grupo1": 1,
+            "grupo2": 2,
+            "dif_media": 2.04,
+            "p_adj": 0.8784,
+            "rejeita_h0": false
+          },
+          {
+            "grupo1": 1,
+            "grupo2": 3,
+            "dif_media": 31.12,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          },
+          {
+            "grupo1": 2,
+            "grupo2": 3,
+            "dif_media": 29.08,
+            "p_adj": 0.0,
+            "rejeita_h0": true
+          }
+        ]
+      }
+    ],
+    "crosstabs_qui_quadrado": {
+      "Modalidade": {
+        "contagem": {
+          "Híbrido": {
+            "1": 14,
+            "2": 23,
+            "3": 18
+          },
+          "Presencial": {
+            "1": 18,
+            "2": 14,
+            "3": 12
+          },
+          "Remoto": {
+            "1": 18,
+            "2": 13,
+            "3": 20
+          }
+        },
+        "pct_por_cluster": {
+          "Híbrido": {
+            "1": 28.0,
+            "2": 46.0,
+            "3": 36.0
+          },
+          "Presencial": {
+            "1": 36.0,
+            "2": 28.0,
+            "3": 24.0
+          },
+          "Remoto": {
+            "1": 36.0,
+            "2": 26.0,
+            "3": 40.0
+          }
+        },
+        "pct_por_categoria": {
+          "Híbrido": {
+            "1": 25.45,
+            "2": 41.82,
+            "3": 32.73
+          },
+          "Presencial": {
+            "1": 40.91,
+            "2": 31.82,
+            "3": 27.27
+          },
+          "Remoto": {
+            "1": 35.29,
+            "2": 25.49,
+            "3": 39.22
+          }
+        },
+        "chi2": 5.0203,
+        "gl": 4,
+        "p_valor": 0.2852187967242111,
+        "significativo_5pct": false
+      },
+      "Senioridade": {
+        "contagem": {
+          "Júnior": {
+            "1": 8,
+            "2": 17,
+            "3": 13
+          },
+          "Pleno": {
+            "1": 12,
+            "2": 9,
+            "3": 12
+          },
+          "Staff": {
+            "1": 16,
+            "2": 10,
+            "3": 13
+          },
+          "Sênior": {
+            "1": 14,
+            "2": 14,
+            "3": 12
+          }
+        },
+        "pct_por_cluster": {
+          "Júnior": {
+            "1": 16.0,
+            "2": 34.0,
+            "3": 26.0
+          },
+          "Pleno": {
+            "1": 24.0,
+            "2": 18.0,
+            "3": 24.0
+          },
+          "Staff": {
+            "1": 32.0,
+            "2": 20.0,
+            "3": 26.0
+          },
+          "Sênior": {
+            "1": 28.0,
+            "2": 28.0,
+            "3": 24.0
+          }
+        },
+        "pct_por_categoria": {
+          "Júnior": {
+            "1": 21.05,
+            "2": 44.74,
+            "3": 34.21
+          },
+          "Pleno": {
+            "1": 36.36,
+            "2": 27.27,
+            "3": 36.36
+          },
+          "Staff": {
+            "1": 41.03,
+            "2": 25.64,
+            "3": 33.33
+          },
+          "Sênior": {
+            "1": 35.0,
+            "2": 35.0,
+            "3": 30.0
+          }
+        },
+        "chi2": 5.3406,
+        "gl": 6,
+        "p_valor": 0.5009281736612032,
+        "significativo_5pct": false
+      },
+      "Squad": {
+        "contagem": {
+          "Squad Alpha": {
+            "1": 4,
+            "2": 3,
+            "3": 5
+          },
+          "Squad Beta": {
+            "1": 5,
+            "2": 8,
+            "3": 5
+          },
+          "Squad Delta": {
+            "1": 4,
+            "2": 7,
+            "3": 2
+          },
+          "Squad Epsilon": {
+            "1": 3,
+            "2": 4,
+            "3": 6
+          },
+          "Squad Eta": {
+            "1": 1,
+            "2": 5,
+            "3": 7
+          },
+          "Squad Gamma": {
+            "1": 7,
+            "2": 5,
+            "3": 3
+          },
+          "Squad Iota": {
+            "1": 8,
+            "2": 8,
+            "3": 8
+          },
+          "Squad Kappa": {
+            "1": 8,
+            "2": 3,
+            "3": 6
+          },
+          "Squad Theta": {
+            "1": 3,
+            "2": 2,
+            "3": 3
+          },
+          "Squad Zeta": {
+            "1": 7,
+            "2": 5,
+            "3": 5
+          }
+        },
+        "pct_por_cluster": {
+          "Squad Alpha": {
+            "1": 8.0,
+            "2": 6.0,
+            "3": 10.0
+          },
+          "Squad Beta": {
+            "1": 10.0,
+            "2": 16.0,
+            "3": 10.0
+          },
+          "Squad Delta": {
+            "1": 8.0,
+            "2": 14.0,
+            "3": 4.0
+          },
+          "Squad Epsilon": {
+            "1": 6.0,
+            "2": 8.0,
+            "3": 12.0
+          },
+          "Squad Eta": {
+            "1": 2.0,
+            "2": 10.0,
+            "3": 14.0
+          },
+          "Squad Gamma": {
+            "1": 14.0,
+            "2": 10.0,
+            "3": 6.0
+          },
+          "Squad Iota": {
+            "1": 16.0,
+            "2": 16.0,
+            "3": 16.0
+          },
+          "Squad Kappa": {
+            "1": 16.0,
+            "2": 6.0,
+            "3": 12.0
+          },
+          "Squad Theta": {
+            "1": 6.0,
+            "2": 4.0,
+            "3": 6.0
+          },
+          "Squad Zeta": {
+            "1": 14.0,
+            "2": 10.0,
+            "3": 10.0
+          }
+        },
+        "pct_por_categoria": {
+          "Squad Alpha": {
+            "1": 33.33,
+            "2": 25.0,
+            "3": 41.67
+          },
+          "Squad Beta": {
+            "1": 27.78,
+            "2": 44.44,
+            "3": 27.78
+          },
+          "Squad Delta": {
+            "1": 30.77,
+            "2": 53.85,
+            "3": 15.38
+          },
+          "Squad Epsilon": {
+            "1": 23.08,
+            "2": 30.77,
+            "3": 46.15
+          },
+          "Squad Eta": {
+            "1": 7.69,
+            "2": 38.46,
+            "3": 53.85
+          },
+          "Squad Gamma": {
+            "1": 46.67,
+            "2": 33.33,
+            "3": 20.0
+          },
+          "Squad Iota": {
+            "1": 33.33,
+            "2": 33.33,
+            "3": 33.33
+          },
+          "Squad Kappa": {
+            "1": 47.06,
+            "2": 17.65,
+            "3": 35.29
+          },
+          "Squad Theta": {
+            "1": 37.5,
+            "2": 25.0,
+            "3": 37.5
+          },
+          "Squad Zeta": {
+            "1": 41.18,
+            "2": 29.41,
+            "3": 29.41
+          }
+        },
+        "chi2": 14.3636,
+        "gl": 18,
+        "p_valor": 0.7051013051176117,
+        "significativo_5pct": false
+      }
+    }
+  },
+  "etapa4_regressao": {
+    "r": 0.8268,
+    "r2": 0.6837,
+    "r2_ajustado": 0.675,
+    "erro_padrao_estimativa": 14.4156,
+    "f_anova": 78.348,
+    "p_anova": 2.906390099553385e-35,
+    "gl_modelo": 4,
+    "gl_residuo": 145,
+    "soma_quadrados_total": 95258.773,
+    "soma_quadrados_regressao": 65126.223,
+    "soma_quadrados_residuo": 30132.55,
+    "coeficientes": [
+      {
+        "termo": "const",
+        "rotulo": "Intercepto (β₀)",
+        "b_nao_padronizado": 172.8533,
+        "erro_padrao": 1.177,
+        "beta_padronizado": 0.0,
+        "t_stat": 146.8552,
+        "p_valor": 1.2917129240419896e-159,
+        "ic95_inf": 170.527,
+        "ic95_sup": 175.1797,
+        "vif": 1.0,
+        "impacto_1dp_escala_0_100": 0.0
+      },
+      {
+        "termo": "F1_Ambiente",
+        "rotulo": "Fator 1 — Ambiente de Trabalho",
+        "b_nao_padronizado": 9.7548,
+        "erro_padrao": 1.181,
+        "beta_padronizado": 0.3858,
+        "t_stat": 8.26,
+        "p_valor": 8.317977019804197e-14,
+        "ic95_inf": 7.4207,
+        "ic95_sup": 12.089,
+        "vif": 1.0,
+        "impacto_1dp_escala_0_100": 7.8
+      },
+      {
+        "termo": "F2_Lideranca",
+        "rotulo": "Fator 2 — Liderança e Cultura",
+        "b_nao_padronizado": 13.4383,
+        "erro_padrao": 1.181,
+        "beta_padronizado": 0.5315,
+        "t_stat": 11.379,
+        "p_valor": 7.715969974729345e-22,
+        "ic95_inf": 11.1042,
+        "ic95_sup": 15.7725,
+        "vif": 1.0,
+        "impacto_1dp_escala_0_100": 10.75
+      },
+      {
+        "termo": "F3_Crescimento",
+        "rotulo": "Fator 3 — Crescimento e Aprendizado",
+        "b_nao_padronizado": 4.5643,
+        "erro_padrao": 1.181,
+        "beta_padronizado": 0.1805,
+        "t_stat": 3.8648,
+        "p_valor": 0.000167181739019954,
+        "ic95_inf": 2.2301,
+        "ic95_sup": 6.8984,
+        "vif": 1.0,
+        "impacto_1dp_escala_0_100": 3.65
+      },
+      {
+        "termo": "F4_Equilibrio",
+        "rotulo": "Fator 4 — Equilíbrio Vida-Trabalho",
+        "b_nao_padronizado": 11.8538,
+        "erro_padrao": 1.181,
+        "beta_padronizado": 0.4688,
+        "t_stat": 10.0373,
+        "p_valor": 2.504944822472506e-18,
+        "ic95_inf": 9.5196,
+        "ic95_sup": 14.1879,
+        "vif": 1.0,
+        "impacto_1dp_escala_0_100": 9.48
+      }
+    ],
+    "pressupostos": {
+      "normalidade_shapiro_w": 0.9854,
+      "normalidade_shapiro_p": 0.11428246224680905,
+      "normalidade_ks_d": 0.054,
+      "normalidade_ks_p": 0.7542471551066551,
+      "homocedasticidade_breusch_pagan_lm": 1.4532,
+      "homocedasticidade_breusch_pagan_p": 0.8348926212909618,
+      "homocedasticidade_bp_f": 0.3546,
+      "homocedasticidade_bp_f_p": 0.8404789925153329,
+      "durbin_watson": 2.3381,
+      "vif_maximo": 1.0,
+      "outliers_residuo_maior_3dp": [],
+      "cooks_distance_max": 0.042
+    }
+  },
+  "etapa5_integracao": {
+    "regressao_por_cluster": {
+      "Cluster_1": {
+        "cluster_id": 1,
+        "rotulo": "C1: Déficit de Liderança & Burnout",
+        "n": 50,
+        "intercepto": 165.5927,
+        "r2": 0.4885,
+        "r2_ajustado": 0.443,
+        "f_stat": 10.7427,
+        "f_p": 3.3768065331358026e-06,
+        "coeficientes": {
+          "F1_Ambiente": {
+            "b": 12.6574,
+            "erro_padrao": 3.5198,
+            "beta": 0.4231,
+            "t": 3.5961,
+            "p": 0.0007987575605496975,
+            "sig_5pct": true
+          },
+          "F2_Lideranca": {
+            "b": 10.0263,
+            "erro_padrao": 3.3975,
+            "beta": 0.3712,
+            "t": 2.9511,
+            "p": 0.0050127758173470136,
+            "sig_5pct": true
+          },
+          "F3_Crescimento": {
+            "b": 4.2952,
+            "erro_padrao": 2.1896,
+            "beta": 0.2101,
+            "t": 1.9616,
+            "p": 0.056010224606489085,
+            "sig_5pct": false
+          },
+          "F4_Equilibrio": {
+            "b": 7.8066,
+            "erro_padrao": 2.9541,
+            "beta": 0.3032,
+            "t": 2.6426,
+            "p": 0.011277636760625041,
+            "sig_5pct": true
+          }
+        }
+      },
+      "Cluster_2": {
+        "cluster_id": 2,
+        "rotulo": "C2: Limitados por Ambiente & Carga",
+        "n": 50,
+        "intercepto": 170.9935,
+        "r2": 0.4459,
+        "r2_ajustado": 0.3966,
+        "f_stat": 9.0519,
+        "f_p": 1.879358108485702e-05,
+        "coeficientes": {
+          "F1_Ambiente": {
+            "b": 7.1864,
+            "erro_padrao": 4.0123,
+            "beta": 0.2457,
+            "t": 1.7911,
+            "p": 0.08000362011450868,
+            "sig_5pct": false
+          },
+          "F2_Lideranca": {
+            "b": 11.4521,
+            "erro_padrao": 2.7859,
+            "beta": 0.5201,
+            "t": 4.1107,
+            "p": 0.0001650268971389211,
+            "sig_5pct": true
+          },
+          "F3_Crescimento": {
+            "b": 4.2455,
+            "erro_padrao": 2.4699,
+            "beta": 0.2005,
+            "t": 1.7189,
+            "p": 0.0925119611690835,
+            "sig_5pct": false
+          },
+          "F4_Equilibrio": {
+            "b": 12.0649,
+            "erro_padrao": 3.3849,
+            "beta": 0.4415,
+            "t": 3.5643,
+            "p": 0.0008777974867566373,
+            "sig_5pct": true
+          }
+        }
+      },
+      "Cluster_3": {
+        "cluster_id": 3,
+        "rotulo": "C3: Engajados de Alta Performance",
+        "n": 50,
+        "intercepto": 174.736,
+        "r2": 0.6806,
+        "r2_ajustado": 0.6523,
+        "f_stat": 23.9776,
+        "f_p": 1.1445905746475407e-10,
+        "coeficientes": {
+          "F1_Ambiente": {
+            "b": 8.4757,
+            "erro_padrao": 2.6487,
+            "beta": 0.3241,
+            "t": 3.1999,
+            "p": 0.0025206970665506887,
+            "sig_5pct": true
+          },
+          "F2_Lideranca": {
+            "b": 16.3865,
+            "erro_padrao": 2.8244,
+            "beta": 0.6246,
+            "t": 5.8018,
+            "p": 6.142785733699768e-07,
+            "sig_5pct": true
+          },
+          "F3_Crescimento": {
+            "b": 5.1972,
+            "erro_padrao": 1.8387,
+            "beta": 0.2421,
+            "t": 2.8265,
+            "p": 0.0069958157723345946,
+            "sig_5pct": true
+          },
+          "F4_Equilibrio": {
+            "b": 10.3725,
+            "erro_padrao": 4.4699,
+            "beta": 0.2166,
+            "t": 2.3205,
+            "p": 0.024904701991626085,
+            "sig_5pct": true
+          }
+        }
+      }
+    },
+    "regressao_por_modalidade": {
+      "Presencial": {
+        "n": 44,
+        "y_media": 172.36,
+        "r2": 0.6901,
+        "r2_ajustado": 0.6583,
+        "coeficientes": {
+          "F1_Ambiente": {
+            "b": 7.5067,
+            "beta": 0.2549,
+            "p": 0.00803144295210218,
+            "sig_5pct": true
+          },
+          "F2_Lideranca": {
+            "b": 15.1658,
+            "beta": 0.5592,
+            "p": 2.359984643797668e-07,
+            "sig_5pct": true
+          },
+          "F3_Crescimento": {
+            "b": 2.4505,
+            "beta": 0.0918,
+            "p": 0.32059363368752264,
+            "sig_5pct": false
+          },
+          "F4_Equilibrio": {
+            "b": 16.6327,
+            "beta": 0.5184,
+            "p": 1.0076075528067694e-06,
+            "sig_5pct": true
+          }
+        }
+      },
+      "Híbrido": {
+        "n": 55,
+        "y_media": 173.15,
+        "r2": 0.683,
+        "r2_ajustado": 0.6576,
+        "coeficientes": {
+          "F1_Ambiente": {
+            "b": 9.6948,
+            "beta": 0.4127,
+            "p": 6.7631133494098756e-06,
+            "sig_5pct": true
+          },
+          "F2_Lideranca": {
+            "b": 12.8808,
+            "beta": 0.5381,
+            "p": 2.1267655951433287e-08,
+            "sig_5pct": true
+          },
+          "F3_Crescimento": {
+            "b": 4.1256,
+            "beta": 0.1777,
+            "p": 0.035476876254921325,
+            "sig_5pct": true
+          },
+          "F4_Equilibrio": {
+            "b": 11.516,
+            "beta": 0.492,
+            "p": 1.3918610259406265e-07,
+            "sig_5pct": true
+          }
+        }
+      },
+      "Remoto": {
+        "n": 51,
+        "y_media": 172.96,
+        "r2": 0.7498,
+        "r2_ajustado": 0.728,
+        "coeficientes": {
+          "F1_Ambiente": {
+            "b": 11.8054,
+            "beta": 0.4811,
+            "p": 5.424771040290055e-08,
+            "sig_5pct": true
+          },
+          "F2_Lideranca": {
+            "b": 12.2909,
+            "beta": 0.4891,
+            "p": 3.789050845338699e-08,
+            "sig_5pct": true
+          },
+          "F3_Crescimento": {
+            "b": 7.1726,
+            "beta": 0.2721,
+            "p": 0.0006309938226478415,
+            "sig_5pct": true
+          },
+          "F4_Equilibrio": {
+            "b": 9.4102,
+            "beta": 0.4119,
+            "p": 1.2719880837280182e-06,
+            "sig_5pct": true
+          }
+        }
+      }
+    },
+    "perfis_por_squad": [
+      {
+        "squad": "Squad Alpha",
+        "n": 12,
+        "y_media": 183.75,
+        "y_dp": 28.94,
+        "F1_Ambiente": 0.18,
+        "F2_Lideranca": 0.315,
+        "F3_Crescimento": -0.309,
+        "F4_Equilibrio": 0.074,
+        "clusters_dist": {
+          "C1": 4,
+          "C2": 3,
+          "C3": 5
+        },
+        "modalidades_dist": {
+          "Presencial": 6,
+          "Híbrido": 3,
+          "Remoto": 3
+        }
+      },
+      {
+        "squad": "Squad Eta",
+        "n": 13,
+        "y_media": 179.92,
+        "y_dp": 23.78,
+        "F1_Ambiente": -0.181,
+        "F2_Lideranca": 0.622,
+        "F3_Crescimento": 0.142,
+        "F4_Equilibrio": 0.129,
+        "clusters_dist": {
+          "C1": 1,
+          "C2": 5,
+          "C3": 7
+        },
+        "modalidades_dist": {
+          "Presencial": 3,
+          "Híbrido": 4,
+          "Remoto": 6
+        }
+      },
+      {
+        "squad": "Squad Epsilon",
+        "n": 13,
+        "y_media": 179.38,
+        "y_dp": 21.18,
+        "F1_Ambiente": 0.472,
+        "F2_Lideranca": 0.542,
+        "F3_Crescimento": -0.368,
+        "F4_Equilibrio": -0.033,
+        "clusters_dist": {
+          "C1": 3,
+          "C2": 4,
+          "C3": 6
+        },
+        "modalidades_dist": {
+          "Presencial": 3,
+          "Híbrido": 5,
+          "Remoto": 5
+        }
+      },
+      {
+        "squad": "Squad Zeta",
+        "n": 17,
+        "y_media": 172.65,
+        "y_dp": 25.63,
+        "F1_Ambiente": -0.065,
+        "F2_Lideranca": -0.227,
+        "F3_Crescimento": 0.027,
+        "F4_Equilibrio": -0.022,
+        "clusters_dist": {
+          "C1": 7,
+          "C2": 5,
+          "C3": 5
+        },
+        "modalidades_dist": {
+          "Presencial": 4,
+          "Híbrido": 8,
+          "Remoto": 5
+        }
+      },
+      {
+        "squad": "Squad Iota",
+        "n": 24,
+        "y_media": 172.08,
+        "y_dp": 26.09,
+        "F1_Ambiente": -0.073,
+        "F2_Lideranca": -0.119,
+        "F3_Crescimento": 0.439,
+        "F4_Equilibrio": 0.155,
+        "clusters_dist": {
+          "C1": 8,
+          "C2": 8,
+          "C3": 8
+        },
+        "modalidades_dist": {
+          "Presencial": 7,
+          "Híbrido": 8,
+          "Remoto": 9
+        }
+      },
+      {
+        "squad": "Squad Theta",
+        "n": 8,
+        "y_media": 172.0,
+        "y_dp": 20.56,
+        "F1_Ambiente": -0.312,
+        "F2_Lideranca": -0.24,
+        "F3_Crescimento": -0.066,
+        "F4_Equilibrio": 0.105,
+        "clusters_dist": {
+          "C1": 3,
+          "C2": 2,
+          "C3": 3
+        },
+        "modalidades_dist": {
+          "Presencial": 1,
+          "Híbrido": 4,
+          "Remoto": 3
+        }
+      },
+      {
+        "squad": "Squad Beta",
+        "n": 18,
+        "y_media": 171.61,
+        "y_dp": 34.11,
+        "F1_Ambiente": -0.225,
+        "F2_Lideranca": -0.073,
+        "F3_Crescimento": -0.057,
+        "F4_Equilibrio": -0.105,
+        "clusters_dist": {
+          "C1": 5,
+          "C2": 8,
+          "C3": 5
+        },
+        "modalidades_dist": {
+          "Presencial": 5,
+          "Híbrido": 7,
+          "Remoto": 6
+        }
+      },
+      {
+        "squad": "Squad Kappa",
+        "n": 17,
+        "y_media": 170.29,
+        "y_dp": 23.21,
+        "F1_Ambiente": 0.346,
+        "F2_Lideranca": -0.221,
+        "F3_Crescimento": -0.051,
+        "F4_Equilibrio": 0.218,
+        "clusters_dist": {
+          "C1": 8,
+          "C2": 3,
+          "C3": 6
+        },
+        "modalidades_dist": {
+          "Presencial": 6,
+          "Híbrido": 5,
+          "Remoto": 6
+        }
+      },
+      {
+        "squad": "Squad Gamma",
+        "n": 15,
+        "y_media": 166.73,
+        "y_dp": 25.3,
+        "F1_Ambiente": -0.014,
+        "F2_Lideranca": -0.228,
+        "F3_Crescimento": -0.209,
+        "F4_Equilibrio": -0.138,
+        "clusters_dist": {
+          "C1": 7,
+          "C2": 5,
+          "C3": 3
+        },
+        "modalidades_dist": {
+          "Presencial": 6,
+          "Híbrido": 5,
+          "Remoto": 4
+        }
+      },
+      {
+        "squad": "Squad Delta",
+        "n": 13,
+        "y_media": 163.54,
+        "y_dp": 15.58,
+        "F1_Ambiente": -0.17,
+        "F2_Lideranca": -0.137,
+        "F3_Crescimento": 0.092,
+        "F4_Equilibrio": -0.468,
+        "clusters_dist": {
+          "C1": 4,
+          "C2": 7,
+          "C3": 2
+        },
+        "modalidades_dist": {
+          "Presencial": 3,
+          "Híbrido": 6,
+          "Remoto": 4
+        }
+      }
+    ]
+  }
+}
